@@ -16,11 +16,12 @@ const knex = require("knex")({
     host: process.env.RDS_HOSTNAME || "localhost",
     user: process.env.RDS_USERNAME || "postgres",
     password: process.env.RDS_PASSWORD || "admin",
-    database: process.env.RDS_DB_NAME || "INTEX",
+    database: process.env.RDS_DB_NAME || "intex",
     port: process.env.RDS_PORT || 5434,
     ssl: process.env.DB_SSL ? { rejectUnauthorized: false } : false,
   },
 });
+
 
 
 app.listen(port, () => console.log('Ready to go to work!'));
