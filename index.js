@@ -22,3 +22,6 @@ const knex = require("knex")({
   },
 });
 
+
+
+app.listen(port, () => console.log('Ready to go to work!'));
