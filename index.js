@@ -21,3 +21,6 @@ const knex = require("knex")({
     ssl: process.env.DB_SSL ? { rejectUnauthorized: false } : false,
   },
 });
+
+
+app.listen(port, () => console.log('Ready to go to work!'));
