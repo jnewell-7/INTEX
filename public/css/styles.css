@@ -17,7 +17,7 @@
   --bs-pink: #d63384;
   --bs-red: #dc3545;
   --bs-orange: #fd7e14;
-  --bs-yellow: #ffc800;
+  --bs-yellow: #198754;
   --bs-green: #198754;
   --bs-teal: #20c997;
   --bs-cyan: #0dcaf0;
@@ -34,14 +34,22 @@
   --bs-gray-700: #495057;
   --bs-gray-800: #343a40;
   --bs-gray-900: #212529;
-  --bs-primary: #ffc800;
-  --bs-secondary: #6c757d;
-  --bs-success: #198754;
-  --bs-info: #0dcaf0;
-  --bs-warning: #ffc800;
-  --bs-danger: #dc3545;
-  --bs-light: #f8f9fa;
-  --bs-dark: #212529;
+    /* Primary Color Palette */
+    --bs-green-dark: #78866B; /* Dark Green */
+    --bs-green-medium: #A9BA9D; /* Medium Green */
+    --bs-green-light: #D0D9CD; /* Light Green */
+    --bs-gray-dark: #687169; /* Dark Gray */
+    --bs-gray-medium: #828E84; /* Medium Gray */
+    --bs-gray-light: #B2BEB5; /* Light Gray */
+
+  /* Primary Branding Colors */
+  --bs-primary: var(--bs-green-medium); /* Buttons, important highlights */
+  --bs-secondary: var(--bs-gray-medium); /* Secondary accents */
+  --bs-success: var(--bs-green-dark); /* Success messages or actions */
+  --bs-info: var(--bs-green-light); /* Informational elements */
+  --bs-light: var(--bs-gray-light); /* Background or light sections */
+  --bs-dark: var(--bs-gray-dark); /* Text or dark sections */
+
   --bs-primary-rgb: 255, 200, 0;
   --bs-secondary-rgb: 108, 117, 125;
   --bs-success-rgb: 25, 135, 84;
@@ -73,10 +81,20 @@
   --bs-border-radius-xl: 1rem;
   --bs-border-radius-2xl: 2rem;
   --bs-border-radius-pill: 50rem;
-  --bs-link-color: #ffc800;
+  --bs-link-color: --bs-green-dark;
   --bs-link-hover-color: #cca000;
   --bs-code-color: #d63384;
   --bs-highlight-bg: #fff4cc;
+
+    /* Font and Background */
+  --bs-body-font-family: "Roboto Slab", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --bs-body-color: var(--bs-gray-dark); /* Main text */
+  --bs-body-bg: var(--bs-gray-light); /* Background */
+  --bs-link-color: var(--bs-primary); /* Links */
+  --bs-link-hover-color: var(--bs-green-dark); /* Link hover */
+  --bs-border-color: var(--bs-gray-medium); /* Borders */
+
+
 }
 
 *,
@@ -2845,21 +2863,24 @@ textarea.form-control-lg {
 }
 
 .btn-primary {
-  --bs-btn-color: #fff;
-  --bs-btn-bg: #ffc800;
-  --bs-btn-border-color: #ffc800;
-  --bs-btn-hover-color: #fff;
-  --bs-btn-hover-bg: #d9aa00;
-  --bs-btn-hover-border-color: #cca000;
-  --bs-btn-focus-shadow-rgb: 255, 208, 38;
-  --bs-btn-active-color: #fff;
-  --bs-btn-active-bg: #cca000;
-  --bs-btn-active-border-color: #bf9600;
-  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
-  --bs-btn-disabled-color: #fff;
-  --bs-btn-disabled-bg: #ffc800;
-  --bs-btn-disabled-border-color: #ffc800;
+  --bs-btn-color: #fff; /* White text */
+  --bs-btn-bg: #4CAF50; /* Balanced vibrant green background */
+  --bs-btn-border-color: #4CAF50; /* Matching green border */
+  --bs-btn-hover-color: #fff; /* White text on hover */
+  --bs-btn-hover-bg: #3E8E41; /* Slightly darker green for hover */
+  --bs-btn-hover-border-color: #3E8E41; /* Matching hover border color */
+  --bs-btn-focus-shadow-rgb: 76, 175, 80; /* RGB for toned-down green focus shadow */
+  --bs-btn-active-color: #fff; /* White text when active */
+  --bs-btn-active-bg: #357A38; /* Darker green for active state */
+  --bs-btn-active-border-color: #357A38; /* Matching active border color */
+  --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125); /* Slight inset shadow for active */
+  --bs-btn-disabled-color: #fff; /* White text for disabled */
+  --bs-btn-disabled-bg: #8BC34A; /* Softer green for disabled */
+  --bs-btn-disabled-border-color: #8BC34A; /* Softer green border for disabled */
 }
+
+
+
 
 .btn-secondary {
   --bs-btn-color: #fff;
