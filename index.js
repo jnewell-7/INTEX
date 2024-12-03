@@ -41,11 +41,14 @@ app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
+    console.log("Received login request:", username, password); // Debugging input
+
     // Query the database for the admin credentials
     const admin = await knex("admin").where({ username }).first();
+    console.log("Admin record found:", admin); // Debugging database result
 
     if (!admin) {
-      // Username not found
+      console.log("Username not found");
       return res.render("login", {
         title: "Admin Login",
         error: "Invalid username or password.",
@@ -54,17 +57,17 @@ app.post("/login", async (req, res) => {
 
     // Verify the password (replace with hashing in production)
     if (admin.password === password) {
-      // Successful login
+      console.log("Login successful!");
       res.redirect("/admin"); // Redirect to admin page or dashboard
     } else {
-      // Invalid password
+      console.log("Password mismatch");
       res.render("login", {
         title: "Admin Login",
         error: "Invalid username or password.",
       });
     }
   } catch (error) {
-    console.error("Error during login:", error);
+    console.error("Error during login:", error); // Debugging errors
     res.status(500).render("login", {
       title: "Admin Login",
       error: "An unexpected error occurred. Please try again later.",
