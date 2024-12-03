@@ -595,7 +595,7 @@ progress {
   color: #6c757d;
 }
 .blockquote-footer::before {
-  content: "— ";
+  content: "— ";
 }
 
 .img-fluid {
@@ -4577,6 +4577,24 @@ textarea.form-control-lg {
   border-top-right-radius: var(--bs-pagination-border-radius);
   border-bottom-right-radius: var(--bs-pagination-border-radius);
 }
+
+/* Default white text */
+.navbar-dark .nav-link {
+  color: white;
+  transition: color 0.3s ease;
+}
+
+/* Black text when scrolled to the top */
+.navbar-dark.scrolled-top .nav-link {
+  color: black !important;
+}
+
+/* Navbar shrink effect */
+.navbar-shrink {
+  background-color: rgba(0, 0, 0, 0.8);
+  transition: background-color 0.3s ease;
+}
+
 
 .pagination-lg {
   --bs-pagination-padding-x: 1.5rem;
@@ -10897,15 +10915,35 @@ p {
 #mainNav .navbar-brand img {
   height: 1.5rem;
 }
+
+#mainNav .navbar-nav {
+  padding-left: 50px; /* Adds padding inside the navbar container */
+}
+
+#mainNav.scrolled-top {
+  background-color: transparent !important;
+  border-bottom: none !important;
+  box-shadow: none !important;
+}
+
 #mainNav .navbar-nav .nav-item .nav-link {
   font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   font-size: 0.95rem;
   color: #fff;
   letter-spacing: 0.0625em;
+
+  /* Adjust spacing between buttons */
+  margin-right: 10px; /* Decrease space between buttons */
+  margin-top: 10px;   /* Keep buttons slightly lower */
 }
-#mainNav .navbar-nav .nav-item .nav-link.active, #mainNav .navbar-nav .nav-item .nav-link:hover {
+
+
+
+#mainNav .navbar-nav .nav-item .nav-link.active,
+#mainNav .navbar-nav .nav-item .nav-link:hover {
   color: #ffc800;
 }
+
 
 @media (min-width: 992px) {
   #mainNav {
