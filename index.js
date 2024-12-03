@@ -22,16 +22,63 @@ const knex = require("knex")({
   connection: {
     host: process.env.RDS_HOSTNAME || "localhost",
     user: process.env.RDS_USERNAME || "postgres",
-    password: process.env.RDS_PASSWORD || "admin",
+    password: process.env.RDS_PASSWORD || "gocougs123",
     database: process.env.RDS_DB_NAME || "intex",
     port: process.env.RDS_PORT || 5432,
     ssl: process.env.DB_INTEX ? { rejectUnauthorized: false } : false,
   },
 });
 
-
-
 // Routes
+
+// Login Page Route (GET)
+app.get("/login", (req, res) => {
+  res.render("login", { title: "Admin Login", error: null }); // Render login page
+});
+
+// Login Submit Route (POST)
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+
+  try {
+    console.log("Received login request:", username, password); // Debugging input
+
+    // Query the database for the admin credentials
+    const admin = await knex("admin").where({ username }).first();
+    console.log("Admin record found:", admin); // Debugging database result
+
+    if (!admin) {
+      console.log("Username not found");
+      return res.render("login", {
+        title: "Admin Login",
+        error: "Invalid username or password.",
+      });
+    }
+
+    // Verify the password (replace with hashing in production)
+    if (admin.password === password) {
+      console.log("Login successful!");
+      res.redirect("/admin"); // Redirect to admin page or dashboard
+    } else {
+      console.log("Password mismatch");
+      res.render("login", {
+        title: "Admin Login",
+        error: "Invalid username or password.",
+      });
+    }
+  } catch (error) {
+    console.error("Error during login:", error); // Debugging errors
+    res.status(500).render("login", {
+      title: "Admin Login",
+      error: "An unexpected error occurred. Please try again later.",
+    });
+  }
+});
+
+// Admin Page Route
+app.get("/admin", (req, res) => {
+  res.render("admin", { title: "Admin Dashboard" }); // Placeholder admin dashboard
+});
 
 // Landing Page Get Route
 app.get("/", (req, res) => {
@@ -45,4 +92,6 @@ app.get("/jen-story", (req, res) => {
 
 
 // Confirmation message
-app.listen(port, () => console.log(`Server is up and running on port ${port}!`));
+app.listen(port, () =>
+  console.log(`Server is up and running on port ${port}!`)
+);
