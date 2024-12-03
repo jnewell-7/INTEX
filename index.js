@@ -95,6 +95,12 @@ app.get("/help", (req, res) => {
   res.render("help", { title: "Request Event" }); 
 });
 
+//donations
+app.get("/donate", (req, res) => {
+  res.render("donate", { title: "Donate Today" }); 
+});
+
+
 
 // Confirmation message
 app.listen(port, () =>
