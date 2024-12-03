@@ -90,6 +90,10 @@ app.get("/jen-story", (req, res) => {
   res.render("jen", { title: "Jen's Story" });
 });
 
+//request event route
+app.get("/help", (req, res) => {
+  res.render("help", { title: "Request Event" }); 
+});
 
 
 // Confirmation message
