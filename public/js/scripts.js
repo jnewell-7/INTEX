@@ -64,3 +64,27 @@ window.addEventListener('DOMContentLoaded', event => {
         });
     
     });
+
+
+
+    document.addEventListener("DOMContentLoaded", function () {
+        const fadeInLeftElements = document.querySelectorAll(".fade-in-left");
+        const fadeInRightElements = document.querySelectorAll(".fade-in-right");
+    
+        const observerOptions = {
+            threshold: 0.1,
+        };
+    
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                }
+            });
+        }, observerOptions);
+    
+        fadeInLeftElements.forEach((el) => observer.observe(el));
+        fadeInRightElements.forEach((el) => observer.observe(el));
+    });
+    
+    

@@ -109,6 +109,69 @@
   }
 }
 
+/* About Section Styling */
+#about {
+  padding: 60px 0;
+}
+
+#about .section-heading {
+  color: var(--bs-green-dark);
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+#about .section-subheading {
+  color: var(--bs-gray-dark);
+  font-size: 1.2rem;
+  margin-bottom: 15px;
+}
+
+#about .section-text {
+  color: var(--bs-gray-medium);
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-bottom: 15px;
+}
+
+/* Links Styling */
+.links-container .smooth-link {
+  font-size: 1.1rem;
+  color: var(--bs-gray-medium);
+  text-decoration: underline;
+  transition: color 0.3s ease;
+}
+
+.links-container .smooth-link:hover {
+  color: var(--bs-gray-dark);
+}
+
+/* Logo Styling */
+.logo-img {
+  transform: scale(2.5); /* Scale image 2.5x */
+  transform-origin: center;
+  transition: transform 1s ease-out, opacity 1s ease-out;
+}
+
+/* Fade-in Animation */
+.fade-in-left {
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: transform 1s ease-out, opacity 1s ease-out;
+}
+
+.fade-in-right {
+  opacity: 0;
+  transform: translateX(100%);
+  transition: transform 1s ease-out, opacity 1s ease-out;
+}
+
+.fade-in-left.visible, .fade-in-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* End of About Section */
+
 body {
   margin: 0;
   font-family: var(--bs-body-font-family);
