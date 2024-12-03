@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donate to Help Save Lives</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+        }
+        .hero {
+            position: relative;
+            background-image: url('https://images.squarespace-cdn.com/content/v1/5b5a266fcef372310148d6d6/1567460209464-IYTINWBNI8U2K1HNM2YY/20181225_165049%2B%25281%2529.jpg?format=2500w'); /* Static local path to the image */
+            background-size: cover;
+            background-position: center;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            text-align: center;
+        }
+        .hero-text {
+            font-size: 2.5rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+        }
+        .donation-box {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
+            max-width: 350px;
+            width: 100%;
+        }
+        .donation-box input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .donation-box button {
+            width: 48%;
+            margin: 5px 1%;
+            padding: 15px;
+            background-color: #2d8f5e;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .donation-box button:hover {
+            background-color: #24724b;
+        }
+        .donation-box label {
+            display: block;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #333;
+        }
+        .donation-box label input {
+            margin-right: 8px;
+        }
+        .donation-box .submit-button {
+            width: 100%;
+            margin-top: 20px;
+            background-color: #0066cc;
+            font-size: 18px;
+            padding: 15px;
+        }
+        .donation-box .submit-button:hover {
+            background-color: #004a99;
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <div class="hero-text">
+            DONATE TO HELP SAVE LIVES
+        </div>
+        <div class="donation-box">
+            <form action="/donate" method="POST">
+                <input type="number" name="amount" value="25" min="1" step="1" placeholder="Enter amount" required>
+                <div>
+                    <button type="button">$5</button>
+                    <button type="button">$25</button>
+                    <button type="button">$50</button>
+                    <button type="button">$100</button>
+                </div>
+                <label>
+                    <input type="checkbox" name="monthly">
+                    Make this donation monthly
+                </label>
+                <button type="submit" class="submit-button">Donate</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

@@ -88,6 +88,23 @@ app.get("/", (req, res) => {
   res.render("index", { title: "Welcome to the Turtle Shelter Project" });
 });
 
+// Jen's Story Get Route
+app.get("/jen-story", (req, res) => {
+  res.render("jen", { title: "Jen's Story" });
+});
+
+//request event route
+app.get("/help", (req, res) => {
+  res.render("help", { title: "Request Event" }); 
+});
+
+//donations
+app.get("/donate", (req, res) => {
+  res.render("donate", { title: "Donate Today" }); 
+});
+
+
+
 // Confirmation message
 app.listen(port, () =>
   console.log(`Server is up and running on port ${port}!`)
