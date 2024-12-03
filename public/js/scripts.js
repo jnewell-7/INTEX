@@ -96,3 +96,34 @@ document.addEventListener('DOMContentLoaded', () => {
         carouselTrack.appendChild(clone);
     });
 });
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    const fadeInElements = document.querySelectorAll(".fade-in-left, .fade-in-right");
+
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("visible");
+                    observer.unobserve(entry.target);
+                }
+            });
+        },
+        { threshold: 0.1 } // Trigger when 10% visible
+    );
+
+    fadeInElements.forEach((element) => observer.observe(element));
+});
+
+
+// Handle navbar text color change on scroll
+const navbar = document.getElementById("mainNav");
+document.addEventListener("scroll", function () {
+    const scrolledTop = window.scrollY === 0;
+    if (scrolledTop) {
+        navbar.classList.add("scrolled-top");
+    } else {
+        navbar.classList.remove("scrolled-top");
+    }
+});

@@ -29,8 +29,6 @@ const knex = require("knex")({
   },
 });
 
-
-
 // Routes
 
 
@@ -65,4 +63,6 @@ app.get("/", (req, res) => {
 });
 
 // Confirmation message
-app.listen(port, () => console.log(`Server is up and running on port ${port}!`));
+app.listen(port, () =>
+  console.log(`Server is up and running on port ${port}!`)
+);
