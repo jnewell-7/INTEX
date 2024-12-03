@@ -115,3 +115,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     fadeInElements.forEach((element) => observer.observe(element));
 });
+
+
+// Handle navbar text color change on scroll
+const navbar = document.getElementById("mainNav");
+document.addEventListener("scroll", function () {
+    const scrolledTop = window.scrollY === 0;
+    if (scrolledTop) {
+        navbar.classList.add("scrolled-top");
+    } else {
+        navbar.classList.remove("scrolled-top");
+    }
+});
