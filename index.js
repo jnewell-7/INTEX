@@ -90,9 +90,6 @@ app.get("/jen-story", (req, res) => {
   res.render("jen", { title: "Jen's Story" });
 });
 
-app.get("/about", (req, res) => {
-  res.render("index", { title: "About" });
-});
 
 
 // Confirmation message
