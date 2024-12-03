@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, "public")));
 const knex = require("knex")({
   client: "pg",
   connection: {
-    host: process.env.RDS_HOSTNAME || "awseb-e-fzr58sdsxd-stack-awsebrdsdatabase-2vdqecpsp679.chiykskmafi4.us-east-1.rds.amazonaws.com",
+    host: process.env.RDS_HOSTNAME || "localhost",
     user: process.env.RDS_USERNAME || "postgres",
     password: process.env.RDS_PASSWORD || "gocougs123",
     database: process.env.RDS_DB_NAME || "intex",
@@ -31,30 +31,50 @@ const knex = require("knex")({
 
 // Routes
 
-
-//Login Route
-
-app.get('/login', (req, res) => {
-  knex('admin')
-      .select('username', 'password')
-      .then(adminCredentials => {
-          res.render('login', { adminCredentials });
-      })
-      .catch(error => {
-          console.error("Error fetching admin credentials: ", error);
-          res.status(500).send('Internal Server Error');
-      });
+// Login Page Route (GET)
+app.get("/login", (req, res) => {
+  res.render("login", { title: "Admin Login", error: null }); // Render login page
 });
 
-
-app.post('/login', (req, res) => {
+// Login Submit Route (POST)
+app.post("/login", async (req, res) => {
   const { username, password } = req.body;
-  
-  if (username === adminCredentials.username && password === adminCredentials.password) {
-    res.render('admin'); // Render the admin page if credentials are correct
-  } else {
-    res.send('Invalid username or password');
+
+  try {
+    // Query the database for the admin credentials
+    const admin = await knex("admin").where({ username }).first();
+
+    if (!admin) {
+      // Username not found
+      return res.render("login", {
+        title: "Admin Login",
+        error: "Invalid username or password.",
+      });
+    }
+
+    // Verify the password (replace with hashing in production)
+    if (admin.password === password) {
+      // Successful login
+      res.redirect("/admin"); // Redirect to admin page or dashboard
+    } else {
+      // Invalid password
+      res.render("login", {
+        title: "Admin Login",
+        error: "Invalid username or password.",
+      });
+    }
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).render("login", {
+      title: "Admin Login",
+      error: "An unexpected error occurred. Please try again later.",
+    });
   }
+});
+
+// Admin Page Route
+app.get("/admin", (req, res) => {
+  res.render("admin", { title: "Admin Dashboard" }); // Placeholder admin dashboard
 });
 
 // Landing Page Get Route
