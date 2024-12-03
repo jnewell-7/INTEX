@@ -38,5 +38,11 @@ app.get("/", (req, res) => {
   res.render("index", { title: "Welcome to the Turtle Shelter Project" });
 });
 
+// Jen's Story Get Route
+app.get("/jen-story", (req, res) => {
+  res.render("jen", { title: "Jen's Story" });
+});
+
+
 // Confirmation message
 app.listen(port, () => console.log(`Server is up and running on port ${port}!`));
