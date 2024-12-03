@@ -23,12 +23,15 @@ const knex = require("knex")({
     host: process.env.RDS_HOSTNAME || "localhost",
     user: process.env.RDS_USERNAME || "postgres",
     password: process.env.RDS_PASSWORD || "gocougs123",
-    database: process.env.RDS_DB_NAME || "intex",
+    database: process.env.RDS_DB_NAME || "ebdb",
     port: process.env.RDS_PORT || 5432,
-    ssl: process.env.DB_INTEX ? { rejectUnauthorized: false } : false,
+    ssl: process.env.DB_SSL ? { rejectUnauthorized: false } : false,
   },
 });
 
+knex.raw("SELECT 1")
+  .then(() => console.log("Database connection successful"))
+  .catch((err) => console.error("Database connection error:", err));
 // Routes
 
 // Login Page Route (GET)
