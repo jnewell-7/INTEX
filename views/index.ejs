@@ -112,22 +112,31 @@
     <!-- Newsletter Sign-Up Section -->
     <section class="page-section" id="newsletter">
         <div class="container">
-            <div class="text-center">
-                <h2 class="section-heading text-uppercase">Join Our Newsletter</h2>
-                <p class="section-subheading text-muted">Stay updated with our latest projects and stories.</p>
+            <div class="text-center newsletter-content">
+                <!-- Text Content -->
+                <h2 class="section-heading text-uppercase fade-in-left">Join Our Newsletter</h2>
+                <p class="section-subheading text-muted fade-in-left">Stay updated with our latest projects and stories.</p>
+                <form action="/newsletter-signup" method="POST" class="text-center">
+                    <input
+                        type="email"
+                        name="email"
+                        placeholder="Enter your email"
+                        required
+                        class="form-control form-control-lg mb-3 fade-in-left"
+                    />
+                    <button type="submit" class="btn btn-primary btn-lg fade-in-left">Sign Up</button>
+                </form>
             </div>
-            <form action="/newsletter-signup" method="POST" class="text-center">
-                <input
-                    type="email"
-                    name="email"
-                    placeholder="Enter your email"
-                    required
-                    class="form-control form-control-lg mb-3"
-                />
-                <button type="submit" class="btn btn-primary btn-lg">Sign Up</button>
-            </form>
+            <!-- Add the Image -->
+            <div class="newsletter-image-container">
+                <img src="/assets/img/send.jpg" alt="Paper Airplane Sending" class="newsletter-image fade-in-left">
+            </div>
         </div>
     </section>
+
+
+
+
 
     <!-- Footer -->
     <footer class="footer py-4">

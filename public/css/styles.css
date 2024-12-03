@@ -347,6 +347,35 @@
 
 
 
+/* Newsletter Section Styling */
+#newsletter {
+  position: relative; /* Ensure child elements are positioned relative to this container */
+  overflow: hidden; /* Hide overflowing parts of the image */
+}
+
+/* Newsletter Image Styling */
+.newsletter-image-container {
+  position: absolute; /* Layer behind the content */
+  top: 40%; /* Adjust as needed */
+  left: 72%; /* Center the image */
+  transform: translate(-50%, -50%) scale(1.2); /* Center and slightly enlarge */
+  z-index: 1; /* Behind the text */
+  opacity: 0.2; /* Subtle background effect */
+}
+
+.newsletter-image {
+  width: 100%; /* Fill the container */
+  max-width: 800px; /* Optional: Limit the image size */
+  height: auto; /* Maintain aspect ratio */
+}
+
+/* Text Content Styling */
+.newsletter-content {
+  position: relative; /* Stack above the image */
+  z-index: 2; /* Layer above the image */
+  background: transparent; /* Ensure no background blocks the image */
+}
+
 
 
 body {
