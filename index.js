@@ -17,7 +17,7 @@ const knex = require("knex")({
     user: process.env.RDS_USERNAME || "postgres",
     password: process.env.RDS_PASSWORD || "admin",
     database: process.env.RDS_DB_NAME || "intex",
-    port: process.env.RDS_PORT || 5434,
+    port: process.env.RDS_PORT || 5432,
     ssl: process.env.DB_INTEX ? { rejectUnauthorized: false } : false,
   },
 });
