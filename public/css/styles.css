@@ -846,6 +846,24 @@ progress {
   margin-bottom: 0;
 }
 
+/* Footer Link Styling */
+.footer .col-lg-4.text-lg-end {
+  white-space: nowrap; /* Prevent links from wrapping onto a new line */
+}
+
+.footer .link-dark, .footer .link-muted {
+  color: var(--bs-dark); /* Maintain consistent link colors */
+  text-decoration: none;
+  margin-right: 1rem; /* Add spacing between links */
+  font-size: 1rem; /* Keep font size consistent */
+}
+
+
+
+
+
+
+
 .blockquote-footer {
   margin-top: -1rem;
   margin-bottom: 1rem;
