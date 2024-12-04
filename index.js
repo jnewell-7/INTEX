@@ -32,9 +32,10 @@ const knex = require("knex")({
     ssl: { rejectUnauthorized: false }, // Adjust SSL as needed
   },
   pool: {
-    min: 2, // Minimum connections in the pool
-    max: 10, // Maximum connections in the pool
-  },
+    min: 0, // Allow releasing connections when not needed
+    max: 15, // Allow a maximum of 15 connections
+    acquireTimeoutMillis: 30000 // Timeout if unable to acquire connection after 30 seconds
+}
 });
 
 // Test the connection
@@ -42,11 +43,9 @@ knex
   .raw("SELECT 1")
   .then(() => {
     console.log("Connection successful!");
-    knex.destroy(); // Close the connection
   })
   .catch((err) => {
     console.error("Connection failed:", err);
-    knex.destroy(); // Ensure connection is closed
   });
 
 // Routes
@@ -61,7 +60,7 @@ app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    console.log("Received login request:", username);
+    console.log("Received login request:", username, password);
 
     // Query the database for the admin credentials
     const admin = await knex("admin").where({ username }).first();
@@ -201,6 +200,8 @@ app.get("/realDonate", (req, res) => {
     "https://turtleshelterproject.org/checkout/donate?donatePageId=5b6a44c588251b72932df5a0"
   );
 });
+
+
 
 // Error Handling Middleware
 app.use((req, res) => {
