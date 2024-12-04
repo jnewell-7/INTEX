@@ -17,6 +17,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.static(path.join(__dirname, "public")));
 
 // Connect to PostgreSQL using Knex object
+
 const knex = require("knex")({
   client: "pg",
   connection: {
@@ -25,13 +26,24 @@ const knex = require("knex")({
     password: process.env.RDS_PASSWORD || "gocougs123",
     database: process.env.RDS_DB_NAME || "ebdb",
     port: process.env.RDS_PORT || 5432,
-    ssl: process.env.DB_SSL ? { rejectUnauthorized: false } : false,
+    ssl: { rejectUnauthorized: false }, // Adjust SSL as needed
   },
   pool: {
     min: 2, // Minimum connections in the pool
     max: 10, // Maximum connections in the pool
   },
 });
+
+// Test the connection
+knex.raw('SELECT 1')
+  .then(() => {
+    console.log('Connection successful!');
+    knex.destroy(); // Close the connection
+  })
+  .catch((err) => {
+    console.error('Connection failed:', err);
+    knex.destroy(); // Ensure connection is closed
+  });
 
 // Routes
 
