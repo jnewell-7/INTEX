@@ -248,6 +248,12 @@ app.get("/get-involved", (req, res) => {
   res.render("volunteer", { title: "Volunteer Today" });
 });
 
+// Dashboard Page Route
+app.get("/dashboard", (req, res) => {
+  res.render("dashboard", { title: "Admin Dashboard" }); // Render the dashboard.ejs file
+});
+
+
 // Error Handling Middleware
 app.use((req, res) => {
   res.status(404).send("Page not found.");
