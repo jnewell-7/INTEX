@@ -146,6 +146,7 @@ app.post("/admin/update", async (req, res) => {
   }
 });
 
+
 app.post("/admin/add", async (req, res) => {
   const { username, password, firstName, lastName, email, phone } = req.body;
 

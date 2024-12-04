@@ -438,7 +438,7 @@
 #about .vest-highlight .description {
   margin-top: 5px;
   font-size: 0.9rem;
-  color: var(--bs-gray-dark);
+  color: #000;
   opacity: 0;
   height: 0;
   transition: opacity 0.3s ease, height 0.3s ease;
@@ -453,7 +453,7 @@
   width: 50%;
   font-size: 1.1rem;
   line-height: 1.7;
-  color: var(--bs-gray-dark);
+  color: #000;
 }
 
 #about .centered-info {
@@ -526,6 +526,57 @@
 }
 
 
+
+.tech-background {
+    position: relative;
+    background: url('/assets/img/background.jpg') center center/cover no-repeat;
+    color: #000; /* Default black text for all content */
+}
+
+.tech-background::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(177, 240, 177, 0.8); /* Lighter, desaturated green overlay */
+    z-index: 1;
+}
+
+.tech-background .container {
+    position: relative;
+    z-index: 2; /* Ensure the content is above the overlay */
+}
+
+.tech-background .section-subheading,
+.tech-background, .text-muted p {
+    color: #000; /* Black text for paragraphs and subheadings */
+}
+
+.tech-background .highlight .title,
+.tech-background .highlight .description {
+    color: #000; /* Black text for highlights */
+}
+
+/* Ensure all paragraphs and highlight descriptions are black */
+.tech-background .section-subheading,
+.tech-background p,
+.tech-background .highlight .title,
+.tech-background .highlight .description {
+    color: #000 !important; /* Force black text with !important */
+}
+
+/* Additional specificity to ensure all child elements are black */
+.tech-background * {
+    color: #000 !important; /* Black text for all elements within .tech-background */
+}
+
+
+
+
+
+
 #page-title {
   margin-top: 150px; /* Pushes the entire section lower */
   padding-bottom: 20px; /* Keeps spacing below the title */
@@ -540,50 +591,6 @@
 }
 
 
-/* Vests Distributed Section */
-#vests-distributed {
-  padding: 60px 0;
-  background-color: #f8f9fa;
-}
-
-#vests-distributed .section-heading {
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--bs-green-dark);
-}
-
-.timeline {
-  border-left: 3px solid var(--bs-green-dark);
-  padding-left: 20px;
-}
-
-.timeline-item {
-  margin-bottom: 20px;
-  position: relative;
-}
-
-.timeline-item h4 {
-  font-size: 1.5rem;
-  color: var(--bs-dark);
-  margin-bottom: 10px;
-}
-
-.timeline-item ul {
-  list-style-type: none;
-  padding-left: 0;
-}
-
-.timeline-item ul li {
-  margin-bottom: 5px;
-  font-size: 1.1rem;
-  color: var(--bs-gray-dark);
-}
-
-.total-vests {
-  font-size: 1.3rem;
-  font-weight: bold;
-  color: var(--bs-green-dark);
-}
 
 /* FAQ Section */
 #faq {
