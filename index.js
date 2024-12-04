@@ -200,6 +200,12 @@ app.post("/logout", (req, res) => {
   });
 });
 
+// Dashboard Page Route
+app.get("/dashboard", (req, res) => {
+  res.render("dashboard", { title: "Admin Dashboard" }); // Render the dashboard.ejs file
+});
+
+
 // Error Handling
 app.use((req, res) => {
   res.status(404).send("Page not found.");
