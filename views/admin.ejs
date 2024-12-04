@@ -251,7 +251,7 @@
               </td>
               <td>
                 <select name="status_<%= request.requestid %>"
-                  onchange="handleStatusChange(event, <%= request.requestid %>)">
+                  onchange="handleStatusChange(event, '<%= request.requestid %>')">
                   <option value="Pending" <%=request.eventreqstatus==="Pending" ? "selected" : "" %>>Pending</option>
                   <option value="Approved" <%=request.eventreqstatus==="Approved" ? "selected" : "" %>>Approved</option>
                   <option value="Completed" <%=request.eventreqstatus==="Completed" ? "selected" : "" %>>Completed
