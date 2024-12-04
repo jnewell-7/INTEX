@@ -1,5 +1,6 @@
 // Proper app variable creation
 const express = require("express");
+const session = require("express-session");
 const app = express();
 const path = require("path");
 
@@ -15,6 +16,16 @@ app.use(express.urlencoded({ extended: true }));
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "public")));
+
+// Session configuration for user authentication
+app.use(
+  session({
+    secret: "turtle_shelter_secret", // Replace with a secure secret in production
+    resave: false,
+    saveUninitialized: true,
+    cookie: { maxAge: 1000 * 60 * 60 }, // 1-hour session lifespan
+  })
+);
 
 // Connect to PostgreSQL using Knex object
 const knex = require("knex")({
@@ -44,6 +55,14 @@ knex
     console.error("Database connection failed:", err);
   });
 
+// Middleware to check if a user is authenticated
+function isAuthenticated(req, res, next) {
+  if (req.session && req.session.isLoggedIn) {
+    return next();
+  }
+  res.redirect("/login");
+}
+
 // Routes
 
 // Login Page Route (GET)
@@ -72,6 +91,8 @@ app.post("/login", async (req, res) => {
 
     if (admin.password === password) {
       console.log("Login successful!");
+      req.session.isLoggedIn = true; // Mark user as logged in
+      req.session.username = admin.username; // Store username in session
       res.redirect("/admin");
     } else {
       console.log("Password mismatch");
@@ -89,8 +110,8 @@ app.post("/login", async (req, res) => {
   }
 });
 
-// Admin Page Route
-app.get("/admin", async (req, res) => {
+// Admin Page Route (Protected)
+app.get("/admin", isAuthenticated, async (req, res) => {
   try {
     // Fetch admin data
     const admins = await knex("admins").select(
@@ -131,8 +152,19 @@ app.get("/admin", async (req, res) => {
   }
 });
 
+// Logout Route
+app.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Error during logout:", err);
+      return res.status(500).send("Failed to log out.");
+    }
+    res.redirect("/login");
+  });
+});
+
 // Edit Admin (Update/Delete) Route
-app.post("/editAdmin", async (req, res) => {
+app.post("/editAdmin", isAuthenticated, async (req, res) => {
   const actions = Object.entries(req.body);
 
   try {
@@ -163,7 +195,7 @@ app.post("/editAdmin", async (req, res) => {
 });
 
 // Add Admin Route
-app.post("/addAdmin", async (req, res) => {
+app.post("/addAdmin", isAuthenticated, async (req, res) => {
   const { username, password, firstname, lastname, email, phone } = req.body;
 
   try {
@@ -182,7 +214,7 @@ app.post("/addAdmin", async (req, res) => {
   }
 });
 
-app.get("/addAdmin", (req, res) => {
+app.get("/addAdmin", isAuthenticated, (req, res) => {
   res.render("addAdmin", { title: "Add New Admin" });
 });
 
