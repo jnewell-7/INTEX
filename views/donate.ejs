@@ -19,23 +19,34 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: center;
+            justify-content: flex-end; /* Moves content to the bottom */
             align-items: center;
             text-align: center;
             color: white;
+            padding-bottom: 50px; /* Adds spacing from the bottom */
+        }
+        .text-container {
+            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 700px;
+            color: #fff;
         }
         .hero-text {
             font-size: 2.5rem;
             font-weight: bold;
-            margin-bottom: 20px;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
+            margin-bottom: 15px;
         }
         .donation-message {
             font-size: 1.2rem;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             line-height: 1.5;
-            max-width: 600px;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.7);
+        }
+        .additional-info {
+            font-size: 1rem;
+            margin-top: 20px;
+            line-height: 1.5;
+            color: #e0e0e0;
         }
         .donate-button {
             background-color: #2d8f5e;
@@ -56,13 +67,18 @@
 </head>
 <body>
     <div class="hero">
-        <div class="hero-text">DONATE TO HELP SAVE LIVES</div>
-        <div class="donation-message">
-            Your donation of $30 provides one vest that will help keep a homeless person warmer in the freezing cold.
+        <div class="text-container">
+            <div class="hero-text">DONATE TO HELP SAVE LIVES</div>
+            <div class="donation-message">
+                Each $30 tax-deductible donation to the Turtle Shelter Project will provide a high-tech foam vest for a youth or adult experiencing homelessness. You can tell us where you would like the vest or vests sent to, or we will send them to where there is the greatest need.
+            </div>
+            <form action="/realDonate" method="GET">
+                <button type="submit" class="donate-button">Donate</button>
+            </form>
+            <div class="additional-info">
+                The Turtle Shelter Project is a 501 (c)(3) non-profit, EIN 82-1035303.
+            </div>
         </div>
-        <form action="/donate" method="POST">
-            <button type="submit" class="donate-button">Donate $30</button>
-        </form>
     </div>
 </body>
 </html>
