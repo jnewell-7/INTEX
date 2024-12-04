@@ -67,6 +67,11 @@
                 document.getElementById("other_input").value = ""; // Clear the input when hidden
             }
         }
+
+        function disableFirstOption(selectElement) {
+            // Disable the first option after the dropdown is interacted with
+            selectElement.options[0].disabled = true;
+        }
     </script>
 </head>
 <body>
@@ -74,11 +79,13 @@
     <form action="/submitVolunteerData" method="POST">
         <!-- Volunteer First Name -->
         <label for="first_name">First Name</label>
-        <input type="text" id="first_name" name="first_name" required>
+        <input type="text" id="first_name" name="first_name" required
+        style="text-transform: uppercase;"oninput="this.value = this.value.toUpperCase()">
 
         <!-- Volunteer Last Name -->
         <label for="last_name">Last Name</label>
-        <input type="text" id="last_name" name="last_name" required>
+        <input type="text" id="last_name" name="last_name" required
+        style="text-transform: uppercase;"oninput="this.value = this.value.toUpperCase()">
 
         <!-- Phone -->
         <label for="phone">Phone</label>
@@ -88,18 +95,15 @@
         <label for="email">Email</label>
         <input type="email" id="email" name="email" required>
 
-        <!-- Street Address -->
-        <label for="street_address">Street Address</label>
-        <input type="text" id="street_address" name="street_address" required>
-
         <!-- City -->
         <label for="city">City</label>
-        <input type="text" id="city" name="city" required>
+        <input type="text" id="city" name="city" required
+        style="text-transform: uppercase;"oninput="this.value = this.value.toUpperCase()">
 
         <!-- State -->
         <label for="state">State</label>
         <select id="state" name="state" required>
-            <option value="">Select a State</option>
+            <option value="">Select State</option>
             <option value="AL">AL - Alabama</option>
             <option value="AK">AK - Alaska</option>
             <option value="AZ">AZ - Arizona</option>
@@ -150,7 +154,6 @@
             <option value="WV">WV - West Virginia</option>
             <option value="WI">WI - Wisconsin</option>
             <option value="WY">WY - Wyoming</option>
-            <!-- Add remaining states as needed -->
         </select>
 
         <!-- Zip Code -->
@@ -159,7 +162,7 @@
 
         <!-- Sewing Level -->
         <label for="sewing_level">Sewing Level</label>
-        <select id="sewing_level" name="sewing_level" required>
+        <select id="sewing_level" name="sewing_level" required onfocus="disableFirstOption(this)">
             <option value="">Select Sewing Level</option>
             <option value="Beginner">Beginner</option>
             <option value="Intermediate">Intermediate</option>
@@ -172,7 +175,7 @@
 
         <!-- Heard About Opportunity -->
         <label for="heard_about">How Did You Hear About This Opportunity?</label>
-        <select id="heard_about" name="heard_about" onchange="toggleOtherInput(this.value)" required>
+        <select id="heard_about" name="heard_about" onchange="toggleOtherInput(this.value)" onfocus="disableFirstOption(this)" required>
             <option value="">Select an Option</option>
             <option value="Social Media">Social Media</option>
             <option value="Friend/Family">Friend/Family</option>
@@ -183,7 +186,8 @@
         <!-- Other Input (Hidden by Default) -->
         <div id="other_input_container" class="hidden">
             <label for="other_input">Please Specify</label>
-            <input type="text" id="other_input" name="other_input">
+            <input type="text" id="other_input" name="other_input"
+        style="text-transform: lowercase;"oninput="this.value = this.value.toLowerCase()">
         </div>
 
         <button type="submit">Submit</button>
