@@ -21,7 +21,9 @@ app.use(express.static(path.join(__dirname, "public")));
 const knex = require("knex")({
   client: "pg",
   connection: {
-    host: process.env.RDS_HOSTNAME || "awseb-e-it3xmpabbx-stack-awsebrdsdatabase-5vjxonr0zyvk.chiykskmafi4.us-east-1.rds.amazonaws.com",
+    host:
+      process.env.RDS_HOSTNAME ||
+      "awseb-e-it3xmpabbx-stack-awsebrdsdatabase-5vjxonr0zyvk.chiykskmafi4.us-east-1.rds.amazonaws.com",
     user: process.env.RDS_USERNAME || "postgres",
     password: process.env.RDS_PASSWORD || "gocougs123",
     database: process.env.RDS_DB_NAME || "ebdb",
@@ -35,13 +37,14 @@ const knex = require("knex")({
 });
 
 // Test the connection
-knex.raw('SELECT 1')
+knex
+  .raw("SELECT 1")
   .then(() => {
-    console.log('Connection successful!');
+    console.log("Connection successful!");
     knex.destroy(); // Close the connection
   })
   .catch((err) => {
-    console.error('Connection failed:', err);
+    console.error("Connection failed:", err);
     knex.destroy(); // Ensure connection is closed
   });
 
@@ -93,20 +96,71 @@ app.post("/login", async (req, res) => {
 // Admin Page Route
 app.get("/admin", async (req, res) => {
   try {
-    // Fetch admin records and event requests from the database
     const admins = await knex("admin").select("*");
     const eventRequests = await knex("eventrequest").select("*");
 
-    // Render the admin page with fetched data
     res.render("admin", {
       title: "Admin Dashboard",
-      admins: admins,
-      eventRequests: eventRequests,
+      admins,
+      eventRequests,
     });
   } catch (error) {
-    console.error("Error fetching data for admin page:", error); // Log full error details
-    res.status(500).send("An error occurred while loading the admin dashboard."); // Display a generic error message
+    console.error("Error fetching admin data:", error);
+    res.status(500).send("Error loading admin dashboard.");
   }
+});
+
+app.post("/admin/update", async (req, res) => {
+  const actions = Object.entries(req.body);
+
+  try {
+    for (const [action, value] of actions) {
+      if (action.startsWith("update_")) {
+        const adminID = action.split("_")[1];
+        const updatedFields = {
+          Username: req.body[`username_${adminID}`],
+          Password: req.body[`password_${adminID}`],
+          FirstName: req.body[`firstName_${adminID}`],
+          LastName: req.body[`lastName_${adminID}`],
+          Email: req.body[`email_${adminID}`],
+          PhoneNumber: req.body[`phone_${adminID}`],
+        };
+        await knex("admin").where({ AdminID: adminID }).update(updatedFields);
+      }
+
+      if (action.startsWith("delete_")) {
+        const adminID = action.split("_")[1];
+        await knex("admin").where({ AdminID: adminID }).del();
+      }
+    }
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error updating admin data:", error);
+    res.status(500).send("Failed to update admin data.");
+  }
+});
+
+app.post("/admin/add", async (req, res) => {
+  const { username, password, firstName, lastName, email, phone } = req.body;
+
+  try {
+    await knex("admin").insert({
+      Username: username,
+      Password: password,
+      FirstName: firstName,
+      LastName: lastName,
+      Email: email,
+      PhoneNumber: phone,
+    });
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error adding new admin:", error);
+    res.status(500).send("Failed to add new admin.");
+  }
+});
+
+app.get("/admin/add", (req, res) => {
+  res.render("add-admin", { title: "Add New Admin" });
 });
 
 // Landing Page Route
@@ -115,8 +169,8 @@ app.get("/", (req, res) => {
 });
 
 // About Get Route
-app.get('/about', (req, res) => {
-  res.render('about', { title: 'About - Turtle Shelter Project' });
+app.get("/about", (req, res) => {
+  res.render("about", { title: "About - Turtle Shelter Project" });
 });
 
 // Jen's Story Page Route
@@ -141,9 +195,6 @@ app.get("/realDonate", (req, res) => {
   );
 });
 
-app.get("/get-involved", (req, res) => {
-  res.render("volunteer", { title: "Volunteer Today" });
-});
 
 
 // Error Handling Middleware
