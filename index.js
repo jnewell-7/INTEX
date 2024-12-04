@@ -88,6 +88,11 @@ app.get("/", (req, res) => {
   res.render("index", { title: "Welcome to the Turtle Shelter Project" });
 });
 
+// About Get Route
+app.get('/about', (req, res) => {
+  res.render('about', { title: 'About - Turtle Shelter Project' });
+});
+
 // Jen's Story Get Route
 app.get("/jen-story", (req, res) => {
   res.render("jen", { title: "Jen's Story" });
@@ -106,6 +111,8 @@ app.get("/donate", (req, res) => {
 app.get("/realDonate", (req, res) => {
   res.redirect("https://turtleshelterproject.org/checkout/donate?donatePageId=5b6a44c588251b72932df5a0"); 
 });
+
+
 
 
 // Confirmation message
