@@ -66,6 +66,21 @@
       background-color: #28a745;
       margin-bottom: 1rem;
     }
+
+    .button.edit {
+      background-color: #ffc107;
+    }
+
+    .button:hover {
+      opacity: 0.9;
+    }
+
+    select {
+      padding: 0.5rem;
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
   </style>
 </head>
 
@@ -85,6 +100,7 @@
           <th>Last Name</th>
           <th>Email</th>
           <th>Phone</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -97,52 +113,127 @@
             <td><%= admin.lastname %></td>
             <td><%= admin.email %></td>
             <td><%= admin.phonenumber %></td>
+            <td>
+              <!-- Edit Admin Button -->
+              <a href="/editAdmin/<%= admin.adminid %>" class="button edit">Edit</a>
+            </td>
           </tr>
         <% }); %>
       </tbody>
     </table>
-
     <button onclick="window.location.href='/admin/add'" class="button add">Add New Admin</button>
 
     <!-- Event Requests Section -->
     <h2>Event Requests</h2>
+    <form id="eventRequestForm" action="/updateEventStatus" method="POST">
+      <table>
+        <thead>
+          <tr>
+            <th>Request ID</th>
+            <th>Event Date</th>
+            <th>Zip Code</th>
+            <th>Estimated Attendance</th>
+            <th>Activity Type</th>
+            <th>Contact First Name</th>
+            <th>Contact Last Name</th>
+            <th>Contact Email</th>
+            <th>Contact Phone</th>
+            <th>Proposed Event Address</th>
+            <th>Jen Story Request</th>
+            <th>Event Request Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% eventRequests.forEach(function(request) { %>
+            <tr>
+              <td><%= request.requestid %></td>
+              <td><%= request.eventdate %></td>
+              <td><%= request.zipcode %></td>
+              <td><%= request.estimatedattendance %></td>
+              <td><%= request.activitytype %></td>
+              <td><%= request.contactfirstname %></td>
+              <td><%= request.contactlastname %></td>
+              <td><%= request.contactemail %></td>
+              <td><%= request.contactphone %></td>
+              <td><%= request.proposedeventaddress %></td>
+              <td><%= request.jenstoryrequest ? "Yes" : "No" %></td>
+              <td>
+                <!-- Dropdown for Event Request Status -->
+                <select
+                  name="status_<%= request.requestid %>"
+                  onchange="handleStatusChange(event, <%= request.requestid %>)"
+                >
+                  <option value="Pending" <%= request.eventreqstatus === "Pending" ? "selected" : "" %>>Pending</option>
+                  <option value="Approved" <%= request.eventreqstatus === "Approved" ? "selected" : "" %>>Approved</option>
+                  <option value="Completed" <%= request.eventreqstatus === "Completed" ? "selected" : "" %>>Completed</option>
+                </select>
+              </td>
+              <td>
+                <button type="submit" name="action" value="update_<%= request.requestid %>" class="button edit">Save</button>
+              </td>
+            </tr>
+          <% }); %>
+        </tbody>
+      </table>
+    </form>
+
+    <!-- Volunteer Management Section -->
+    <h2>Manage Volunteers</h2>
     <table>
       <thead>
         <tr>
-          <th>Request ID</th>
-          <th>Event Date</th>
+          <th>Volunteer ID</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Phone</th>
+          <th>Email</th>
+          <th>Sewing Level</th>
+          <th>Monthly Hours</th>
+          <th>Heard About Opportunity</th>
           <th>Zip Code</th>
-          <th>Estimated Attendance</th>
-          <th>Activity Type</th>
-          <th>Contact First Name</th>
-          <th>Contact Last Name</th>
-          <th>Contact Email</th>
-          <th>Contact Phone</th>
-          <th>Proposed Event Address</th>
-          <th>Jen Story Request</th>
-          <th>Event Request Status</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <% eventRequests.forEach(function(request) { %>
+        <% volunteers.forEach(function(volunteer) { %>
           <tr>
-            <td><%= request.requestid %></td>
-            <td><%= request.eventdate %></td>
-            <td><%= request.zipcode %></td>
-            <td><%= request.estimatedattendance %></td>
-            <td><%= request.activitytype %></td>
-            <td><%= request.contactfirstname %></td>
-            <td><%= request.contactlastname %></td>
-            <td><%= request.contactemail %></td>
-            <td><%= request.contactphone %></td>
-            <td><%= request.proposedeventaddress %></td>
-            <td><%= request.jenstoryrequest ? "Yes" : "No" %></td>
-            <td><%= request.eventreqstatus %></td>
+            <td><%= volunteer.volunteerid %></td>
+            <td><%= volunteer.volfirstname %></td>
+            <td><%= volunteer.vollastname %></td>
+            <td><%= volunteer.phone %></td>
+            <td><%= volunteer.email %></td>
+            <td><%= volunteer.sewinglevel %></td>
+            <td><%= volunteer.monthlyhours %></td>
+            <td><%= volunteer.heardaboutopportunity %></td>
+            <td><%= volunteer.zipcode %></td>
+            <td>
+              <!-- Edit Volunteer Button -->
+              <a href="/editVolunteer/<%= volunteer.volunteerid %>" class="button edit">Edit</a>
+            </td>
           </tr>
         <% }); %>
       </tbody>
     </table>
+    <button onclick="window.location.href='/volunteer/add'" class="button add">Add New Volunteer</button>
   </div>
+
+  <script>
+    function handleStatusChange(event, requestId) {
+      if (event.target.value === "Completed") {
+        const confirmed = confirm(
+          "Are you sure you want to mark this event request as completed? This will move it to the events table."
+        );
+        if (!confirmed) {
+          // Reset the dropdown to its previous value if user cancels
+          event.target.value = "Pending";
+        } else {
+          // Submit the form to handle the status update
+          document.getElementById("eventRequestForm").submit();
+        }
+      }
+    }
+  </script>
 </body>
 
 </html>
