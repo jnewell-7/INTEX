@@ -377,6 +377,349 @@
 }
 
 
+
+
+
+/* About Section Styling */
+#about {
+  padding: 80px 0;
+}
+
+#about .section-heading {
+  font-size: 2.5rem;
+  font-weight: 700;
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+#about .diagram-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+#about .vest-diagram {
+  width: 45%;
+  position: relative;
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+#about .vest-highlight {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  opacity: 0;
+  transition: opacity 0.5s ease-in-out;
+}
+
+#about .vest-highlight .line {
+  height: 2px;
+  width: 100px;
+  background-color: var(--bs-green-dark);
+  margin-right: 10px;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.5s ease-out;
+}
+
+#about .vest-highlight.visible .line {
+  transform: scaleX(1);
+}
+
+#about .vest-highlight .title {
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+#about .vest-highlight .description {
+  margin-top: 5px;
+  font-size: 0.9rem;
+  color: var(--bs-gray-dark);
+  opacity: 0;
+  height: 0;
+  transition: opacity 0.3s ease, height 0.3s ease;
+}
+
+#about .vest-highlight .title:hover + .description {
+  opacity: 1;
+  height: auto;
+}
+
+#about .vest-info {
+  width: 50%;
+  font-size: 1.1rem;
+  line-height: 1.7;
+  color: var(--bs-gray-dark);
+}
+
+#about .centered-info {
+  margin-top: 30px;
+  text-align: center;
+  font-size: 1.1rem;
+  line-height: 1.7;
+}
+
+/* Animation triggers */
+#about .fade-in {
+  opacity: 0;
+  transform: translateX(-100%);
+  transition: opacity 1s ease-out, transform 1s ease-out;
+}
+
+#about .fade-in.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+
+
+
+/* Vest Diagram */
+.vest-diagram {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.vest-diagram img {
+  width: 100%;
+  height: auto;
+  transition: transform 0.3s ease-in-out;
+}
+
+.vest-diagram img:hover {
+  transform: scale(1.05);
+}
+
+
+/* Vest Diagram Container Styling */
+.vest-container {
+  display: inline-block;
+  position: relative;
+  overflow: hidden;
+  width: 100%; /* Size of the container */
+  max-width: 800px;
+  margin: 0 auto;
+  cursor: pointer;
+  border: 4px solid #ccc; /* Light gray border */
+  border-radius: 8px; /* Slightly rounded corners */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Subtle drop shadow */
+  background-color: #fff; /* White background for the container */
+  transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+}
+
+/* Vest Image */
+.vest-container .vest-image {
+  width: 100%; /* Scale the image to fit within the container */
+  height: auto;
+}
+
+/* Hover Effect */
+.vest-container:hover {
+  transform: scale(1.02); /* Slightly enlarge the container on hover */
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.3); /* Enhanced shadow effect on hover */
+}
+
+
+#page-title {
+  margin-top: 150px; /* Pushes the entire section lower */
+  padding-bottom: 20px; /* Keeps spacing below the title */
+  background-color: var(--bs-light); /* Ensure the section is visible */
+}
+
+#page-title h1 {
+  font-size: 3rem;
+  font-weight: bold;
+  color: var(--bs-gray-dark);
+  text-align: left; /* Aligns the title to the left */
+}
+
+
+/* Vests Distributed Section */
+#vests-distributed {
+  padding: 60px 0;
+  background-color: #f8f9fa;
+}
+
+#vests-distributed .section-heading {
+  font-size: 2rem;
+  font-weight: bold;
+  color: var(--bs-green-dark);
+}
+
+.timeline {
+  border-left: 3px solid var(--bs-green-dark);
+  padding-left: 20px;
+}
+
+.timeline-item {
+  margin-bottom: 20px;
+  position: relative;
+}
+
+.timeline-item h4 {
+  font-size: 1.5rem;
+  color: var(--bs-dark);
+  margin-bottom: 10px;
+}
+
+.timeline-item ul {
+  list-style-type: none;
+  padding-left: 0;
+}
+
+.timeline-item ul li {
+  margin-bottom: 5px;
+  font-size: 1.1rem;
+  color: var(--bs-gray-dark);
+}
+
+.total-vests {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: var(--bs-green-dark);
+}
+
+/* FAQ Section */
+#faq {
+  padding: 60px 0;
+  background-color: #343a40;
+  color: #f8f9fa;
+}
+
+#faq .section-heading {
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 40px;
+}
+
+.accordion-button {
+  background-color: var(--bs-dark);
+  color: var(--bs-light);
+  border: none;
+}
+
+.accordion-button:hover {
+  background-color: var(--bs-green-dark);
+}
+
+.accordion-button:focus {
+  box-shadow: none;
+}
+
+.accordion-body {
+  background-color: var(--bs-light);
+  color: var(--bs-dark);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+
+
+/* Highlight Lines */
+.highlight {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.highlight-1 {
+  top: 20%;
+  left: -90px;
+}
+
+.highlight-2 {
+  top: 40%;
+  right: -90px;
+}
+
+.highlight-3 {
+  top: 70%;
+  left: -110px;
+}
+
+.highlight .line {
+  width: 2px;
+  height: 50px;
+  background-color: var(--bs-gray-dark);
+  position: absolute;
+}
+
+.highlight-1 .line {
+  top: 30px;
+  left: 130px;
+  transform: rotate(135deg);
+}
+
+.highlight-2 .line {
+  top: 30px;
+  right: 130px;
+  transform: rotate(45deg);
+}
+
+.highlight-3 .line {
+  top: 30px;
+  left: 150px;
+  transform: rotate(315deg);
+}
+
+/* Highlight Titles and Descriptions */
+.highlight .title {
+  font-weight: bold;
+  text-decoration: underline;
+  cursor: pointer;
+  margin-top: 5px;
+}
+
+.highlight .description {
+  display: none;
+  margin-top: 5px;
+  color: var(--bs-gray-medium);
+}
+
+.highlight:hover .description {
+  display: block;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+/* Fade-in Animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Caption Styling */
+.vest-caption {
+  margin-top: 20px;
+  font-size: 1.1rem;
+  color: var(--bs-gray-dark);
+  text-align: center;
+  font-weight: 500;
+  min-height: 40px; /* Reserve space for the caption */
+  transition: opacity 0.3s ease-in-out;
+  opacity: 0; /* Hidden by default */
+}
+
+.vest-caption.visible {
+  opacity: 1; /* Becomes visible when triggered */
+}
+
+
+
+
+
+
+
 /* Story Section */
 #jen-story .story-container {
   margin-top: 20px;

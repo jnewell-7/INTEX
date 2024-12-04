@@ -187,3 +187,27 @@ document.addEventListener("DOMContentLoaded", () => {
     updateStory();
   });
   
+
+
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const highlights = document.querySelectorAll(".highlight");
+    const caption = document.getElementById("vest-caption");
+
+    highlights.forEach((highlight) => {
+        const description = highlight.getAttribute("data-description");
+        
+        highlight.addEventListener("mouseover", () => {
+            caption.textContent = description;
+            caption.classList.add("visible");
+        });
+
+        highlight.addEventListener("mouseout", () => {
+            caption.classList.remove("visible");
+        });
+    });
+});
+
+
+
+
