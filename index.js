@@ -83,6 +83,29 @@ app.get("/donate", (req, res) => {
   res.render("donate", { title: "Donate Today" });
 });
 
+// Login Page Route
+app.get("/login", (req, res) => {
+  res.render("login", { title: "Admin Login", errorMessage: null });
+});
+
+// Login Submit Route
+app.post("/login", async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    const admin = await knex("admins").where({ username }).first();
+    if (admin && admin.password === password) {
+      req.session.isLoggedIn = true;
+      req.session.username = admin.username;
+      res.redirect("/admin");
+    } else {
+      res.render("login", { title: "Admin Login", errorMessage: "Invalid username or password." });
+    }
+  } catch (error) {
+    console.error("Error during login:", error);
+    res.status(500).render("login", { title: "Admin Login", errorMessage: "An error occurred." });
+  }
+});
+
 // Admin Page Route
 app.get("/admin", isAuthenticated, async (req, res) => {
   try {
@@ -138,9 +161,6 @@ app.post("/updateEventStatus", async (req, res) => {
           const request = await knex("eventrequests").where({ requestid }).first();
           if (request) {
             const totalParticipants = req.body[`participants_${requestid}`] || 0;
-            const zipcodeInfo = await knex("zipcodes").where({ zipcode: request.zipcode }).first();
-
-            if (!zipcodeInfo) throw new Error("Invalid zip code.");
 
             await knex("events").insert({
               eventid: request.requestid,
@@ -191,6 +211,31 @@ app.post("/submitVolunteerData", async (req, res) => {
   } catch (error) {
     console.error("Error adding volunteer:", error);
     res.status(500).send("Failed to add volunteer.");
+  }
+});
+
+// Add Admin Route
+app.post("/addAdmin", isAuthenticated, async (req, res) => {
+  const { username, password } = req.body;
+  try {
+    await knex("admins").insert({ username, password });
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error adding admin:", error);
+    res.status(500).send("Failed to add admin.");
+  }
+});
+
+// Edit Admin Route
+app.post("/editAdmin/:adminid", isAuthenticated, async (req, res) => {
+  const { adminid } = req.params;
+  const { username, password } = req.body;
+  try {
+    await knex("admins").where({ adminid }).update({ username, password });
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error editing admin:", error);
+    res.status(500).send("Failed to edit admin.");
   }
 });
 
