@@ -125,7 +125,7 @@
 
     <!-- Event Requests Section -->
     <h2>Event Requests</h2>
-    <form action="/updateEventStatus" method="POST">
+    <form id="eventRequestForm" action="/updateEventStatus" method="POST">
       <table>
         <thead>
           <tr>
@@ -141,6 +141,7 @@
             <th>Proposed Event Address</th>
             <th>Jen Story Request</th>
             <th>Event Request Status</th>
+            <th>Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -159,17 +160,22 @@
               <td><%= request.jenstoryrequest ? "Yes" : "No" %></td>
               <td>
                 <!-- Dropdown for Event Request Status -->
-                <select name="status_<%= request.requestid %>">
+                <select
+                  name="status_<%= request.requestid %>"
+                  onchange="handleStatusChange(event, <%= request.requestid %>)"
+                >
                   <option value="Pending" <%= request.eventreqstatus === "Pending" ? "selected" : "" %>>Pending</option>
                   <option value="Approved" <%= request.eventreqstatus === "Approved" ? "selected" : "" %>>Approved</option>
                   <option value="Completed" <%= request.eventreqstatus === "Completed" ? "selected" : "" %>>Completed</option>
                 </select>
               </td>
+              <td>
+                <button type="submit" name="action" value="update_<%= request.requestid %>" class="button edit">Save</button>
+              </td>
             </tr>
           <% }); %>
         </tbody>
       </table>
-      <button type="submit" class="button edit">Save Changes</button>
     </form>
 
     <!-- Volunteer Management Section -->
@@ -211,6 +217,23 @@
     </table>
     <button onclick="window.location.href='/volunteer/add'" class="button add">Add New Volunteer</button>
   </div>
+
+  <script>
+    function handleStatusChange(event, requestId) {
+      if (event.target.value === "Completed") {
+        const confirmed = confirm(
+          "Are you sure you want to mark this event request as completed? This will move it to the events table."
+        );
+        if (!confirmed) {
+          // Reset the dropdown to its previous value if user cancels
+          event.target.value = "Pending";
+        } else {
+          // Submit the form to handle the status update
+          document.getElementById("eventRequestForm").submit();
+        }
+      }
+    }
+  </script>
 </body>
 
 </html>

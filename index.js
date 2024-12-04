@@ -200,12 +200,38 @@ app.post("/updateEventStatus", async (req, res) => {
 
     for (const [key, value] of updates) {
       if (key.startsWith("status_")) {
-        const requestid = key.split("_")[1];
-        await knex("eventrequests").where({ requestid }).update({ eventreqstatus: value });
+        const requestid = key.split("_")[1]; // Extract request ID from the key
+
+        if (value === "Completed") {
+          // Fetch the event request record
+          const request = await knex("eventrequests").where({ requestid }).first();
+
+          if (request) {
+            // Move the record to the events table
+            await knex("events").insert({
+              eventid: request.requestid, // Or generate a new ID if necessary
+              eventdate: request.eventdate,
+              zipcode: request.zipcode,
+              estimatedattendance: request.estimatedattendance,
+              activitytype: request.activitytype,
+              contactfirstname: request.contactfirstname,
+              contactlastname: request.contactlastname,
+              contactemail: request.contactemail,
+              contactphone: request.contactphone,
+              proposedeventaddress: request.proposedeventaddress,
+            });
+
+            // Delete the record from the eventrequests table
+            await knex("eventrequests").where({ requestid }).del();
+          }
+        } else {
+          // Update the event request status if not "Completed"
+          await knex("eventrequests").where({ requestid }).update({ eventreqstatus: value });
+        }
       }
     }
 
-    res.redirect("/admin");
+    res.redirect("/admin"); // Redirect back to the admin page
   } catch (error) {
     console.error("Error updating event request status:", error);
     res.status(500).send("Failed to update event request status.");
