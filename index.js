@@ -1,10 +1,9 @@
-// Proper app variable creation
 const express = require("express");
 const session = require("express-session");
 const app = express();
 const path = require("path");
 
-// Establishes port using .env file
+// Establishes port using .env file or default
 const port = process.env.PORT || 3000;
 
 // Set EJS as the view engine
@@ -77,27 +76,13 @@ app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    console.log("Received login request:", username);
-
-    // Query the database for admin credentials
     const admin = await knex("admins").where({ username }).first();
-    console.log("Admin record found:", admin);
 
-    if (!admin) {
-      console.log("Username not found");
-      return res.render("login", {
-        title: "Admin Login",
-        errorMessage: "Invalid username or password.",
-      });
-    }
-
-    if (admin.password === password) {
-      console.log("Login successful!");
+    if (admin && admin.password === password) {
       req.session.isLoggedIn = true; // Mark user as logged in
       req.session.username = admin.username; // Store username in session
       res.redirect("/admin");
     } else {
-      console.log("Password mismatch");
       res.render("login", {
         title: "Admin Login",
         errorMessage: "Invalid username or password.",
@@ -115,13 +100,8 @@ app.post("/login", async (req, res) => {
 // Admin Page Route (Protected)
 app.get("/admin", isAuthenticated, async (req, res) => {
   try {
-    // Fetch admin data ordered by first name
     const admins = await knex("admins").select("*").orderBy("adminid", "asc");
-
-    // Fetch event request data (unchanged)
     const eventRequests = await knex("eventrequests").select("*");
-
-    // Fetch volunteer data ordered by first name
     const volunteers = await knex("volunteers")
       .join("zipcodes", "volunteers.zipcode", "=", "zipcodes.zipcode")
       .select(
@@ -139,32 +119,24 @@ app.get("/admin", isAuthenticated, async (req, res) => {
       )
       .orderBy("volunteers.volfirstname", "asc");
 
-    // Render the admin dashboard with all data
-    res.render("admin", {
-      title: "Admin Dashboard",
-      admins,
-      eventRequests,
-      volunteers,
-    });
+    res.render("admin", { title: "Admin Dashboard", admins, eventRequests, volunteers });
   } catch (error) {
     console.error("Error loading admin page:", error);
     res.status(500).send("Error loading admin dashboard.");
   }
 });
 
-app.get("/editAdmin/:id", async (req, res) => {
+// Edit Admin (GET)
+app.get("/editAdmin/:id", isAuthenticated, async (req, res) => {
   const adminid = req.params.id;
 
   try {
-    // Fetch the admin record by ID
     const admin = await knex("admins").where({ adminid }).first();
 
-    // If the admin record is not found, return a 404 error
     if (!admin) {
       return res.status(404).send("Admin not found.");
     }
 
-    // Render the editAdmin page with the admin data
     res.render("editAdmin", {
       title: `Edit Admin - ${admin.firstname} ${admin.lastname}`,
       admin,
@@ -175,34 +147,11 @@ app.get("/editAdmin/:id", async (req, res) => {
   }
 });
 
-// Edit Admin (Update/Delete) Route
-app.post("/editAdmin", async (req, res) => {
-  const {
-    adminid,
-    username,
-    password,
-    firstname,
-    lastname,
-    email,
-    phonenumber,
-  } = req.body;
-// Logout Route
-app.post("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) {
-      console.error("Error during logout:", err);
-      return res.status(500).send("Failed to log out.");
-    }
-    res.redirect("/login");
-  });
-});
-
-// Edit Admin (Update/Delete) Route
+// Edit Admin (POST)
 app.post("/editAdmin", isAuthenticated, async (req, res) => {
-  const actions = Object.entries(req.body);
+  const { adminid, username, password, firstname, lastname, email, phonenumber } = req.body;
 
   try {
-    // Update the admin record in the database
     await knex("admins").where({ adminid }).update({
       username,
       password,
@@ -212,7 +161,6 @@ app.post("/editAdmin", isAuthenticated, async (req, res) => {
       phonenumber,
     });
 
-    // Redirect back to the admin dashboard after successful update
     res.redirect("/admin");
   } catch (error) {
     console.error("Error updating admin data:", error);
@@ -220,7 +168,12 @@ app.post("/editAdmin", isAuthenticated, async (req, res) => {
   }
 });
 
-// Add Admin Route
+// Add Admin (GET)
+app.get("/addAdmin", isAuthenticated, (req, res) => {
+  res.render("addAdmin", { title: "Add New Admin" });
+});
+
+// Add Admin (POST)
 app.post("/addAdmin", isAuthenticated, async (req, res) => {
   const { username, password, firstname, lastname, email, phone } = req.body;
 
@@ -240,58 +193,34 @@ app.post("/addAdmin", isAuthenticated, async (req, res) => {
   }
 });
 
-app.get("/addAdmin", isAuthenticated, (req, res) => {
-  res.render("addAdmin", { title: "Add New Admin" });
-});
-
+// Update Event Request Status
 app.post("/updateEventStatus", async (req, res) => {
   try {
     const updates = Object.entries(req.body);
 
     for (const [key, value] of updates) {
       if (key.startsWith("status_")) {
-        const requestid = key.split("_")[1]; // Extract request ID from the key
-        await knex("eventrequests")
-          .where({ requestid })
-          .update({ eventreqstatus: value });
+        const requestid = key.split("_")[1];
+        await knex("eventrequests").where({ requestid }).update({ eventreqstatus: value });
       }
     }
 
-    res.redirect("/admin"); // Redirect back to the admin page
+    res.redirect("/admin");
   } catch (error) {
     console.error("Error updating event request status:", error);
     res.status(500).send("Failed to update event request status.");
   }
 });
 
-// Landing Page Route
-app.get("/", (req, res) => {
-  res.render("index", { title: "Welcome to the Turtle Shelter Project" });
-});
-
-// About Page Route
-app.get("/about", (req, res) => {
-  res.render("about", { title: "About - Turtle Shelter Project" });
-});
-
-// Jen's Story Page Route
-app.get("/jen-story", (req, res) => {
-  res.render("jen", { title: "Jen's Story" });
-});
-
-// Event Request Page Route
-app.get("/help", (req, res) => {
-  res.render("help", { title: "Request Event" });
-});
-
-// Donations Page Route
-app.get("/donate", (req, res) => {
-  res.render("donate", { title: "Donate Today" });
-});
-
-// Get Involved Route
-app.get("/get-involved", (req, res) => {
-  res.render("volunteer", { title: "Volunteer Today" });
+// Logout Route
+app.post("/logout", (req, res) => {
+  req.session.destroy((err) => {
+    if (err) {
+      console.error("Error during logout:", err);
+      return res.status(500).send("Failed to log out.");
+    }
+    res.redirect("/login");
+  });
 });
 
 // Error Handling Middleware
