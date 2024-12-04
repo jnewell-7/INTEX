@@ -399,6 +399,19 @@
   margin-bottom: 40px;
 }
 
+
+.return-home-link {
+  color: #000000 !important;; 
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.return-home-link:hover {
+  text-decoration: underline;
+  color: #000000 !important;; 
+}
+
+
 #about .vest-diagram {
   width: 45%;
   position: relative;
