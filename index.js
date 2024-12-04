@@ -1,7 +1,7 @@
 // Proper app variable creation
-let express = require("express");
-let app = express();
-let path = require("path");
+const express = require("express");
+const app = express();
+const path = require("path");
 
 // Establishes port using .env file
 const port = process.env.PORT || 3000;
@@ -25,7 +25,7 @@ const knex = require("knex")({
     password: process.env.RDS_PASSWORD || "gocougs123",
     database: process.env.RDS_DB_NAME || "ebdb",
     port: process.env.RDS_PORT || 5432,
-    ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false,
+    ssl: process.env.DB_SSL ? { rejectUnauthorized: false } : false,
   },
   pool: {
     min: 2, // Minimum connections in the pool
@@ -37,7 +37,7 @@ const knex = require("knex")({
 
 // Login Page Route (GET)
 app.get("/login", (req, res) => {
-  res.render("login", { title: "Admin Login", error: null }); // Render login page
+  res.render("login", { title: "Admin Login", errorMessage: null }); // Render login page
 });
 
 // Login Submit Route (POST)
@@ -45,7 +45,7 @@ app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    console.log("Received login request:", username, password);
+    console.log("Received login request:", username);
 
     // Query the database for the admin credentials
     const admin = await knex("admin").where({ username }).first();
@@ -55,7 +55,7 @@ app.post("/login", async (req, res) => {
       console.log("Username not found");
       return res.render("login", {
         title: "Admin Login",
-        error: "Invalid username or password.",
+        errorMessage: "Invalid username or password.",
       });
     }
 
@@ -66,53 +66,70 @@ app.post("/login", async (req, res) => {
       console.log("Password mismatch");
       res.render("login", {
         title: "Admin Login",
-        error: "Invalid username or password.",
+        errorMessage: "Invalid username or password.",
       });
     }
   } catch (error) {
     console.error("Error during login:", error);
     res.status(500).render("login", {
       title: "Admin Login",
-      error: "An unexpected error occurred. Please try again later.",
+      errorMessage: "An unexpected error occurred. Please try again later.",
     });
-  } finally {
-    // Ensure the connection is released back to the pool
-    knex.destroy();
   }
 });
 
 // Admin Page Route
-app.get("/admin", (req, res) => {
-  res.render("admin", { title: "Admin Dashboard" }); // Placeholder admin dashboard
+app.get("/admin", async (req, res) => {
+  try {
+    // Fetch admin records and event requests from the database
+    const admins = await knex("admin").select("*");
+    const eventRequests = await knex("eventrequest").select("*");
+
+    // Render the admin page with fetched data
+    res.render("admin", {
+      title: "Admin Dashboard",
+      admins: admins,
+      eventRequests: eventRequests,
+    });
+  } catch (error) {
+    console.error("Error fetching data for admin page:", error); // Log full error details
+    res.status(500).send("An error occurred while loading the admin dashboard."); // Display a generic error message
+  }
 });
 
-// Landing Page Get Route
+// Landing Page Route
 app.get("/", (req, res) => {
   res.render("index", { title: "Welcome to the Turtle Shelter Project" });
 });
 
-// Jen's Story Get Route
+// Jen's Story Page Route
 app.get("/jen-story", (req, res) => {
   res.render("jen", { title: "Jen's Story" });
 });
 
-//request event route
+// Event Request Page Route
 app.get("/help", (req, res) => {
-  res.render("help", { title: "Request Event" }); 
+  res.render("help", { title: "Request Event" });
 });
 
-//donations
+// Donations Page Route
 app.get("/donate", (req, res) => {
-  res.render("donate", { title: "Donate Today" }); 
+  res.render("donate", { title: "Donate Today" });
 });
 
-// sends user to the real donation page 
+// Redirect to Real Donation Page
 app.get("/realDonate", (req, res) => {
-  res.redirect("https://turtleshelterproject.org/checkout/donate?donatePageId=5b6a44c588251b72932df5a0"); 
+  res.redirect(
+    "https://turtleshelterproject.org/checkout/donate?donatePageId=5b6a44c588251b72932df5a0"
+  );
 });
 
+// Error Handling Middleware
+app.use((req, res) => {
+  res.status(404).send("Page not found.");
+});
 
-// Confirmation message
-app.listen(port, () =>
-  console.log(`Server is up and running on port ${port}!`)
-);
+// Start Server
+app.listen(port, () => {
+  console.log(`Server is up and running on port ${port}!`);
+});

@@ -1,1 +1,153 @@
-<h1>this is a test</h1>
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f0f0f0;
+            margin: 0;
+        }
+        .dashboard-container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 90%;
+            max-width: 1200px;
+            text-align: center;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+        h1 {
+            margin-bottom: 1.5rem;
+            color: #7d8562;
+            font-weight: 700;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 1.5rem;
+            font-size: 0.9rem;
+        }
+        th, td {
+            padding: 0.75rem;
+            text-align: left;
+            border: 1px solid #d0d0d0;
+        }
+        th {
+            background-color: #7d8562;
+            color: #ffffff;
+            font-weight: 700;
+        }
+        td input {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #d0d0d0;
+            border-radius: 4px;
+        }
+        td input:focus {
+            outline: none;
+            border-color: #7d8562;
+            box-shadow: 0 0 5px rgba(46, 125, 50, 0.4);
+        }
+        .button {
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: #ffffff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .button.edit {
+            background-color: #ffc107;
+        }
+        .button.delete {
+            background-color: #dc3545;
+        }
+        .button.add {
+            background-color: #28a745;
+            margin-bottom: 1rem;
+        }
+        .button:hover {
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <h1>Admin Dashboard</h1>
+        <h2>Manage Admins</h2>
+        <form action="/admin/update" method="POST">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Admin ID</th>
+                        <th>Username</th>
+                        <th>Password</th>
+                        <th>First Name</th>
+                        <th>Last Name</th>
+                        <th>Email</th>
+                        <th>Phone</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <% admins.forEach(function(admin) { %>
+                        <tr>
+                            <td><%= admin.AdminID %></td>
+                            <td><input type="text" name="username_<%= admin.AdminID %>" value="<%= admin.Username %>"></td>
+                            <td><input type="text" name="password_<%= admin.AdminID %>" value="<%= admin.Password %>"></td>
+                            <td><input type="text" name="firstName_<%= admin.AdminID %>" value="<%= admin.FirstName %>"></td>
+                            <td><input type="text" name="lastName_<%= admin.AdminID %>" value="<%= admin.LastName %>"></td>
+                            <td><input type="email" name="email_<%= admin.AdminID %>" value="<%= admin.Email %>"></td>
+                            <td><input type="text" name="phone_<%= admin.AdminID %>" value="<%= admin.PhoneNumber %>"></td>
+                            <td>
+                                <button type="submit" name="action" value="update_<%= admin.AdminID %>" class="button edit">Update</button>
+                                <button type="submit" name="action" value="delete_<%= admin.AdminID %>" class="button delete">Delete</button>
+                            </td>
+                        </tr>
+                    <% }); %>
+                </tbody>
+            </table>
+        </form>
+        <button onclick="window.location.href='/admin/add'" class="button add">Add New Admin</button>
+
+        <h2>Event Requests</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Request ID</th>
+                    <th>Event Date</th>
+                    <th>Zip Code</th>
+                    <th>Attendance</th>
+                    <th>Activity Type</th>
+                    <th>Contact Name</th>
+                    <th>Contact Phone</th>
+                    <th>Jen Story Request</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% eventRequests.forEach(function(request) { %>
+                    <tr>
+                        <td><%= request.RequestID %></td>
+                        <td><%= request.EventDate %></td>
+                        <td><%= request.ZipCode %></td>
+                        <td><%= request.RoughAttendance %></td>
+                        <td><%= request.ActivityType %></td>
+                        <td><%= request.ContactName %></td>
+                        <td><%= request.ContactPhone %></td>
+                        <td><%= request.JenStoryRequest ? "Yes" : "No" %></td>
+                    </tr>
+                <% }); %>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>
