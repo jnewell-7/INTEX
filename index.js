@@ -246,6 +246,10 @@ app.get("/realDonate", (req, res) => {
   );
 });
 
+app.get("/get-involved", (req, res) => {
+  res.render("volunteer", { title: "Volunteer Today" });
+});
+
 // Logout Route
 app.post("/logout", (req, res) => {
   req.session.destroy((err) => {
