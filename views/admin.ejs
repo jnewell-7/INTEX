@@ -113,18 +113,18 @@
           <% admins.forEach(function(admin) { %>
             <tr>
               <td>
-                <%= admin.AdminID %>
+                <%= admin.adminid %>
               </td>
-              <td><input type="text" name="username_<%= admin.AdminID %>" value="<%= admin.Username %>"></td>
-              <td><input type="password" name="password_<%= admin.AdminID %>" value="<%= admin.Password %>"></td>
-              <td><input type="text" name="firstName_<%= admin.AdminID %>" value="<%= admin.FirstName %>"></td>
-              <td><input type="text" name="lastName_<%= admin.AdminID %>" value="<%= admin.LastName %>"></td>
-              <td><input type="email" name="email_<%= admin.AdminID %>" value="<%= admin.Email %>"></td>
-              <td><input type="text" name="phone_<%= admin.AdminID %>" value="<%= admin.PhoneNumber %>"></td>
+              <td><input type="text" name="username_<%= admin.adminid %>" value="<%= admin.username %>"></td>
+              <td><input type="password" name="password_<%= admin.adminid %>" value="<%= admin.password %>"></td>
+              <td><input type="text" name="firstName_<%= admin.adminid %>" value="<%= admin.firstname %>"></td>
+              <td><input type="text" name="lastName_<%= admin.adminid %>" value="<%= admin.lastname %>"></td>
+              <td><input type="email" name="email_<%= admin.adminid %>" value="<%= admin.email %>"></td>
+              <td><input type="text" name="phone_<%= admin.adminid %>" value="<%= admin.phonenumber %>"></td>
               <td>
-                <button type="submit" name="action" value="update_<%= admin.AdminID %>"
+                <button type="submit" name="action" value="update_<%= admin.adminid %>"
                   class="button edit">Update</button>
-                <button type="submit" name="action" value="delete_<%= admin.AdminID %>"
+                <button type="submit" name="action" value="delete_<%= admin.adminid %>"
                   class="button delete">Delete</button>
               </td>
             </tr>
@@ -153,28 +153,28 @@
         <% eventRequests.forEach(function(request) { %>
           <tr>
             <td>
-              <%= request.RequestID %>
+              <%= request.requestid %>
             </td>
             <td>
-              <%= request.EventDate %>
+              <%= request.eventdate %>
             </td>
             <td>
-              <%= request.ZipCode %>
+              <%= request.zipcode %>
             </td>
             <td>
-              <%= request.RoughAttendance %>
+              <%= request.roughattendance %>
             </td>
             <td>
-              <%= request.ActivityType %>
+              <%= request.activitytype %>
             </td>
             <td>
-              <%= request.ContactName %>
+              <%= request.contactname %>
             </td>
             <td>
-              <%= request.ContactPhone %>
+              <%= request.contactphone %>
             </td>
             <td>
-              <%= request.JenStoryRequest ? "Yes" : "No" %>
+              <%= request.jenstoryrequest ? "Yes" : "No" %>
             </td>
           </tr>
           <% }); %>
