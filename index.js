@@ -221,6 +221,58 @@ app.use((req, res) => {
   res.status(404).send("Page not found.");
 });
 
+
+// Route to handle adding a new volunteer
+app.post('/submitVolunteerData', async (req, res) => {
+  try {
+      // Extract form values from req.body
+      const first_name = req.body.first_name ? req.body.first_name.trim().toUpperCase() : ''; 
+      const last_name = req.body.last_name ? req.body.last_name.trim().toUpperCase() : '';
+      const phone = req.body.phone ? req.body.phone.trim() : ''; 
+      const email = req.body.email ? req.body.email.trim().toLowerCase() : ''; 
+      const zipcode = req.body.zipcode ? req.body.zipcode.trim() : ''; 
+      const sewing_level = req.body.sewing_level ? req.body.sewing_level.trim() : ''; 
+      const monthly_hours = parseInt(req.body.monthly_hours, 10) || 0;
+      const heard_about = req.body.heard_about === 'Other' && req.body.other_input
+          ? req.body.other_input.trim() 
+          : req.body.heard_about;
+      
+      const city = req.body.city ? req.body.city.trim().toUpperCase() : ''; 
+      const state = req.body.state ? req.body.state.trim().toUpperCase() : '';
+
+      // Validate if the zipcode exists in the zipcodes table
+      let zipcodeRecord = await knex('zipcodes').where({ zipcode }).first();
+
+      // If the zipcode does not exist, insert it along with city and state into the zipcodes table
+      if (!zipcodeRecord) {
+          await knex('zipcodes').insert({
+              zipcode: zipcode,
+              city: city,
+              state: state,
+          });
+      }
+
+      // Insert the new volunteer into the volunteers table
+      await knex('volunteers').insert({
+          volfirstname: first_name,
+          vollastname: last_name,
+          phone: phone,
+          email: email,
+          zipcode: zipcode, // Only store the zipcode here (foreign key)
+          sewinglevel: sewing_level,
+          monthlyhours: monthly_hours,
+          heardaboutopportunity: heard_about,
+      });
+
+      res.redirect('/'); // Redirect to the homepage after adding the volunteer
+  } catch (error) {
+      console.error('Error adding volunteer:', error);
+      res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
 // Start Server
 app.listen(port, () => {
   console.log(`Server is up and running on port ${port}!`);
