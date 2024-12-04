@@ -263,5 +263,59 @@ app.use((req, res) => {
   res.status(404).send("Page not found.");
 });
 
+//Post route to put volunteer data into the database
+app.post('/submitVolunteerData', (req, res) => {
+  // Extract form values from req.body with necessary validation and transformation
+  try {
+    const first_name = req.body.first_name?.trim().toUpperCase(); // Ensure first name is uppercase and trimmed
+    const last_name = req.body.last_name?.trim().toUpperCase(); // Ensure last name is uppercase and trimmed
+    const phone = req.body.phone?.trim(); // Phone number (validated in frontend, ensure trimmed)
+    const email = req.body.email?.trim().toLowerCase(); // Ensure email is lowercase and trimmed
+    const city = req.body.city?.trim().toUpperCase(); // Ensure city is uppercase and trimmed
+    const state = req.body.state?.trim().toUpperCase(); // Ensure state is uppercase and trimmed
+    const zipcode = req.body.zipcode?.trim(); // Zipcode
+    const sewing_level = req.body.sewing_level?.trim(); // Sewing level (dropdown value)
+    const monthly_hours = parseInt(req.body.monthly_hours, 10); // Convert to integer
+    const heard_about = req.body.heard_about === 'Other' ? req.body.other_input?.trim() : req.body.heard_about?.trim(); // Handle 'Other' case, ensure trimmed
+
+    // Validate 'Other' input if 'Other' is selected for heard_about
+    if (req.body.heard_about === 'Other' && (!req.body.other_input || req.body.other_input.trim() === '')) {
+      return res.status(400).send('Please specify how you heard about us.');
+    }
+
+    // Insert the new volunteer into the database
+    knex('volunteers')
+      .insert({
+        volfirstname: first_name,
+        vollastname: last_name,
+        phone: phone,
+        email: email,
+        city: city,
+        state: state,
+        zipcode: zipcode,
+        sewinglevel: sewing_level,
+        monthlyhours: monthly_hours,
+        heardaboutopportunity: heard_about,
+      })
+      .then(() => {
+        res.redirect('/'); // Redirect to the homepage after adding the volunteer
+      })
+      .catch(error => {
+        console.error('Error adding volunteer:', error);
+        // Handle common errors like duplicate email or database constraint violations
+        if (error.code === '23505') { // Assuming 23505 is the unique violation error code for your database
+          res.status(400).send('A volunteer with this email already exists.');
+        } else {
+          res.status(500).send('Internal Server Error');
+        }
+      });
+  } catch (err) {
+    console.error('Unexpected error:', err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
 // Start Server
 app.listen(port, () => console.log(`Server is running on port ${port}!`));
