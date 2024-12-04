@@ -11,98 +11,108 @@
             padding: 0;
             background-color: #f0f4f8;
         }
+        /* Navigation Bar */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #2c2c2c; /* Dark background */
+            padding: 10px 20px;
+            color: #fff;
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+        }
+        .navbar .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ffcc00; /* Highlighted logo color */
+            text-decoration: none;
+        }
+        .navbar .nav-links {
+            display: flex;
+            gap: 20px;
+        }
+        .navbar .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .navbar .nav-links a:hover {
+            color: #ffcc00; /* Highlight color on hover */
+        }
+        /* Hero Section */
         .hero {
             position: relative;
-            background-image: url('https://images.squarespace-cdn.com/content/v1/5b5a266fcef372310148d6d6/1567460209464-IYTINWBNI8U2K1HNM2YY/20181225_165049%2B%25281%2529.jpg?format=2500w'); /* Static local path to the image */
+            background-image: url('https://images.squarespace-cdn.com/content/v1/5b5a266fcef372310148d6d6/1567460209464-IYTINWBNI8U2K1HNM2YY/20181225_165049%2B%25281%2529.jpg?format=2500w');
             background-size: cover;
             background-position: center;
             height: 100vh;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
+            justify-content: flex-end; /* Align content to bottom */
             align-items: center;
-            color: white;
             text-align: center;
+            color: white;
+            padding-bottom: 100px; /* Add spacing below the text */
+        }
+        .text-container {
+            background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 700px;
+            color: #fff;
         }
         .hero-text {
             font-size: 2.5rem;
             font-weight: bold;
-            margin-bottom: 20px;
-            text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.8);
-        }
-        .donation-box {
-            position: absolute;
-            bottom: 30px;
-            left: 30px;
-            background: #ffffff;
-            border-radius: 12px;
-            padding: 30px;
-            box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.15);
-            max-width: 350px;
-            width: 100%;
-        }
-        .donation-box input[type="number"] {
-            width: 100%;
-            padding: 15px;
             margin-bottom: 15px;
-            border: 1px solid #ccc;
-            border-radius: 8px;
-            font-size: 16px;
         }
-        .donation-box button {
-            width: 48%;
-            margin: 5px 1%;
-            padding: 15px;
+        .donation-message {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+        .donate-button {
             background-color: #2d8f5e;
             color: white;
             border: none;
             border-radius: 8px;
-            font-size: 16px;
+            padding: 20px 40px;
+            font-size: 1.5rem;
+            font-weight: bold;
             cursor: pointer;
-            display: inline-block;
+            box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+            transition: background-color 0.3s ease;
         }
-        .donation-box button:hover {
+        .donate-button:hover {
             background-color: #24724b;
-        }
-        .donation-box label {
-            display: block;
-            margin-top: 15px;
-            font-size: 14px;
-            color: #333;
-        }
-        .donation-box label input {
-            margin-right: 8px;
-        }
-        .donation-box .submit-button {
-            width: 100%;
-            margin-top: 20px;
-            background-color: #0066cc;
-            font-size: 18px;
-            padding: 15px;
-        }
-        .donation-box .submit-button:hover {
-            background-color: #004a99;
         }
     </style>
 </head>
 <body>
-    <div class="hero">
-        <div class="hero-text">
-            DONATE TO HELP SAVE LIVES
+    <!-- Navigation Bar -->
+    <div class="navbar">
+        <a href="/" class="logo">TURTLE SHELTER PROJECT</a>
+        <div class="nav-links">
+            <a href="/about">ABOUT</a>
+            <a href="/story">JEN'S STORY</a>
+            <a href="/get-involved">GET INVOLVED</a>
         </div>
-        <div class="donation-box">
-            <form action="/donate" method="POST">
-                <input type="number" name="amount" value="25" min="1" step="1" placeholder="Enter amount" required>
-                <div>
-                    <button type="button">$5</button>
-                    <button type="button">$25</button>
-                    <button type="button">$50</button>
-                    <button type="button">$100</button>
-                </div>
-                <label>
-                    <input type="checkbox" name="monthly">
-                    Make this donation monthly
-                </label>
-                <button type="submit" class="submit-button">Donate</button>
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <div class="text-container">
+            <div class="hero-text">DONATE TO HELP SAVE LIVES</div>
+            <div class="donation-message">
+                Each $30 tax-deductible donation to the Turtle Shelter Project will provide a high-tech foam vest for a youth or adult experiencing homelessness. You can tell us where you would like the vest or vests sent to, or we will send them to where there is the greatest need.
+            </div>
+            <form action="/realDonate" method="GET">
+                <button type="submit" class="donate-button">Donate</button>
             </form>
         </div>
     </div>
