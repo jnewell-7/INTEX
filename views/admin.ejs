@@ -53,18 +53,6 @@
       color: #ffffff;
     }
 
-    td input {
-      width: 100%;
-      padding: 0.5rem;
-      border: 1px solid #d0d0d0;
-      border-radius: 4px;
-    }
-
-    td input:focus {
-      border-color: #7d8562;
-      outline: none;
-    }
-
     .button {
       padding: 0.75rem 1rem;
       font-size: 0.9rem;
@@ -72,14 +60,6 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
-    }
-
-    .button.edit {
-      background-color: #ffc107;
-    }
-
-    .button.delete {
-      background-color: #dc3545;
     }
 
     .button.add {
@@ -95,43 +75,33 @@
 
     <!-- Admin Management Section -->
     <h2>Manage Admins</h2>
-    <form action="/admin/update" method="POST">
-      <table>
-        <thead>
+    <table>
+      <thead>
+        <tr>
+          <th>Admin ID</th>
+          <th>Username</th>
+          <th>Password</th>
+          <th>First Name</th>
+          <th>Last Name</th>
+          <th>Email</th>
+          <th>Phone</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% admins.forEach(function(admin) { %>
           <tr>
-            <th>Admin ID</th>
-            <th>Username</th>
-            <th>Password</th>
-            <th>First Name</th>
-            <th>Last Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Actions</th>
+            <td><%= admin.adminid %></td>
+            <td><%= admin.username %></td>
+            <td><%= admin.password %></td>
+            <td><%= admin.firstname %></td>
+            <td><%= admin.lastname %></td>
+            <td><%= admin.email %></td>
+            <td><%= admin.phonenumber %></td>
           </tr>
-        </thead>
-        <tbody>
-          <% admins.forEach(function(admin) { %>
-            <tr>
-              <td>
-                <%= admin.adminid %>
-              </td>
-              <td><input type="text" name="username_<%= admin.adminid %>" value="<%= admin.username %>"></td>
-              <td><input type="password" name="password_<%= admin.adminid %>" value="<%= admin.password %>"></td>
-              <td><input type="text" name="firstName_<%= admin.adminid %>" value="<%= admin.firstname %>"></td>
-              <td><input type="text" name="lastName_<%= admin.adminid %>" value="<%= admin.lastname %>"></td>
-              <td><input type="email" name="email_<%= admin.adminid %>" value="<%= admin.email %>"></td>
-              <td><input type="text" name="phone_<%= admin.adminid %>" value="<%= admin.phonenumber %>"></td>
-              <td>
-                <button type="submit" name="action" value="update_<%= admin.adminid %>"
-                  class="button edit">Update</button>
-                <button type="submit" name="action" value="delete_<%= admin.adminid %>"
-                  class="button delete">Delete</button>
-              </td>
-            </tr>
-            <% }); %>
-        </tbody>
-      </table>
-    </form>
+        <% }); %>
+      </tbody>
+    </table>
+
     <button onclick="window.location.href='/admin/add'" class="button add">Add New Admin</button>
 
     <!-- Event Requests Section -->
@@ -142,42 +112,34 @@
           <th>Request ID</th>
           <th>Event Date</th>
           <th>Zip Code</th>
-          <th>Attendance</th>
+          <th>Estimated Attendance</th>
           <th>Activity Type</th>
-          <th>Contact Name</th>
+          <th>Contact First Name</th>
+          <th>Contact Last Name</th>
+          <th>Contact Email</th>
           <th>Contact Phone</th>
+          <th>Proposed Event Address</th>
           <th>Jen Story Request</th>
+          <th>Event Request Status</th>
         </tr>
       </thead>
       <tbody>
         <% eventRequests.forEach(function(request) { %>
           <tr>
-            <td>
-              <%= request.requestid %>
-            </td>
-            <td>
-              <%= request.eventdate %>
-            </td>
-            <td>
-              <%= request.zipcode %>
-            </td>
-            <td>
-              <%= request.roughattendance %>
-            </td>
-            <td>
-              <%= request.activitytype %>
-            </td>
-            <td>
-              <%= request.contactname %>
-            </td>
-            <td>
-              <%= request.contactphone %>
-            </td>
-            <td>
-              <%= request.jenstoryrequest ? "Yes" : "No" %>
-            </td>
+            <td><%= request.requestid %></td>
+            <td><%= request.eventdate %></td>
+            <td><%= request.zipcode %></td>
+            <td><%= request.estimatedattendance %></td>
+            <td><%= request.activitytype %></td>
+            <td><%= request.contactfirstname %></td>
+            <td><%= request.contactlastname %></td>
+            <td><%= request.contactemail %></td>
+            <td><%= request.contactphone %></td>
+            <td><%= request.proposedeventaddress %></td>
+            <td><%= request.jenstoryrequest ? "Yes" : "No" %></td>
+            <td><%= request.eventreqstatus %></td>
           </tr>
-          <% }); %>
+        <% }); %>
       </tbody>
     </table>
   </div>
