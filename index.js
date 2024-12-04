@@ -106,6 +106,7 @@ app.get("/donate", (req, res) => {
   res.render("donate", { title: "Donate Today" }); 
 });
 
+// sends user to the real donation page 
 app.get("/realDonate", (req, res) => {
   res.redirect("https://turtleshelterproject.org/checkout/donate?donatePageId=5b6a44c588251b72932df5a0"); 
 });
