@@ -38,8 +38,9 @@ const knex = require("knex")({
     ssl: { rejectUnauthorized: false }, // Adjust SSL as needed
   },
   pool: {
-    min: 2,
-    max: 10,
+    min: 0,
+    max: 15,
+    acquireTimeoutMillis: 30000,
   },
 });
 
@@ -57,42 +58,139 @@ function isAuthenticated(req, res, next) {
 
 // Routes
 
-// Landing Page Route (GET)
+// Landing Page Route
 app.get("/", (req, res) => {
-  res.render("index", { title: "Welcome to Turtle Shelter" });
+  res.render("index", { title: "Welcome to the Turtle Shelter Project" });
 });
 
-// Login Page Route (GET)
-app.get("/login", (req, res) => {
-  res.render("login", { title: "Admin Login", errorMessage: null });
+// About Page Route
+app.get("/about", (req, res) => {
+  res.render("about", { title: "About - Turtle Shelter Project" });
 });
 
-// Login Submit Route (POST)
-app.post("/login", async (req, res) => {
-  const { username, password } = req.body;
-  try {
-    const admin = await knex("admins").where({ username }).first();
-    if (admin && admin.password === password) {
-      req.session.isLoggedIn = true;
-      req.session.username = admin.username;
-      res.redirect("/admin");
-    } else {
-      res.render("login", { title: "Admin Login", errorMessage: "Invalid username or password." });
-    }
-  } catch (error) {
-    console.error("Error during login:", error);
-    res.status(500).render("login", { title: "Admin Login", errorMessage: "An error occurred." });
-  }
+// Jen's Story Page Route
+app.get("/jen-story", (req, res) => {
+  res.render("jen", { title: "Jen's Story" });
+});
+
+// Help Page Route
+app.get("/help", (req, res) => {
+  res.render("help", { title: "Request Event" });
+});
+
+// Donate Page Route
+app.get("/donate", (req, res) => {
+  res.render("donate", { title: "Donate Today" });
 });
 
 // Admin Page Route
 app.get("/admin", isAuthenticated, async (req, res) => {
   try {
     const admins = await knex("admins").select("*").orderBy("adminid", "asc");
-    res.render("admin", { title: "Admin Dashboard", admins });
+    const eventRequests = await knex("eventrequests").select("*");
+    const volunteers = await knex("volunteers")
+      .join("zipcodes", "volunteers.zipcode", "=", "zipcodes.zipcode")
+      .select(
+        "volunteers.volunteerid",
+        "volunteers.volfirstname",
+        "volunteers.vollastname",
+        "volunteers.phone",
+        "volunteers.email",
+        "volunteers.sewinglevel",
+        "volunteers.monthlyhours",
+        "volunteers.heardaboutopportunity",
+        "volunteers.zipcode",
+        "zipcodes.city",
+        "zipcodes.state"
+      )
+      .orderBy("volunteers.volfirstname", "asc");
+    const events = await knex("events")
+      .join("zipcodes", "events.zipcode", "=", "zipcodes.zipcode")
+      .select(
+        "events.eventid",
+        "events.eventdate",
+        "events.eventaddress",
+        "events.zipcode",
+        "zipcodes.city",
+        "zipcodes.state",
+        "events.totalparticipants",
+        "events.eventstatus"
+      )
+      .orderBy("events.eventdate", "asc");
+
+    res.render("admin", { title: "Admin Dashboard", admins, eventRequests, volunteers, events });
   } catch (error) {
     console.error("Error loading admin page:", error);
     res.status(500).send("Error loading admin dashboard.");
+  }
+});
+
+// Update Event Request Status
+app.post("/updateEventStatus", async (req, res) => {
+  try {
+    const updates = Object.entries(req.body);
+
+    for (const [key, value] of updates) {
+      if (key.startsWith("status_")) {
+        const requestid = key.split("_")[1];
+
+        if (value === "Completed") {
+          const request = await knex("eventrequests").where({ requestid }).first();
+          if (request) {
+            const totalParticipants = req.body[`participants_${requestid}`] || 0;
+            const zipcodeInfo = await knex("zipcodes").where({ zipcode: request.zipcode }).first();
+
+            if (!zipcodeInfo) throw new Error("Invalid zip code.");
+
+            await knex("events").insert({
+              eventid: request.requestid,
+              eventdate: request.eventdate,
+              eventaddress: request.proposedeventaddress,
+              eventstatus: value,
+              totalparticipants: totalParticipants,
+              zipcode: request.zipcode,
+            });
+
+            await knex("eventrequests").where({ requestid }).del();
+          }
+        } else {
+          await knex("eventrequests").where({ requestid }).update({ eventreqstatus: value });
+        }
+      }
+    }
+
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error updating event request status:", error);
+    res.status(500).send("Failed to update event request status.");
+  }
+});
+
+// Add Volunteer Route
+app.post("/submitVolunteerData", async (req, res) => {
+  const { first_name, last_name, phone, email, zipcode, sewing_level, monthly_hours, heard_about, city, state } = req.body;
+
+  try {
+    let zipcodeRecord = await knex("zipcodes").where({ zipcode }).first();
+    if (!zipcodeRecord) {
+      await knex("zipcodes").insert({ zipcode, city, state });
+    }
+
+    await knex("volunteers").insert({
+      volfirstname: first_name.toUpperCase(),
+      vollastname: last_name.toUpperCase(),
+      phone,
+      email: email.toLowerCase(),
+      zipcode,
+      sewinglevel: sewing_level,
+      monthlyhours: parseInt(monthly_hours, 10),
+      heardaboutopportunity: heard_about,
+    });
+
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error adding volunteer:", error);
+    res.status(500).send("Failed to add volunteer.");
   }
 });
 
