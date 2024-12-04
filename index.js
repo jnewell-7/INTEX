@@ -20,12 +20,16 @@ app.use(express.static(path.join(__dirname, "public")));
 const knex = require("knex")({
   client: "pg",
   connection: {
-    host: process.env.RDS_HOSTNAME || "localhost",
+    host: process.env.RDS_HOSTNAME || "awseb-e-it3xmpabbx-stack-awsebrdsdatabase-5vjxonr0zyvk.chiykskmafi4.us-east-1.rds.amazonaws.com",
     user: process.env.RDS_USERNAME || "postgres",
     password: process.env.RDS_PASSWORD || "gocougs123",
     database: process.env.RDS_DB_NAME || "ebdb",
     port: process.env.RDS_PORT || 5432,
-    ssl: process.env.DB_SSL ? { rejectUnauthorized: false } : false,
+    ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false,
+  },
+  pool: {
+    min: 2, // Minimum connections in the pool
+    max: 10, // Maximum connections in the pool
   },
 });
 
@@ -41,11 +45,11 @@ app.post("/login", async (req, res) => {
   const { username, password } = req.body;
 
   try {
-    console.log("Received login request:", username, password); // Debugging input
+    console.log("Received login request:", username, password);
 
     // Query the database for the admin credentials
     const admin = await knex("admin").where({ username }).first();
-    console.log("Admin record found:", admin); // Debugging database result
+    console.log("Admin record found:", admin);
 
     if (!admin) {
       console.log("Username not found");
@@ -55,10 +59,9 @@ app.post("/login", async (req, res) => {
       });
     }
 
-    // Verify the password (replace with hashing in production)
     if (admin.password === password) {
       console.log("Login successful!");
-      res.redirect("/admin"); // Redirect to admin page or dashboard
+      res.redirect("/admin");
     } else {
       console.log("Password mismatch");
       res.render("login", {
@@ -67,11 +70,14 @@ app.post("/login", async (req, res) => {
       });
     }
   } catch (error) {
-    console.error("Error during login:", error); // Debugging errors
+    console.error("Error during login:", error);
     res.status(500).render("login", {
       title: "Admin Login",
       error: "An unexpected error occurred. Please try again later.",
     });
+  } finally {
+    // Ensure the connection is released back to the pool
+    knex.destroy();
   }
 });
 
