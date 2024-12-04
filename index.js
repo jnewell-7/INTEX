@@ -20,7 +20,9 @@ app.use(express.static(path.join(__dirname, "public")));
 const knex = require("knex")({
   client: "pg",
   connection: {
-    host: process.env.RDS_HOSTNAME || "awseb-e-it3xmpabbx-stack-awsebrdsdatabase-5vjxonr0zyvk.chiykskmafi4.us-east-1.rds.amazonaws.com",
+    host:
+      process.env.RDS_HOSTNAME ||
+      "awseb-e-it3xmpabbx-stack-awsebrdsdatabase-5vjxonr0zyvk.chiykskmafi4.us-east-1.rds.amazonaws.com",
     user: process.env.RDS_USERNAME || "postgres",
     password: process.env.RDS_PASSWORD || "gocougs123",
     database: process.env.RDS_DB_NAME || "ebdb",
@@ -92,38 +94,36 @@ app.post("/login", async (req, res) => {
 // Admin Page Route
 app.get("/admin", async (req, res) => {
   try {
-    // Fetch admin data
-    const admins = await knex("admins").select(
-      "adminid",
-      "username",
-      "password",
-      "firstname",
-      "lastname",
-      "email",
-      "phonenumber"
-    );
+    // Fetch admin data ordered by first name
+    const admins = await knex("admins").select("*").orderBy("adminid", "asc");
 
-    // Fetch event request data
-    const eventRequests = await knex("eventrequests").select(
-      "requestid",
-      "eventdate",
-      "zipcode",
-      "estimatedattendance",
-      "activitytype",
-      "contactfirstname",
-      "contactlastname",
-      "contactemail",
-      "contactphone",
-      "proposedeventaddress",
-      "jenstoryrequest",
-      "eventreqstatus"
-    );
+    // Fetch event request data (unchanged)
+    const eventRequests = await knex("eventrequests").select("*");
 
-    // Render the admin dashboard
+    // Fetch volunteer data ordered by first name
+    const volunteers = await knex("volunteers")
+      .join("zipcodes", "volunteers.zipcode", "=", "zipcodes.zipcode")
+      .select(
+        "volunteers.volunteerid",
+        "volunteers.volfirstname",
+        "volunteers.vollastname",
+        "volunteers.phone",
+        "volunteers.email",
+        "volunteers.sewinglevel",
+        "volunteers.monthlyhours",
+        "volunteers.heardaboutopportunity",
+        "volunteers.zipcode",
+        "zipcodes.city",
+        "zipcodes.state"
+      )
+      .orderBy("volunteers.volfirstname", "asc");
+
+    // Render the admin dashboard with all data
     res.render("admin", {
       title: "Admin Dashboard",
       admins,
       eventRequests,
+      volunteers,
     });
   } catch (error) {
     console.error("Error loading admin page:", error);
@@ -131,30 +131,53 @@ app.get("/admin", async (req, res) => {
   }
 });
 
-// Edit Admin (Update/Delete) Route
-app.post("/editAdmin", async (req, res) => {
-  const actions = Object.entries(req.body);
+app.get("/editAdmin/:id", async (req, res) => {
+  const adminid = req.params.id;
 
   try {
-    for (const [action, value] of actions) {
-      if (action.startsWith("update_")) {
-        const adminid = action.split("_")[1];
-        const updatedFields = {
-          username: req.body[`username_${adminid}`],
-          password: req.body[`password_${adminid}`],
-          firstname: req.body[`firstname_${adminid}`],
-          lastname: req.body[`lastname_${adminid}`],
-          email: req.body[`email_${adminid}`],
-          phonenumber: req.body[`phone_${adminid}`],
-        };
-        await knex("admins").where({ adminid }).update(updatedFields);
-      }
+    // Fetch the admin record by ID
+    const admin = await knex("admins").where({ adminid }).first();
 
-      if (action.startsWith("delete_")) {
-        const adminid = action.split("_")[1];
-        await knex("admins").where({ adminid }).del();
-      }
+    // If the admin record is not found, return a 404 error
+    if (!admin) {
+      return res.status(404).send("Admin not found.");
     }
+
+    // Render the editAdmin page with the admin data
+    res.render("editAdmin", {
+      title: `Edit Admin - ${admin.firstname} ${admin.lastname}`,
+      admin,
+    });
+  } catch (error) {
+    console.error("Error fetching admin data:", error);
+    res.status(500).send("Failed to load admin data.");
+  }
+});
+
+// Edit Admin (Update/Delete) Route
+app.post("/editAdmin", async (req, res) => {
+  const {
+    adminid,
+    username,
+    password,
+    firstname,
+    lastname,
+    email,
+    phonenumber,
+  } = req.body;
+
+  try {
+    // Update the admin record in the database
+    await knex("admins").where({ adminid }).update({
+      username,
+      password,
+      firstname,
+      lastname,
+      email,
+      phonenumber,
+    });
+
+    // Redirect back to the admin dashboard after successful update
     res.redirect("/admin");
   } catch (error) {
     console.error("Error updating admin data:", error);
@@ -184,6 +207,26 @@ app.post("/addAdmin", async (req, res) => {
 
 app.get("/addAdmin", (req, res) => {
   res.render("addAdmin", { title: "Add New Admin" });
+});
+
+app.post("/updateEventStatus", async (req, res) => {
+  try {
+    const updates = Object.entries(req.body);
+
+    for (const [key, value] of updates) {
+      if (key.startsWith("status_")) {
+        const requestid = key.split("_")[1]; // Extract request ID from the key
+        await knex("eventrequests")
+          .where({ requestid })
+          .update({ eventreqstatus: value });
+      }
+    }
+
+    res.redirect("/admin"); // Redirect back to the admin page
+  } catch (error) {
+    console.error("Error updating event request status:", error);
+    res.status(500).send("Failed to update event request status.");
+  }
 });
 
 // Landing Page Route
