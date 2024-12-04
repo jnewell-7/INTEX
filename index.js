@@ -239,6 +239,13 @@ app.post("/editAdmin/:adminid", isAuthenticated, async (req, res) => {
   }
 });
 
+// Redirect to Real Donation Page
+app.get("/realDonate", (req, res) => {
+  res.redirect(
+    "https://turtleshelterproject.org/checkout/donate?donatePageId=5b6a44c588251b72932df5a0"
+  );
+});
+
 // Logout Route
 app.post("/logout", (req, res) => {
   req.session.destroy((err) => {
