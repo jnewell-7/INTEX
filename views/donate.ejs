@@ -11,28 +11,34 @@
             padding: 0;
             background-color: #f0f4f8;
         }
-        /* Navigation Bar */
+        /* Navbar Styles */
         .navbar {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-start; /* Align items initially to the left */
             align-items: center;
-            background-color: #2c2c2c; /* Dark background */
-            padding: 10px 20px;
+            padding: 20px 60px; /* Adjusted padding for a better look */
             color: #fff;
             position: fixed;
             top: 0;
             width: 100%;
             z-index: 1000;
+            transition: all 0.3s ease;
+            background-color: transparent; /* Transparent by default */
+        }
+        .navbar-shrink {
+            background-color: #2c2c2c; /* Dark background when scrolled */
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
         }
         .navbar .logo {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             font-weight: bold;
-            color: #ffcc00; /* Highlighted logo color */
+            color: #ffcc00;
             text-decoration: none;
+            margin-right: 365px; /* Increased space between the logo and nav-links for better balance */
         }
         .navbar .nav-links {
             display: flex;
-            gap: 20px;
+            gap: 100px; /* Spacing between links */
         }
         .navbar .nav-links a {
             color: #fff;
@@ -40,9 +46,10 @@
             font-size: 1rem;
             font-weight: 500;
             transition: color 0.3s ease;
+            text-align: center;
         }
         .navbar .nav-links a:hover {
-            color: #ffcc00; /* Highlight color on hover */
+            color: #ffcc00;
         }
         /* Hero Section */
         .hero {
@@ -53,11 +60,11 @@
             height: 100vh;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end; /* Align content to bottom */
+            justify-content: flex-end; /* Moves content to the bottom */
             align-items: center;
             text-align: center;
             color: white;
-            padding-bottom: 100px; /* Add spacing below the text */
+            padding-bottom: 50px; /* Adds spacing from the bottom */
         }
         .text-container {
             background-color: rgba(0, 0, 0, 0.6); /* Semi-transparent background */
@@ -75,6 +82,12 @@
             font-size: 1.2rem;
             margin-bottom: 20px;
             line-height: 1.5;
+        }
+        .additional-info {
+            font-size: 1rem;
+            margin-top: 20px;
+            line-height: 1.5;
+            color: #e0e0e0;
         }
         .donate-button {
             background-color: #2d8f5e;
@@ -95,11 +108,11 @@
 </head>
 <body>
     <!-- Navigation Bar -->
-    <div class="navbar">
+    <div id="mainNav" class="navbar">
         <a href="/" class="logo">TURTLE SHELTER PROJECT</a>
         <div class="nav-links">
-            <a href="/about">ABOUT</a>
-            <a href="/story">JEN'S STORY</a>
+            <a href="/">ABOUT</a>
+            <a href="/jen-story">JEN'S STORY</a>
             <a href="/get-involved">GET INVOLVED</a>
         </div>
     </div>
@@ -114,7 +127,31 @@
             <form action="/realDonate" method="GET">
                 <button type="submit" class="donate-button">Donate</button>
             </form>
+            <div class="additional-info">
+                The Turtle Shelter Project is a 501 (c)(3) non-profit, EIN 82-1035303.
+            </div>
         </div>
     </div>
+
+    <script>
+        // Navbar shrink function
+        var navbarShrink = function () {
+            const navbarCollapsible = document.body.querySelector('#mainNav');
+            if (!navbarCollapsible) {
+                return;
+            }
+            if (window.scrollY === 0) {
+                navbarCollapsible.classList.remove('navbar-shrink');
+            } else {
+                navbarCollapsible.classList.add('navbar-shrink');
+            }
+        };
+
+        // Shrink the navbar 
+        navbarShrink();
+
+        // Shrink the navbar when page is scrolled
+        document.addEventListener('scroll', navbarShrink);
+    </script>
 </body>
 </html>
