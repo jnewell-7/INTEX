@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Admin Dashboard</title>
+    <title><%= title %></title>
     <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -24,15 +24,14 @@
             overflow-y: auto;
             max-height: 90vh;
         }
-        h1 {
-            margin-bottom: 1.5rem;
+        h1, h2 {
             color: #7d8562;
             font-weight: 700;
         }
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 1.5rem;
+            margin: 1.5rem 0;
             font-size: 0.9rem;
         }
         th, td {
@@ -43,7 +42,6 @@
         th {
             background-color: #7d8562;
             color: #ffffff;
-            font-weight: 700;
         }
         td input {
             width: 100%;
@@ -52,37 +50,27 @@
             border-radius: 4px;
         }
         td input:focus {
-            outline: none;
             border-color: #7d8562;
-            box-shadow: 0 0 5px rgba(46, 125, 50, 0.4);
+            outline: none;
         }
         .button {
             padding: 0.75rem 1rem;
             font-size: 0.9rem;
-            font-weight: 700;
             color: #ffffff;
             border: none;
             border-radius: 4px;
             cursor: pointer;
         }
-        .button.edit {
-            background-color: #ffc107;
-        }
-        .button.delete {
-            background-color: #dc3545;
-        }
-        .button.add {
-            background-color: #28a745;
-            margin-bottom: 1rem;
-        }
-        .button:hover {
-            opacity: 0.9;
-        }
+        .button.edit { background-color: #ffc107; }
+        .button.delete { background-color: #dc3545; }
+        .button.add { background-color: #28a745; margin-bottom: 1rem; }
     </style>
 </head>
 <body>
     <div class="dashboard-container">
         <h1>Admin Dashboard</h1>
+
+        <!-- Admin Management Section -->
         <h2>Manage Admins</h2>
         <form action="/admin/update" method="POST">
             <table>
@@ -100,25 +88,26 @@
                 </thead>
                 <tbody>
                     <% admins.forEach(function(admin) { %>
-                        <tr>
-                            <td><%= admin.AdminID %></td>
-                            <td><input type="text" name="username_<%= admin.AdminID %>" value="<%= admin.Username %>"></td>
-                            <td><input type="text" name="password_<%= admin.AdminID %>" value="<%= admin.Password %>"></td>
-                            <td><input type="text" name="firstName_<%= admin.AdminID %>" value="<%= admin.FirstName %>"></td>
-                            <td><input type="text" name="lastName_<%= admin.AdminID %>" value="<%= admin.LastName %>"></td>
-                            <td><input type="email" name="email_<%= admin.AdminID %>" value="<%= admin.Email %>"></td>
-                            <td><input type="text" name="phone_<%= admin.AdminID %>" value="<%= admin.PhoneNumber %>"></td>
-                            <td>
-                                <button type="submit" name="action" value="update_<%= admin.AdminID %>" class="button edit">Update</button>
-                                <button type="submit" name="action" value="delete_<%= admin.AdminID %>" class="button delete">Delete</button>
-                            </td>
-                        </tr>
+                    <tr>
+                        <td><%= admin.AdminID %></td>
+                        <td><input type="text" name="username_<%= admin.AdminID %>" value="<%= admin.Username %>"></td>
+                        <td><input type="password" name="password_<%= admin.AdminID %>" value="<%= admin.Password %>"></td>
+                        <td><input type="text" name="firstName_<%= admin.AdminID %>" value="<%= admin.FirstName %>"></td>
+                        <td><input type="text" name="lastName_<%= admin.AdminID %>" value="<%= admin.LastName %>"></td>
+                        <td><input type="email" name="email_<%= admin.AdminID %>" value="<%= admin.Email %>"></td>
+                        <td><input type="text" name="phone_<%= admin.AdminID %>" value="<%= admin.PhoneNumber %>"></td>
+                        <td>
+                            <button type="submit" name="action" value="update_<%= admin.AdminID %>" class="button edit">Update</button>
+                            <button type="submit" name="action" value="delete_<%= admin.AdminID %>" class="button delete">Delete</button>
+                        </td>
+                    </tr>
                     <% }); %>
                 </tbody>
             </table>
         </form>
         <button onclick="window.location.href='/admin/add'" class="button add">Add New Admin</button>
 
+        <!-- Event Requests Section -->
         <h2>Event Requests</h2>
         <table>
             <thead>
@@ -135,16 +124,16 @@
             </thead>
             <tbody>
                 <% eventRequests.forEach(function(request) { %>
-                    <tr>
-                        <td><%= request.RequestID %></td>
-                        <td><%= request.EventDate %></td>
-                        <td><%= request.ZipCode %></td>
-                        <td><%= request.RoughAttendance %></td>
-                        <td><%= request.ActivityType %></td>
-                        <td><%= request.ContactName %></td>
-                        <td><%= request.ContactPhone %></td>
-                        <td><%= request.JenStoryRequest ? "Yes" : "No" %></td>
-                    </tr>
+                <tr>
+                    <td><%= request.RequestID %></td>
+                    <td><%= request.EventDate %></td>
+                    <td><%= request.ZipCode %></td>
+                    <td><%= request.RoughAttendance %></td>
+                    <td><%= request.ActivityType %></td>
+                    <td><%= request.ContactName %></td>
+                    <td><%= request.ContactPhone %></td>
+                    <td><%= request.JenStoryRequest ? "Yes" : "No" %></td>
+                </tr>
                 <% }); %>
             </tbody>
         </table>
