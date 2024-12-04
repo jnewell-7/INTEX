@@ -10,6 +10,14 @@ const port = process.env.PORT || 3000;
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
+app.use((req, res, next) => {
+  res.setHeader(
+    "Content-Security-Policy",
+    "style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;"
+  );
+  next();
+});
+
 // Middleware for form handling
 app.use(express.urlencoded({ extended: true }));
 
@@ -96,16 +104,22 @@ app.post("/login", async (req, res) => {
 // Admin Page Route
 app.get("/admin", async (req, res) => {
   try {
+    // Fetch admin data
     const admins = await knex("admin").select("*");
-    const eventRequests = await knex("eventrequest").select("*");
+    console.log("Admins:", admins); // Log the data retrieved from the admin table
 
+    // Fetch event request data
+    const eventRequests = await knex("eventrequest").select("*");
+    console.log("Event Requests:", eventRequests); // Log the data retrieved from the eventrequest table
+
+    // Render the admin dashboard
     res.render("admin", {
       title: "Admin Dashboard",
       admins,
       eventRequests,
     });
   } catch (error) {
-    console.error("Error fetching admin data:", error);
+    console.error("Error loading admin page:", error); // Log the full error
     res.status(500).send("Error loading admin dashboard.");
   }
 });
