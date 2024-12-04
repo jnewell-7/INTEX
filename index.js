@@ -239,6 +239,79 @@ app.post("/editAdmin/:adminid", isAuthenticated, async (req, res) => {
   }
 });
 
+app.get("/editVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
+  const { volunteerid } = req.params;
+  try {
+    const volunteer = await knex("volunteers").where({ volunteerid }).first();
+    if (volunteer) {
+      res.render("editVolunteer", { title: "Edit Volunteer", volunteer });
+    } else {
+      res.status(404).send("Volunteer not found.");
+    }
+  } catch (error) {
+    console.error("Error loading volunteer data:", error);
+    res.status(500).send("Error loading volunteer data.");
+  }
+});
+
+app.post("/editVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
+  const { volunteerid } = req.params;
+  const { first_name, last_name, phone, email, sewing_level, monthly_hours, heard_about, zipcode } = req.body;
+
+  try {
+    await knex("volunteers").where({ volunteerid }).update({
+      volfirstname: first_name.toUpperCase(),
+      vollastname: last_name.toUpperCase(),
+      phone,
+      email: email.toLowerCase(),
+      sewinglevel: sewing_level,
+      monthlyhours: parseInt(monthly_hours, 10),
+      heardaboutopportunity: heard_about,
+      zipcode,
+    });
+
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error updating volunteer:", error);
+    res.status(500).send("Failed to update volunteer.");
+  }
+});
+
+app.get("/editEvent/:eventid", isAuthenticated, async (req, res) => {
+  const { eventid } = req.params;
+  try {
+    const event = await knex("events").where({ eventid }).first();
+    if (event) {
+      res.render("editEvent", { title: "Edit Event", event });
+    } else {
+      res.status(404).send("Event not found.");
+    }
+  } catch (error) {
+    console.error("Error loading event data:", error);
+    res.status(500).send("Error loading event data.");
+  }
+});
+
+app.post("/editEvent/:eventid", isAuthenticated, async (req, res) => {
+  const { eventid } = req.params;
+  const { event_date, event_address, zipcode, total_participants, event_status } = req.body;
+
+  try {
+    await knex("events").where({ eventid }).update({
+      eventdate: event_date,
+      eventaddress: event_address,
+      zipcode,
+      totalparticipants: parseInt(total_participants, 10),
+      eventstatus: event_status,
+    });
+
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error updating event:", error);
+    res.status(500).send("Failed to update event.");
+  }
+});
+
 // Redirect to Real Donation Page
 app.get("/realDonate", (req, res) => {
   res.redirect(

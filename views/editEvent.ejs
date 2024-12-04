@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Edit Event</title>
+  <style>
+    body {
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f0f0f0;
+      margin: 0;
+    }
+
+    .edit-form-container {
+      background-color: #ffffff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #7d8562;
+      margin-bottom: 1rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+    }
+
+    label {
+      margin-bottom: 0.5rem;
+      font-weight: bold;
+    }
+
+    input,
+    select {
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      border: 1px solid #d0d0d0;
+      border-radius: 4px;
+      font-size: 1rem;
+    }
+
+    .button {
+      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      color: #ffffff;
+      background-color: #28a745;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    .button:hover {
+      opacity: 0.9;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="edit-form-container">
+    <h1>Edit Event</h1>
+    <form action="/editEvent/<%= event.eventid %>" method="POST">
+      <label for="event_date">Event Date</label>
+      <input type="date" id="event_date" name="event_date" value="<%= event.eventdate.toISOString().split('T')[0] %>" required>
+
+      <label for="event_address">Event Address</label>
+      <input type="text" id="event_address" name="event_address" value="<%= event.eventaddress %>" required>
+
+      <label for="zipcode">Zip Code</label>
+      <input type="text" id="zipcode" name="zipcode" value="<%= event.zipcode %>" required>
+
+      <label for="total_participants">Total Participants</label>
+      <input type="number" id="total_participants" name="total_participants" value="<%= event.totalparticipants %>" required>
+
+      <label for="event_status">Event Status</label>
+      <select id="event_status" name="event_status" required>
+        <option value="Scheduled" <%= event.eventstatus === "Scheduled" ? "selected" : "" %>>Scheduled</option>
+        <option value="Completed" <%= event.eventstatus === "Completed" ? "selected" : "" %>>Completed</option>
+        <option value="Cancelled" <%= event.eventstatus === "Cancelled" ? "selected" : "" %>>Cancelled</option>
+      </select>
+
+      <button type="submit" class="button">Save Changes</button>
+    </form>
+  </div>
+</body>
+
+</html>
