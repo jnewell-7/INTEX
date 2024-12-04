@@ -97,12 +97,18 @@ app.post("/login", async (req, res) => {
 app.get("/admin", async (req, res) => {
   try {
     // Fetch admin data
-    const admins = await knex("admin").select("*");
-    console.log("Admins:", admins); // Log the data retrieved from the admin table
+    const admins = await knex("admin").select(
+      "adminid",
+      "username",
+      "password",
+      "firstname",
+      "lastname",
+      "email",
+      "phonenumber"
+    );
 
     // Fetch event request data
     const eventRequests = await knex("eventrequest").select("*");
-    console.log("Event Requests:", eventRequests); // Log the data retrieved from the eventrequest table
 
     // Render the admin dashboard
     res.render("admin", {
@@ -111,32 +117,32 @@ app.get("/admin", async (req, res) => {
       eventRequests,
     });
   } catch (error) {
-    console.error("Error loading admin page:", error); // Log the full error
+    console.error("Error loading admin page:", error);
     res.status(500).send("Error loading admin dashboard.");
   }
 });
 
-app.post("/admin/update", async (req, res) => {
+app.post("/editAdmin", async (req, res) => {
   const actions = Object.entries(req.body);
 
   try {
     for (const [action, value] of actions) {
       if (action.startsWith("update_")) {
-        const adminID = action.split("_")[1];
+        const adminid = action.split("_")[1];
         const updatedFields = {
-          Username: req.body[`username_${adminID}`],
-          Password: req.body[`password_${adminID}`],
-          FirstName: req.body[`firstName_${adminID}`],
-          LastName: req.body[`lastName_${adminID}`],
-          Email: req.body[`email_${adminID}`],
-          PhoneNumber: req.body[`phone_${adminID}`],
+          username: req.body[`username_${adminid}`],
+          password: req.body[`password_${adminid}`],
+          firstname: req.body[`firstName_${adminid}`],
+          lastname: req.body[`lastName_${adminid}`],
+          email: req.body[`email_${adminid}`],
+          phonenumber: req.body[`phone_${adminid}`],
         };
-        await knex("admin").where({ AdminID: adminID }).update(updatedFields);
+        await knex("admin").where({ adminid }).update(updatedFields);
       }
 
       if (action.startsWith("delete_")) {
-        const adminID = action.split("_")[1];
-        await knex("admin").where({ AdminID: adminID }).del();
+        const adminid = action.split("_")[1];
+        await knex("admin").where({ adminid }).del();
       }
     }
     res.redirect("/admin");
@@ -146,17 +152,17 @@ app.post("/admin/update", async (req, res) => {
   }
 });
 
-app.post("/admin/add", async (req, res) => {
+app.post("/addAdmin", async (req, res) => {
   const { username, password, firstName, lastName, email, phone } = req.body;
 
   try {
     await knex("admin").insert({
-      Username: username,
-      Password: password,
-      FirstName: firstName,
-      LastName: lastName,
-      Email: email,
-      PhoneNumber: phone,
+      username: username,
+      password: password,
+      firstname: firstName,
+      lastname: lastName,
+      email: email,
+      phonenumber: phone,
     });
     res.redirect("/admin");
   } catch (error) {
@@ -165,8 +171,8 @@ app.post("/admin/add", async (req, res) => {
   }
 });
 
-app.get("/admin/add", (req, res) => {
-  res.render("add-admin", { title: "Add New Admin" });
+app.get("/addAdmin", (req, res) => {
+  res.render("addAdmin", { title: "Add New Admin" });
 });
 
 // Landing Page Route
