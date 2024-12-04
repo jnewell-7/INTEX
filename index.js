@@ -66,6 +66,15 @@ function isAuthenticated(req, res, next) {
 
 // Routes
 
+// Landing Page Route (GET)
+app.get("/", (req, res) => {
+  res.render("index", { title: "Welcome to Turtle Shelter" });
+});
+
+
+
+
+
 // Login Page Route (GET)
 app.get("/login", (req, res) => {
   res.render("login", { title: "Admin Login", errorMessage: null }); // Render login page
