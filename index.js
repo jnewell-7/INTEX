@@ -141,6 +141,9 @@ app.get("/realDonate", (req, res) => {
   );
 });
 
+app.get("/get-involved", (req, res) => {
+  res.render("volunteer", { title: "Volunteer Today" });
+});
 
 
 // Error Handling Middleware
