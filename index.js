@@ -226,6 +226,27 @@ app.post("/addAdmin", isAuthenticated, async (req, res) => {
   }
 });
 
+// Edit Admin (GET)
+app.get("/editAdmin/:id", isAuthenticated, async (req, res) => {
+  const adminid = req.params.id;
+
+  try {
+    const admin = await knex("admins").where({ adminid }).first();
+
+    if (!admin) {
+      return res.status(404).send("Admin not found.");
+    }
+
+    res.render("editAdmin", {
+      title: `Edit Admin - ${admin.firstname} ${admin.lastname}`,
+      admin,
+    });
+  } catch (error) {
+    console.error("Error fetching admin data:", error);
+    res.status(500).send("Failed to load admin data.");
+  }
+});
+
 // Edit Admin Route
 app.post("/editAdmin/:adminid", isAuthenticated, async (req, res) => {
   const { adminid } = req.params;
