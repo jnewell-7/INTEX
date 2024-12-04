@@ -13,6 +13,11 @@
             background-color: #f0f0f0;
             margin: 0;
         }
+
+        .parent-container {
+            position: relative;
+        }
+
         .login-container {
             background-color: #ffffff;
             padding: 2rem;
@@ -20,26 +25,33 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 400px;
             text-align: center;
+            position: relative;
+            z-index: 1;
         }
+
         .login-container h2 {
             margin-bottom: 1rem;
             color: #7d8562;
             font-weight: 700;
         }
+
         .login-container p {
             margin-bottom: 2rem;
             color: #6d6d6d;
         }
+
         .form-group {
             margin-bottom: 1.5rem;
             text-align: left;
         }
+
         .form-group label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 700;
             color: #7d8562;
         }
+
         .form-group input {
             width: 100%;
             padding: 0.75rem;
@@ -47,11 +59,13 @@
             border-radius: 4px;
             font-size: 1rem;
         }
+
         .form-group input:focus {
             outline: none;
             border-color: #7d8562;
             box-shadow: 0 0 5px rgba(46, 125, 50, 0.4);
         }
+
         .login-button {
             width: 100%;
             padding: 1rem;
@@ -63,41 +77,73 @@
             cursor: pointer;
             font-weight: 700;
         }
+
         .login-button:hover {
             background-color: #606e46;
         }
+
         .forgot-password {
             margin-top: 1rem;
             color: #7d8562;
             text-decoration: none;
             font-weight: 700;
         }
+
         .forgot-password:hover {
             text-decoration: underline;
+        }
+
+        .return-home-link {
+            position: absolute;
+            top: -30px;
+            left: 0;
+            text-decoration: none;
+            color: #7d8562;
+            font-weight: 700;
+            font-size: 1rem;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+
+        .return-home-link:hover {
+            text-decoration: underline;
+            color: #606e46;
+        }
+
+        .decorative-image {
+            position: absolute;
+            top: -110px; /* Adjust as needed */
+            right: -70px; /* Adjust as needed */
+            width: 150px; /* Adjust size */
+            z-index: 0; /* Ensure it appears behind the login box */
+            opacity: 0.9; /* Slight transparency for effect */
+            scale: 2.0;
         }
     </style>
 </head>
 <body>
-    <div class="login-container">
-        <h2>Admin Login</h2>
-        <p>Enter your credentials to access the admin panel</p>
-        
-        <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
-            <div id="error-message" style="color: red;">Incorrect username or password</div>
-        <% } %>
-        <form action="/login" method="POST">
-        <div class="form-group">
-                <label for="username">Username:</label>
-                <input type="text" id="username" name="username" required>
-            </div>
-            <div class="form-group">
-                <label for="password">Password:</label>
-                <input type="password" id="password" name="password" required>
-            </div>
-            <button type="submit" class="login-button">Login</button>
-        </form>
-        
+    <div class="parent-container">
+        <img src="/assets/img/turtleadmin.png" alt="Turtle Admin" class="decorative-image">
+        <div class="login-container">
+            <a href="/" class="return-home-link">&larr; Return Home</a>
+            <h2>Admin Login</h2>
+            <p>Enter your credentials to access the admin panel</p>
+            
+            <% if (typeof errorMessage !== 'undefined' && errorMessage) { %>
+                <div id="error-message" style="color: red;">Incorrect username or password</div>
+            <% } %>
+            <form action="/login" method="POST">
+                <div class="form-group">
+                    <label for="username">Username:</label>
+                    <input type="text" id="username" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password:</label>
+                    <input type="password" id="password" name="password" required>
+                </div>
+                <button type="submit" class="login-button">Login</button>
+            </form>
+        </div>
     </div>
 </body>
 </html>
-
