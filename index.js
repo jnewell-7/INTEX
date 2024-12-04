@@ -10,13 +10,6 @@ const port = process.env.PORT || 3000;
 app.set("view engine", "ejs");
 app.set("views", path.join(__dirname, "views"));
 
-app.use((req, res, next) => {
-  res.setHeader(
-    "Content-Security-Policy",
-    "style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com;"
-  );
-  next();
-});
 
 // Middleware for form handling
 app.use(express.urlencoded({ extended: true }));
