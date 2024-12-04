@@ -20,6 +20,7 @@
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 400px;
             text-align: center;
+            position: relative;
         }
         .login-container h2 {
             margin-bottom: 1rem;
@@ -75,10 +76,26 @@
         .forgot-password:hover {
             text-decoration: underline;
         }
+        .return-home-link {
+            position: absolute;
+            top: -30px;
+            left: 0;
+            text-decoration: none;
+            color: #7d8562;
+            font-weight: 700;
+            font-size: 1rem;
+            display: inline-block;
+            margin-bottom: 20px;
+        }
+        .return-home-link:hover {
+            text-decoration: underline;
+            color: #606e46;
+        }
     </style>
 </head>
 <body>
     <div class="login-container">
+        <a href="/" class="return-home-link">&larr; Return Home</a>
         <h2>Admin Login</h2>
         <p>Enter your credentials to access the admin panel</p>
         
@@ -86,7 +103,7 @@
             <div id="error-message" style="color: red;">Incorrect username or password</div>
         <% } %>
         <form action="/login" method="POST">
-        <div class="form-group">
+            <div class="form-group">
                 <label for="username">Username:</label>
                 <input type="text" id="username" name="username" required>
             </div>
@@ -96,8 +113,6 @@
             </div>
             <button type="submit" class="login-button">Login</button>
         </form>
-        
     </div>
 </body>
 </html>
-
