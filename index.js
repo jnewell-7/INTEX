@@ -349,9 +349,23 @@ app.get("/manage-event-requests", isAuthenticated, async (req, res) => {
 
 // Edit Event Request (GET)
 app.get("/editReq/:requestid", isAuthenticated, async (req, res) => {
+  const { requestid } = req.params;
+
   try {
-    const { requestid } = req.params;
-    const request = await knex("eventrequests").where({ requestid }).first();
+    const request = await knex("eventrequests")
+      .join("zipcodes", "eventrequests.zipcode", "=", "zipcodes.zipcode")
+      .select(
+        "eventrequests.requestid",
+        "eventrequests.eventdate",
+        "eventrequests.eventtime",
+        "eventrequests.proposedeventaddress",
+        "zipcodes.city",
+        "zipcodes.state",
+        "eventrequests.zipcode"
+      )
+      .where({ requestid })
+      .first();
+
     if (request) {
       res.render("editReq", { request });
     } else {
@@ -657,10 +671,13 @@ app.get("/updateEvent/:requestid", isAuthenticated, async (req, res) => {
 
   try {
     const request = await knex("eventrequests")
+      .join("zipcodes", "eventrequests.zipcode", "=", "zipcodes.zipcode")
       .select(
         "eventrequests.requestid",
         "eventrequests.eventdate",
         "eventrequests.proposedeventaddress",
+        "zipcodes.city",
+        "zipcodes.state",
         "eventrequests.zipcode"
       )
       .where({ requestid })
