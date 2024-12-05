@@ -339,20 +339,6 @@ app.post("/addAdmin", isAuthenticated, async (req, res) => {
   }
 });
 
-//delete admin route 
-app.post("/deleteAdmin/:adminid", isAuthenticated, async (req, res) => {
-  const { adminid } = req.params; // Extract `adminid` from the URL
-  try {
-    // Delete the admin with the specified ID
-    await knex("admins").where({ adminid }).del();
-    res.redirect("/admin"); // Redirect to the admin list after deletion
-  } catch (error) {
-    console.error("Error deleting admin:", error);
-    res.status(500).send("Failed to delete admin.");
-  }
-});
-
-
 
 
 // Edit Admin (GET)
@@ -559,16 +545,19 @@ app.post('/submitVolunteerData', (req, res) => {
   }
 });
 
-app.post("/deleteAdmin", isAuthenticated, async (req, res) => {
-  const { adminid } = req.body;
+//delete admin route 
+app.post("/deleteAdmin/:adminid", isAuthenticated, async (req, res) => {
+  const { adminid } = req.params; // Extract `adminid` from the URL
   try {
+    // Delete the admin with the specified ID
     await knex("admins").where({ adminid }).del();
-    res.redirect("/admin");
+    res.redirect("/admin"); // Redirect to the admin list after deletion
   } catch (error) {
     console.error("Error deleting admin:", error);
     res.status(500).send("Failed to delete admin.");
   }
 });
+
 
 app.post("/deleteVolunteer", isAuthenticated, async (req, res) => {
   const { volunteerid } = req.body;
