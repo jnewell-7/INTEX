@@ -327,9 +327,11 @@ app.get("/editAdmin/:id", isAuthenticated, async (req, res) => {
 // Edit Admin Route
 app.post("/editAdmin/:adminid", isAuthenticated, async (req, res) => {
   const { adminid } = req.params;
-  const { username, password } = req.body;
+  const { username, password, firstname, lastname, email, phonenumber } = req.body; // Include all fields from the form
   try {
-    await knex("admins").where({ adminid }).update({ username, password });
+    await knex("admins")
+      .where({ adminid })
+      .update({ username, password, firstname, lastname, email, phonenumber });
     res.redirect("/admin");
   } catch (error) {
     console.error("Error editing admin:", error);

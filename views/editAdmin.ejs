@@ -81,7 +81,7 @@
 <body>
   <div class="form-container">
     <h1>Edit Admin</h1>
-    <form action="/editAdmin" method="POST">
+    <form action="/editAdmin/<%= admin.adminid %>" method="POST">
       <input type="hidden" name="adminid" value="<%= admin.adminid %>">
 
       <label for="username">Username</label>
