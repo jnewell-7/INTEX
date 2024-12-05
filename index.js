@@ -65,6 +65,11 @@ app.get("/", (req, res) => {
   res.render("index", { title: "Welcome to the Turtle Shelter Project" });
 });
 
+// Route to render the volunteer form page at /volunteer
+app.get("/volunteer", (req, res) => {
+  res.render("volunteer", { title: "Join Us as a Volunteer" });
+});
+
 // About Page Route
 app.get("/about", (req, res) => {
   res.render("about", { title: "About - Turtle Shelter Project" });
