@@ -309,17 +309,37 @@ app.post("/submitVolunteerData", async (req, res) => {
   }
 });
 
+
+
+
+app.get("/addAdmin", (req, res) => {
+  res.render("addAdmin", { title: "Add Admin" });
+});
+
+
+
 // Add Admin Route
 app.post("/addAdmin", isAuthenticated, async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, firstname, lastname, email, phonenumber } = req.body;
   try {
-    await knex("admins").insert({ username, password });
-    res.redirect("/admin");
+    // Directly insert the provided password without hashing
+    await knex("admins").insert({
+      username,
+      password, // Store the plain-text password
+      firstname,
+      lastname,
+      email,
+      phonenumber,
+    });
+
+    res.redirect("/admin"); // Redirect to the admin list after adding
   } catch (error) {
     console.error("Error adding admin:", error);
-    res.status(500).send("Failed to add admin.");
+    res.status(500).send("Failed to create a new admin.");
   }
 });
+
+
 
 // Edit Admin (GET)
 app.get("/editAdmin/:id", isAuthenticated, async (req, res) => {
@@ -525,16 +545,19 @@ app.post('/submitVolunteerData', (req, res) => {
   }
 });
 
-app.post("/deleteAdmin", isAuthenticated, async (req, res) => {
-  const { adminid } = req.body;
+//delete admin route 
+app.post("/deleteAdmin/:adminid", isAuthenticated, async (req, res) => {
+  const { adminid } = req.params; // Extract `adminid` from the URL
   try {
+    // Delete the admin with the specified ID
     await knex("admins").where({ adminid }).del();
-    res.redirect("/admin");
+    res.redirect("/admin"); // Redirect to the admin list after deletion
   } catch (error) {
     console.error("Error deleting admin:", error);
     res.status(500).send("Failed to delete admin.");
   }
 });
+
 
 app.post("/deleteVolunteer", isAuthenticated, async (req, res) => {
   const { volunteerid } = req.body;
