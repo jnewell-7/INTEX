@@ -112,66 +112,68 @@
 
         <!-- Event Address -->
         <label for="event_address">Event Address</label>
-        <input type="text" id="event_address" name="event_address" required>
+        <input type="text" id="event_address" name="event_address" required
+        style="text-transform: uppercase;"oninput="this.value = this.value.toUpperCase()">>
 
         <!-- Event City -->
         <label for="event_city">Event City</label>
-        <input type="text" id="event_city" name="event_city" required>
+        <input type="text" id="event_city" name="event_city" required
+        style="text-transform: uppercase;"oninput="this.value = this.value.toUpperCase()">>
 
         <!-- Event State -->
         <label for="event_state">Event State</label>
         <select id="event_state" name="event_state" required>
             <option value="">Select a State</option>
-            <option value="AL">AL - Alabama</option>
-            <option value="AK">AK - Alaska</option>
-            <option value="AZ">AZ - Arizona</option>
-            <option value="AR">AR - Arkansas</option>
-            <option value="CA">CA - California</option>
-            <option value="CO">CO - Colorado</option>
-            <option value="CT">CT - Connecticut</option>
-            <option value="DE">DE - Delaware</option>
-            <option value="FL">FL - Florida</option>
-            <option value="GA">GA - Georgia</option>
-            <option value="HI">HI - Hawaii</option>
-            <option value="ID">ID - Idaho</option>
-            <option value="IL">IL - Illinois</option>
-            <option value="IN">IN - Indiana</option>
-            <option value="IA">IA - Iowa</option>
-            <option value="KS">KS - Kansas</option>
-            <option value="KY">KY - Kentucky</option>
-            <option value="LA">LA - Louisiana</option>
-            <option value="ME">ME - Maine</option>
-            <option value="MD">MD - Maryland</option>
-            <option value="MA">MA - Massachusetts</option>
-            <option value="MI">MI - Michigan</option>
-            <option value="MN">MN - Minnesota</option>
-            <option value="MS">MS - Mississippi</option>
-            <option value="MO">MO - Missouri</option>
-            <option value="MT">MT - Montana</option>
-            <option value="NE">NE - Nebraska</option>
-            <option value="NV">NV - Nevada</option>
-            <option value="NH">NH - New Hampshire</option>
-            <option value="NJ">NJ - New Jersey</option>
-            <option value="NM">NM - New Mexico</option>
-            <option value="NY">NY - New York</option>
-            <option value="NC">NC - North Carolina</option>
-            <option value="ND">ND - North Dakota</option>
-            <option value="OH">OH - Ohio</option>
-            <option value="OK">OK - Oklahoma</option>
-            <option value="OR">OR - Oregon</option>
-            <option value="PA">PA - Pennsylvania</option>
-            <option value="RI">RI - Rhode Island</option>
-            <option value="SC">SC - South Carolina</option>
-            <option value="SD">SD - South Dakota</option>
-            <option value="TN">TN - Tennessee</option>
-            <option value="TX">TX - Texas</option>
-            <option value="UT">UT - Utah</option>
-            <option value="VT">VT - Vermont</option>
-            <option value="VA">VA - Virginia</option>
-            <option value="WA">WA - Washington</option>
-            <option value="WV">WV - West Virginia</option>
-            <option value="WI">WI - Wisconsin</option>
-            <option value="WY">WY - Wyoming</option>
+            <option value="AL">AL - ALABAMA</option>
+            <option value="AK">AK - ALASKA</option>
+            <option value="AZ">AZ - ARIZONA</option>
+            <option value="AR">AR - ARKANSAS</option>
+            <option value="CA">CA - CALIFORNIA</option>
+            <option value="CO">CO - COLORADO</option>
+            <option value="CT">CT - CONNECTICUT</option>
+            <option value="DE">DE - DELAWARE</option>
+            <option value="FL">FL - FLORIDA</option>
+            <option value="GA">GA - GEORGIA</option>
+            <option value="HI">HI - HAWAII</option>
+            <option value="ID">ID - IDAHO</option>
+            <option value="IL">IL - ILLINOIS</option>
+            <option value="IN">IN - INDIANA</option>
+            <option value="IA">IA - IOWA</option>
+            <option value="KS">KS - KANSAS</option>
+            <option value="KY">KY - KENTUCKY</option>
+            <option value="LA">LA - LOUISIANA</option>
+            <option value="ME">ME - MAINE</option>
+            <option value="MD">MD - MARYLAND</option>
+            <option value="MA">MA - MASSACHUSETTS</option>
+            <option value="MI">MI - MICHIGAN</option>
+            <option value="MN">MN - MINNESOTA</option>
+            <option value="MS">MS - MISSISSIPPI</option>
+            <option value="MO">MO - MISSOURI</option>
+            <option value="MT">MT - MONTANA</option>
+            <option value="NE">NE - NEBRASKA</option>
+            <option value="NV">NV - NEVADA</option>
+            <option value="NH">NH - NEW HAMPSHIRE</option>
+            <option value="NJ">NJ - NEW JERSEY</option>
+            <option value="NM">NM - NEW MEXICO</option>
+            <option value="NY">NY - NEW YORK</option>
+            <option value="NC">NC - NORTH CAROLINA</option>
+            <option value="ND">ND - NORTH DAKOTA</option>
+            <option value="OH">OH - OHIO</option>
+            <option value="OK">OK - OKLAHOMA</option>
+            <option value="OR">OR - OREGON</option>
+            <option value="PA">PA - PENNSYLVANIA</option>
+            <option value="RI">RI - RHODE ISLAND</option>
+            <option value="SC">SC - SOUTH CAROLINA</option>
+            <option value="SD">SD - SOUTH DAKOTA</option>
+            <option value="TN">TN - TENNESSEE</option>
+            <option value="TX">TX - TEXAS</option>
+            <option value="UT">UT - UTAH</option>
+            <option value="VT">VT - VERMONT</option>
+            <option value="VA">VA - VIRGINIA</option>
+            <option value="WA">WA - WASHINGTON</option>
+            <option value="WV">WV - WEST VIRGINIA</option>
+            <option value="WI">WI - WISCONSIN</option>
+            <option value="WY">WY - WYOMING</option>
         </select>
 
         <!-- Zip Code -->
@@ -210,11 +212,13 @@
 
         <!-- Contact First Name -->
         <label for="contact_first_name">Contact First Name</label>
-        <input type="text" id="contact_first_name" name="contact_first_name" required>
+        <input type="text" id="contact_first_name" name="contact_first_name" required
+        style="text-transform: uppercase;"oninput="this.value = this.value.toUpperCase()">>
 
         <!-- Contact Last Name -->
         <label for="contact_last_name">Contact Last Name</label>
-        <input type="text" id="contact_last_name" name="contact_last_name" required>
+        <input type="text" id="contact_last_name" name="contact_last_name" required
+        style="text-transform: uppercase;"oninput="this.value = this.value.toUpperCase()">>
 
         <!-- Contact Phone -->
         <label for="contact_phone">Contact Phone</label>
@@ -222,7 +226,8 @@
 
         <!-- Contact Email -->
         <label for="contact_email">Contact Email</label>
-        <input type="email" id="contact_email" name="contact_email" required>
+        <input type="email" id="contact_email" name="contact_email" required
+        style="text-transform: uppercase;"oninput="this.value = this.value.toUpperCase()">
 
         <!-- Jen Story Request -->
         <label for="jen_story_request">
