@@ -53,6 +53,19 @@
         button:hover {
             background-color: #6d774f;
         }
+        .return-home-link {
+            display: inline-block;
+            margin: 20px;
+            font-size: 18px;
+            color: #7d8562;
+            text-decoration: none;
+            font-weight: bold;
+            margin-left: 5%;
+            transition: color 0.3s ease;
+        }
+        .return-home-link:hover {
+            color: #6d774f;
+        }
         .hidden {
             display: none;
         }
@@ -75,17 +88,18 @@
     </script>
 </head>
 <body>
+    <a href="/get-involved" class="return-home-link">&larr; Return Home</a>
     <h1>Volunteer Form</h1>
     <form action="/submitVolunteerData" method="POST">
         <!-- Volunteer First Name -->
         <label for="first_name">First Name</label>
         <input type="text" id="first_name" name="first_name" required
-        style="text-transform: uppercase;"oninput="this.value = this.value.toUpperCase()">
+        style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
 
         <!-- Volunteer Last Name -->
         <label for="last_name">Last Name</label>
         <input type="text" id="last_name" name="last_name" required
-        style="text-transform: uppercase;"oninput="this.value = this.value.toUpperCase()">
+        style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
 
         <!-- Phone -->
         <label for="phone">Phone</label>
@@ -98,7 +112,7 @@
         <!-- City -->
         <label for="city">City</label>
         <input type="text" id="city" name="city" required
-        style="text-transform: uppercase;"oninput="this.value = this.value.toUpperCase()">
+        style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
 
         <!-- State -->
         <label for="state">State</label>
@@ -187,10 +201,11 @@
         <div id="other_input_container" class="hidden">
             <label for="other_input">Please Specify</label>
             <input type="text" id="other_input" name="other_input"
-        style="text-transform: uppercase;"oninput="this.value = this.value.toUpperCase()">
+            style="text-transform: uppercase;" oninput="this.value = this.value.toUpperCase()">
         </div>
 
         <button type="submit">Submit</button>
     </form>
 </body>
 </html>
+

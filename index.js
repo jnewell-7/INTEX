@@ -12,6 +12,7 @@ app.set("views", path.join(__dirname, "views"));
 
 // Middleware for form handling
 app.use(express.urlencoded({ extended: true }));
+app.use(express.json()); // Add this to parse JSON requests
 
 // Serve static files from the public directory
 app.use(express.static(path.join(__dirname, "public")));
@@ -97,6 +98,8 @@ app.post("/submitEventRequest", async (req, res) => {
     eventdate,
     eventtime,
     proposedeventaddress,
+    city,
+    state,
     zipcode,
     estimatedattendance,
     activitytype,
@@ -108,18 +111,33 @@ app.post("/submitEventRequest", async (req, res) => {
   } = req.body;
 
   try {
-    // Check if zip code exists in the zipcodes table
+    // Check if the ZIP code exists in the zipcodes table
     let zipcodeRecord = await knex("zipcodes").where({ zipcode }).first();
 
     if (!zipcodeRecord) {
-      return res.status(400).send("Invalid zip code. Please try again.");
+      // Insert ZIP code into zipcodes table
+      await knex("zipcodes").insert({
+        zipcode,
+        city: city.toUpperCase(),
+        state: state.toUpperCase(),
+      });
+    } else {
+      // Verify the city and state match the existing ZIP code record
+      if (
+        zipcodeRecord.city.toUpperCase() !== city.toUpperCase() ||
+        zipcodeRecord.state.toUpperCase() !== state.toUpperCase()
+      ) {
+        return res
+          .status(400)
+          .send("City and state do not match the existing ZIP code.");
+      }
     }
 
-    // Insert the event request into the eventrequests table
+    // Insert event request into eventrequests table
     await knex("eventrequests").insert({
       eventdate,
       eventtime,
-      proposedeventaddress,
+      proposedeventaddress: proposedeventaddress.toUpperCase(),
       zipcode,
       estimatedattendance: parseInt(estimatedattendance, 10),
       activitytype,
@@ -320,7 +338,7 @@ app.post("/addEvent", isAuthenticated, async (req, res) => {
     // Insert the event into the events table without specifying eventid
     const [event] = await knex("events")
       .insert({
-        requestid: requestid || null, // Store requestid if available
+        requestid: requestid || null,
         eventdate: formattedDate,
         eventaddress,
         eventstatus: eventstatus || "Pending",
@@ -414,10 +432,10 @@ app.post("/saveEvent", isAuthenticated, async (req, res) => {
     // Format eventdate
     const formattedDate = new Date(eventdate).toISOString().split("T")[0];
 
-    // Insert the event into the events table without specifying eventid
+    // Insert the event into the events table
     const [event] = await knex("events")
       .insert({
-        requestid, // Store requestid as a foreign key
+        requestid,
         eventdate: formattedDate,
         eventaddress,
         zipcode,
@@ -426,9 +444,9 @@ app.post("/saveEvent", isAuthenticated, async (req, res) => {
       })
       .returning("*");
 
-    const eventid = event.eventid; // Auto-generated eventid
+    const eventid = event.eventid;
 
-    // Insert produced items into the eventproduction table
+    // Insert produced items
     const producedItems = [
       { name: "Pockets", quantity: parseInt(pockets || 0, 10) },
       { name: "Collars", quantity: parseInt(collars || 0, 10) },
@@ -465,26 +483,19 @@ app.post("/saveEvent", isAuthenticated, async (req, res) => {
   }
 });
 
-// Update Event Request Status
-app.post("/updateEventStatus", isAuthenticated, async (req, res) => {
+// NEW: Update Event Request Status using JSON request
+app.post("/updateEventStatus/:requestid", isAuthenticated, async (req, res) => {
+  const { requestid } = req.params;
+  const { status } = req.body;
+
   try {
-    const updates = Object.entries(req.body);
-
-    for (const [key, value] of updates) {
-      if (key.startsWith("status_")) {
-        const requestid = key.split("_")[1];
-
-        // Update the event request status
-        await knex("eventrequests")
-          .where({ requestid })
-          .update({ eventreqstatus: value });
-      }
-    }
-
-    res.redirect("/admin");
+    await knex("eventrequests")
+      .where({ requestid })
+      .update({ eventreqstatus: status });
+    res.status(200).send("Status updated successfully");
   } catch (error) {
     console.error("Error updating event request status:", error);
-    res.status(500).send("Failed to update event request status.");
+    res.status(500).send("Failed to update status");
   }
 });
 
@@ -581,7 +592,6 @@ app.get("/addAdmin", isAuthenticated, (req, res) => {
   res.render("addAdmin", { title: "Add Admin" });
 });
 
-// Add Admin Route
 app.post("/addAdmin", isAuthenticated, async (req, res) => {
   const { username, password, firstname, lastname, email, phonenumber } =
     req.body;
@@ -729,6 +739,46 @@ app.post("/editEvent/:eventid", isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error("Error updating event:", error);
     res.status(500).send("Failed to update event.");
+  }
+});
+
+// NEW: Edit Event Request Routes
+app.get("/editReq/:requestid", isAuthenticated, async (req, res) => {
+  const { requestid } = req.params;
+
+  try {
+    const request = await knex("eventrequests").where({ requestid }).first();
+
+    if (!request) {
+      return res.status(404).send("Event request not found");
+    }
+
+    res.render("editReq", { title: "Edit Event Request", request });
+  } catch (error) {
+    console.error("Error fetching event request:", error);
+    res.status(500).send("Failed to load event request");
+  }
+});
+
+app.post("/editReq/:requestid", isAuthenticated, async (req, res) => {
+  const { requestid } = req.params;
+  const { eventdate, eventtime, proposedeventaddress, city, state, zipcode } =
+    req.body;
+
+  try {
+    await knex("eventrequests").where({ requestid }).update({
+      eventdate,
+      eventtime,
+      proposedeventaddress: proposedeventaddress.toUpperCase(),
+      city: city.toUpperCase(),
+      state: state.toUpperCase(),
+      zipcode,
+    });
+
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error updating event request:", error);
+    res.status(500).send("Failed to update event request");
   }
 });
 

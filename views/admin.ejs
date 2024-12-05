@@ -73,7 +73,7 @@
 
     /* Scrollable Table Body */
     .table-container {
-      max-height: 300px;
+      max-height: 400px;
       /* Adjust height as needed */
       overflow-y: auto;
       margin-bottom: 1rem;
@@ -116,13 +116,13 @@
     }
 
     .button.save {
-      background-color: #556b2f;
+      background-color: #8f9775;
       /* Dark olive green */
       color: #ffffff;
     }
 
     .button.complete {
-      background-color: #8f9775;
+      background-color: #556b2f;
       /* Medium sage green */
       color: #ffffff;
     }
@@ -282,88 +282,86 @@
 
     <!-- Event Requests Section -->
     <h2>Event Requests</h2>
-    <form id="eventRequestForm" action="/updateEventStatus" method="POST">
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Request ID</th>
-              <th>Date/Time</th>
-              <th>Estimated Attendance</th>
-              <th>Type</th>
-              <th>Contact</th>
-              <th>Address</th>
-              <th>Hear Jen's Story</th>
-              <th>Status</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <% eventRequests.forEach(function(request, index) { %>
-              <% if (index < 5) { %>
-                <tr>
-                  <td>
-                    <%= request.requestid %>
-                  </td>
-                  <td>
-                    <%= request.eventdatetime %>
-                  </td>
-                  <td>
-                    <%= request.estimatedattendance %>
-                  </td>
-                  <td>
-                    <%= request.activitytype %>
-                  </td>
-                  <td>
-                    <strong>
-                      <%= request.name %>
-                    </strong><br>
-                    <a href="mailto:<%= request.contactemail %>">
-                      <%= request.contactemail %>
-                    </a><br>
-                    <%= request.contactphone %>
-                  </td>
-                  <td>
-                    <%= request.proposedeventaddress %><br>
-                      <%= request.city %>, <%= request.state %>
-                          <%= request.zipcode %>
-                  </td>
-                  <td>
-                    <%= request.jenstoryrequest ? "Yes" : "No" %>
-                  </td>
-                  <td>
-                    <select name="status_<%= request.requestid %>">
-                      <option value="Pending" <%=request.eventreqstatus==="Pending" ? "selected" : "" %>>Pending
-                      </option>
-                      <option value="Approved" <%=request.eventreqstatus==="Approved" ? "selected" : "" %>>Approved
-                      </option>
-                    </select>
-                  </td>
-                  <td>
-                    <div class="action-buttons">
-                      <button type="submit" name="action" value="update_<%= request.requestid %>" class="button save">
-                        Save
-                      </button>
-                      <!-- Complete button -->
-                      <a href="/updateEvent/<%= request.requestid %>" class="button complete"
-                        onclick="return confirm('Mark this request as completed?')">Complete</a>
-                      <form action="/deleteEventReq/<%= request.requestid %>" method="POST" style="display: inline;">
-                        <button type="submit" class="button delete"
-                          onclick="return confirm('Are you sure you want to decline this event request?')">Decline</button>
-                      </form>
-                    </div>
-                  </td>
+    <!-- Removed the form tag as we no longer need it for auto-saving -->
+    <div class="table-container">
+      <table>
+        <thead>
+          <tr>
+            <th>Request ID</th>
+            <th>Date/Time</th>
+            <th>Estimated Attendance</th>
+            <th>Type</th>
+            <th>Contact</th>
+            <th>Address</th>
+            <th>Hear Jen's Story</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% eventRequests.forEach(function(request, index) { %>
+            <% if (index < 5) { %>
+              <tr>
+                <td>
+                  <%= request.requestid %>
+                </td>
+                <td>
+                  <%= request.eventdatetime %>
+                </td>
+                <td>
+                  <%= request.estimatedattendance %>
+                </td>
+                <td>
+                  <%= request.activitytype %>
+                </td>
+                <td>
+                  <strong>
+                    <%= request.name %>
+                  </strong><br>
+                  <a href="mailto:<%= request.contactemail %>">
+                    <%= request.contactemail %>
+                  </a><br>
+                  <%= request.contactphone %>
+                </td>
+                <td>
+                  <%= request.proposedeventaddress %><br>
+                    <%= request.city %>, <%= request.state %>
+                        <%= request.zipcode %>
+                </td>
+                <td>
+                  <%= request.jenstoryrequest ? "Yes" : "No" %>
+                </td>
+                <td>
+                  <select name="status_<%= request.requestid %>" class="status-dropdown"
+                    data-request-id="<%= request.requestid %>">
+                    <option value="Pending" <%=request.eventreqstatus==="Pending" ? "selected" : "" %>>Pending</option>
+                    <option value="Approved" <%=request.eventreqstatus==="Approved" ? "selected" : "" %>>Approved
+                    </option>
+                  </select>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <!-- Edit button -->
+                    <a href="/editReq/<%= request.requestid %>" class="button edit">Edit</a>
+                    <!-- Complete button -->
+                    <a href="/updateEvent/<%= request.requestid %>" class="button complete"
+                      onclick="return confirm('Mark this request as completed?')">Complete</a>
+                    <form action="/deleteEventReq/<%= request.requestid %>" method="POST" style="display: inline;">
+                      <button type="submit" class="button delete"
+                        onclick="return confirm('Are you sure you want to decline this event request?')">Decline</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              <% } else { %>
+                <tr style="display: none;">
+                  <!-- Hidden rows beyond the first 5 -->
                 </tr>
-                <% } else { %>
-                  <tr style="display: none;">
-                    <!-- Hidden rows beyond the first 5 -->
-                  </tr>
-                  <% } %>
-                    <% }); %>
-          </tbody>
-        </table>
-      </div>
-    </form>
+                <% } %>
+                  <% }); %>
+        </tbody>
+      </table>
+    </div>
 
     <!-- Events Section -->
     <h2>Events</h2>
@@ -438,6 +436,35 @@
     <!-- Add Event Button -->
     <button type="button" onclick="window.location.href='/addEvent'" class="button add">Add New Event</button>
   </div>
+
+  <!-- JavaScript to handle the status dropdown change -->
+  <script>
+    document.querySelectorAll(".status-dropdown").forEach((dropdown) => {
+      dropdown.addEventListener("change", function () {
+        const requestId = this.getAttribute("data-request-id");
+        const newStatus = this.value;
+
+        fetch(`/updateEventStatus/${requestId}`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ status: newStatus }),
+        })
+          .then((response) => {
+            if (response.ok) {
+              alert("Status updated successfully!");
+            } else {
+              alert("Failed to update status. Please try again.");
+            }
+          })
+          .catch((error) => {
+            console.error("Error updating status:", error);
+            alert("An error occurred. Please try again.");
+          });
+      });
+    });
+  </script>
 </body>
 
 </html>
