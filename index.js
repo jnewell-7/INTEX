@@ -62,14 +62,15 @@ function isAuthenticated(req, res, next) {
 
 // FUNCTION: Fetch city/state from external API if not found in DB
 async function getCityStateFromApi(zipcode) {
-  const apiKey = process.env.ZIP_API_KEY || "d4af938dbc584fa1e4a4a39ad492c315"; // Ensure you set this in your environment variables
+  const apiKey = process.env.ZIP_API_KEY; // Ensure this is set in your environment variables
   if (!apiKey) {
-    throw new Error("ZIP_API_KEY is not set. Please configure it in your environment.");
+    throw new Error(
+      "ZIP_API_KEY is not set. Please configure it in your environment."
+    );
   }
 
-  const url = `http://api.positionstack.com/v1/forward
-  ? access_key = d4af938dbc584fa1e4a4a39ad492c315
-  & query = 1600 Pennsylvania Ave NW, Washington DC`;
+  const encodedZip = encodeURIComponent(zipcode);
+  const url = `http://api.positionstack.com/v1/forward?access_key=${apiKey}&query=${encodedZip}&limit=1`;
 
   try {
     const response = await axios.get(url);
@@ -77,7 +78,7 @@ async function getCityStateFromApi(zipcode) {
     if (response.data && response.data.data && response.data.data.length > 0) {
       const location = response.data.data[0];
       const city = location.locality || location.region;
-      const state = location.region || '';
+      const state = location.region || "";
 
       return { city, state };
     } else {
@@ -236,8 +237,6 @@ app.get("/login", (req, res) => {
   res.render("login", { title: "Admin Login", errorMessage: null });
 });
 
-
-
 // Login Submit Route
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -262,13 +261,10 @@ app.post("/login", async (req, res) => {
   }
 });
 
-
-
 // Dashboard Route
 app.get("/dashboard", isAuthenticated, (req, res) => {
   res.render("dashboard", { title: "Admin Dashboard" });
 });
-
 
 // Prevent URL bypass
 function isAuthenticated(req, res, next) {
@@ -277,10 +273,6 @@ function isAuthenticated(req, res, next) {
   }
   res.redirect("/login"); // Redirect to login if not authenticated
 }
-
-
-
-
 
 // Admin Page Route
 app.get("/admin", isAuthenticated, async (req, res) => {
