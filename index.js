@@ -187,7 +187,9 @@ app.get("/admin", isAuthenticated, async (req, res) => {
       .join("zipcodes", "eventrequests.zipcode", "=", "zipcodes.zipcode")
       .select(
         "eventrequests.requestid",
-        "eventrequests.eventdate",
+        knex.raw(
+          "TO_CHAR(eventrequests.eventdate, 'MM/DD/YYYY') || ' ' || TO_CHAR(eventrequests.eventtime, 'HH:MI AM') AS eventdatetime"
+        ),
         "eventrequests.estimatedattendance",
         "eventrequests.activitytype",
         knex.raw(
@@ -199,7 +201,8 @@ app.get("/admin", isAuthenticated, async (req, res) => {
         "zipcodes.city",
         "zipcodes.state",
         "eventrequests.zipcode",
-        "eventrequests.eventreqstatus"
+        "eventrequests.eventreqstatus",
+        "eventrequests.jenstoryrequest" // Add Jen's Story request field
       )
       .orderBy("eventrequests.requestid", "asc");
 
@@ -236,11 +239,10 @@ app.get("/admin", isAuthenticated, async (req, res) => {
       )
       .select(
         "events.eventid",
-        "events.eventdate",
-        "events.eventaddress",
-        "zipcodes.city",
-        "zipcodes.state",
-        "events.zipcode",
+        knex.raw("TO_CHAR(events.eventdate, 'MM/DD/YYYY') AS eventdate"),
+        knex.raw(
+          "CONCAT(events.eventaddress, '<br>', zipcodes.city, ', ', zipcodes.state, '<br>', events.zipcode) AS fulladdress"
+        ),
         "events.totalparticipants",
         "events.eventstatus",
         knex.raw(
@@ -257,7 +259,7 @@ app.get("/admin", isAuthenticated, async (req, res) => {
         ),
         knex.raw(
           "SUM(COALESCE(eventproduction.quantityproduced, 0)) AS total_items_produced"
-        ) // Total items produced for each event
+        )
       )
       .groupBy(
         "events.eventid",
