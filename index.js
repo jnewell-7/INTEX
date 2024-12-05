@@ -165,7 +165,15 @@ app.post("/login", async (req, res) => {
 app.get("/admin", isAuthenticated, async (req, res) => {
   try {
     const admins = await knex("admins").select("*").orderBy("adminid", "asc");
-    const eventRequests = await knex("eventrequests").select("*");
+
+    const eventRequests = await knex("eventrequests")
+      .join("zipcodes", "eventrequests.zipcode", "=", "zipcodes.zipcode") // Join with zipcodes table
+      .select(
+        "eventrequests.*", // Select all fields from eventrequests
+        "zipcodes.city", // Add city from zipcodes
+        "zipcodes.state" // Add state from zipcodes
+      );
+
     const volunteers = await knex("volunteers")
       .join("zipcodes", "volunteers.zipcode", "=", "zipcodes.zipcode")
       .select(
@@ -182,6 +190,7 @@ app.get("/admin", isAuthenticated, async (req, res) => {
         "zipcodes.state"
       )
       .orderBy("volunteers.volfirstname", "asc");
+
     const events = await knex("events")
       .join("zipcodes", "events.zipcode", "=", "zipcodes.zipcode")
       .select(
