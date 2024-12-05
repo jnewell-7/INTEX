@@ -577,8 +577,19 @@
 .tech-background p,
 .tech-background .highlight .title,
 .tech-background .highlight .description {
-    color: white !important; /* Force black text with !important */
+    color: #45b8aa !important; /* Force black text with !important */
 }
+
+/* jacob if you run into any coloring issues delete this */
+.tech-background .section-subheading,
+.tech-background p,
+.tech-background .highlight,
+.tech-background .highlight .description {
+    color: white !important; /* Force white text with !important */
+}
+
+
+
 
 /* Additional specificity to ensure all child elements are black */
 .tech-background * {
