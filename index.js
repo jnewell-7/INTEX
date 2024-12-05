@@ -274,6 +274,139 @@ function isAuthenticated(req, res, next) {
   res.redirect("/login"); // Redirect to login if not authenticated
 }
 
+// Manage Volunteer
+app.get("/manageVolunteers", isAuthenticated, async (req, res) => {
+  try {
+    const volunteers = await knex("volunteers")
+      .join("zipcodes", "volunteers.zipcode", "=", "zipcodes.zipcode")
+      .select(
+        "volunteers.volunteerid",
+        knex.raw(
+          "CONCAT(volunteers.volfirstname, ' ', volunteers.vollastname) AS name"
+        ),
+        "volunteers.phone",
+        "volunteers.email",
+        "volunteers.sewinglevel",
+        "volunteers.monthlyhours",
+        "volunteers.heardaboutopportunity",
+        "volunteers.zipcode",
+        "zipcodes.city",
+        "zipcodes.state"
+      )
+      .orderBy([
+        { column: "volunteers.volfirstname", order: "asc" },
+        { column: "volunteers.vollastname", order: "asc" },
+      ]);
+
+    res.render("manageVolunteers", {
+      title: "Manage Volunteers",
+      volunteers,
+    });
+  } catch (error) {
+    console.error("Error loading volunteers page:", error);
+    res.status(500).send("Failed to load volunteers.");
+  }
+});
+
+
+// Manage Event Requests Route
+app.get("/manage-event-requests", isAuthenticated, async (req, res) => {
+  try {
+    const eventRequests = await knex("eventrequests")
+      .join("zipcodes", "eventrequests.zipcode", "=", "zipcodes.zipcode")
+      .select(
+        "eventrequests.requestid",
+        knex.raw(
+          "TO_CHAR(eventrequests.eventdate, 'MM/DD/YYYY') || ' ' || TO_CHAR(eventrequests.eventtime, 'HH:MI AM') AS eventdatetime"
+        ),
+        "eventrequests.estimatedattendance",
+        "eventrequests.activitytype",
+        knex.raw(
+          "CONCAT(eventrequests.contactfirstname, ' ', eventrequests.contactlastname) AS name"
+        ),
+        "eventrequests.contactemail",
+        "eventrequests.contactphone",
+        "eventrequests.proposedeventaddress",
+        "zipcodes.city",
+        "zipcodes.state",
+        "eventrequests.zipcode",
+        "eventrequests.eventreqstatus",
+        "eventrequests.jenstoryrequest"
+      )
+      .orderBy("eventrequests.requestid", "asc");
+
+    res.render("manageEventRequests", {
+      title: "Manage Event Requests",
+      eventRequests,
+    });
+  } catch (error) {
+    console.error("Error loading event requests page:", error);
+    res.status(500).send("Failed to load event requests.");
+  }
+});
+
+
+// Manage Events Route
+app.get("/manageEvents", isAuthenticated, async (req, res) => {
+  try {
+    const events = await knex("events")
+      .join("zipcodes", "events.zipcode", "=", "zipcodes.zipcode")
+      .leftJoin("eventproduction", "events.eventid", "eventproduction.eventid")
+      .leftJoin(
+        "produceditems",
+        "eventproduction.produceditemid",
+        "produceditems.produceditemid"
+      )
+      .select(
+        "events.eventid",
+        knex.raw("TO_CHAR(events.eventdate, 'MM/DD/YYYY') AS eventdate"),
+        knex.raw(
+          "CONCAT(events.eventaddress, '<br>', zipcodes.city, ', ', zipcodes.state, '<br>', events.zipcode) AS fulladdress"
+        ),
+        "events.totalparticipants",
+        "events.eventstatus",
+        knex.raw(
+          "SUM(CASE WHEN TRIM(produceditems.produceditemname) = 'Pockets' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS pockets"
+        ),
+        knex.raw(
+          "SUM(CASE WHEN TRIM(produceditems.produceditemname) = 'Collars' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS collars"
+        ),
+        knex.raw(
+          "SUM(CASE WHEN TRIM(produceditems.produceditemname) = 'Envelopes' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS envelopes"
+        ),
+        knex.raw(
+          "SUM(CASE WHEN TRIM(produceditems.produceditemname) = 'Vests' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS vests"
+        ),
+        knex.raw(
+          "SUM(COALESCE(eventproduction.quantityproduced, 0)) AS total_items_produced"
+        )
+      )
+      .groupBy(
+        "events.eventid",
+        "events.eventdate",
+        "events.eventaddress",
+        "zipcodes.city",
+        "zipcodes.state",
+        "events.zipcode",
+        "events.totalparticipants",
+        "events.eventstatus"
+      )
+      .orderBy("events.eventid", "asc");
+
+    res.render("manageEvents", {
+      title: "Manage Events",
+      events,
+    });
+  } catch (error) {
+    console.error("Error loading events page:", error);
+    res.status(500).send("Failed to load events.");
+  }
+});
+
+
+
+
+
 // Admin Page Route
 app.get("/admin", isAuthenticated, async (req, res) => {
   try {
