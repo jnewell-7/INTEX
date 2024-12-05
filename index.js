@@ -320,8 +320,6 @@ app.post("/submitVolunteerData", async (req, res) => {
 
 //delete admin route 
 app.post('/deleteAdmin/:adminid', (req, res) => {
-  console.log('Route hit');
-  console.log('Admin ID:', req.params.adminid);
   const adminid = req.params.adminid;
   knex('admins')
     .where('adminid', adminid)
