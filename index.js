@@ -70,10 +70,17 @@ app.get("/about", (req, res) => {
   res.render("about", { title: "About - Turtle Shelter Project" });
 });
 
-// Jen's Story Page Route
+// Jen's Story Page Get Route
 app.get("/jen-story", (req, res) => {
   res.render("jen", { title: "Jen's Story" });
 });
+
+// Get Involved Page Get Route
+app.get("/get-involved", (req, res) => {
+  res.render("get-involved", { title: "Get Involved - Turtle Shelter Project" });
+});
+
+
 
 // event request Page Route
 app.get("/reqEvent", (req, res) => {
@@ -328,6 +335,15 @@ app.post("/updateEventStatus", async (req, res) => {
   }
 });
 
+
+// Route for the Admin Dashboard
+app.get("/dashboard", (req, res) => {
+  // Render the dashboard.ejs file
+  res.render("dashboard", { title: "Admin Dashboard" });
+});
+
+
+
 // Add Volunteer Route
 app.post("/submitVolunteerData", async (req, res) => {
   const {
@@ -367,17 +383,75 @@ app.post("/submitVolunteerData", async (req, res) => {
   }
 });
 
+
+
+
+
+//delete volunteer route 
+app.post('/deleteVolunteer/:volunteerid', (req, res) => {
+  const { volunteerid } = req.params; // Extract volunteer ID from URL
+
+  knex('volunteers')
+    .where('volunteerid', volunteerid) // Match the record by ID
+    .del() // Delete the record
+    .then(() => {
+      res.redirect('/admin'); // Redirect to the volunteers list page
+    })
+    .catch((error) => {
+      console.error('Error deleting volunteer:', error);
+      res.status(500).send('Failed to delete volunteer.');
+    });
+});
+
+
+
+
+//delete admin route 
+app.post('/deleteAdmin/:adminid', (req, res) => {
+  const adminid = req.params.adminid;
+  knex('admins')
+    .where('adminid', adminid)
+    .del()
+    .then(() => {
+      res.redirect('/admin');
+    })
+    .catch(error => {
+      console.error('Error deleting admin:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
+
+
+
+// Add Admin Route
+app.get("/addAdmin", (req, res) => {
+  res.render("addAdmin", { title: "Add Admin" });
+});
+
+
+
 // Add Admin Route
 app.post("/addAdmin", isAuthenticated, async (req, res) => {
-  const { username, password } = req.body;
+  const { username, password, firstname, lastname, email, phonenumber } = req.body;
   try {
-    await knex("admins").insert({ username, password });
-    res.redirect("/admin");
+    // Directly insert the provided password without hashing
+    await knex("admins").insert({
+      username,
+      password, // Store the plain-text password
+      firstname,
+      lastname,
+      email,
+      phonenumber,
+    });
+
+    res.redirect("/admin"); // Redirect to the admin list after adding
   } catch (error) {
     console.error("Error adding admin:", error);
-    res.status(500).send("Failed to add admin.");
+    res.status(500).send("Failed to create a new admin.");
   }
 });
+
+
 
 // Edit Admin (GET)
 app.get("/editAdmin/:id", isAuthenticated, async (req, res) => {
@@ -519,6 +593,17 @@ app.get("/get-involved", (req, res) => {
   res.render("volunteer", { title: "Volunteer Today" });
 });
 
+// Route to render the volunteer form page
+app.get('/volunteer/add', (req, res) => {
+  res.render('volunteer', { title: 'Add New Volunteer' });
+});
+
+// Route to render the admin form page
+app.get('/admin/add', (req, res) => {
+  res.render('addAdmin', { title: 'Add New Admin' });
+});
+
+
 // Logout Route
 app.post("/logout", (req, res) => {
   req.session.destroy((err) => {
@@ -586,10 +671,48 @@ app.post("/submitVolunteerData", (req, res) => {
         }
       });
   } catch (err) {
+<<<<<<< HEAD
     console.error("Unexpected error:", err);
     res.status(500).send("Internal Server Error");
   }
 });
 
+=======
+    console.error('Unexpected error:', err);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+
+
+
+
+
+
+app.post("/deleteEventReq", isAuthenticated, async (req, res) => {
+  const { requestid } = req.body;
+  try {
+    await knex("eventrequests").where({ requestid }).del();
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error deleting event request:", error);
+    res.status(500).send("Failed to delete event request.");
+  }
+});
+
+app.post("/deleteEvent", isAuthenticated, async (req, res) => {
+  const { eventid } = req.body;
+  try {
+    await knex("events").where({ eventid }).del();
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    res.status(500).send("Failed to delete event.");
+  }
+});
+
+
+
+>>>>>>> e41c1a44d05b21c8cd7e223133938c11a24130a2
 // Start Server
 app.listen(port, () => console.log(`Server is running on port ${port}!`));

@@ -159,18 +159,18 @@
             <td>
               <div class="action-buttons">
                 <a href="/editAdmin/<%= admin.adminid %>" class="button edit">Edit</a>
-                <form action="/deleteAdmin" method="POST" style="display:inline;">
-                  <input type="hidden" name="adminid" value="<%= admin.adminid %>">
+                <form action="/deleteAdmin/<%= admin.adminid %>" method="POST" style="display: inline;">
                   <button type="submit" class="button delete"
                     onclick="return confirm('Are you sure you want to delete this admin?')">Delete</button>
                 </form>
+                
               </div>
             </td>
           </tr>
         <% }); %>
       </tbody>
     </table>
-    <button onclick="window.location.href='/admin/add'" class="button add">Add New Admin</button>
+    <button onclick="window.location.href='/addAdmin'" class="button add">Add New Admin</button>
 
     <!-- Volunteer Management Section -->
     <h2>Manage Volunteers</h2>
@@ -202,11 +202,11 @@
             <td>
               <div class="action-buttons">
                 <a href="/editVolunteer/<%= volunteer.volunteerid %>" class="button edit">Edit</a>
-                <form action="/deleteVolunteer" method="POST" style="display:inline;">
-                  <input type="hidden" name="volunteerid" value="<%= volunteer.volunteerid %>">
+                <form action="/deleteVolunteer/<%= volunteer.volunteerid %>" method="POST" style="display: inline;">
                   <button type="submit" class="button delete"
                     onclick="return confirm('Are you sure you want to delete this volunteer?')">Delete</button>
                 </form>
+                
               </div>
             </td>
           </tr>
