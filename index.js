@@ -63,14 +63,14 @@ function isAuthenticated(req, res, next) {
 
 // FUNCTION: Fetch city/state from external API if not found in DB
 async function getCityStateFromApi(zipcode) {
-  const apiKey = process.env.ZIP_API_KEY || "be71deaece99ee0b4b557ebdcbab0ec7"; // Set this in your EB environment
+  const apiKey = process.env.ZIP_API_KEY || "d4af938dbc584fa1e4a4a39ad492c315"; // Set this in your EB environment
   if (!apiKey) {
     throw new Error("ZIP_API_KEY is not set. Please configure it in EB.");
   }
 
   // Example: Adjust the URL based on the chosen API's documentation
   const url = `http://api.positionstack.com/v1/forward
-  ? access_key = be71deaece99ee0b4b557ebdcbab0ec7
+  ? access_key = d4af938dbc584fa1e4a4a39ad492c315
   & query = 1600 Pennsylvania Ave NW, Washington DC`;
 
   const response = await axios.get(url);
