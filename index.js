@@ -246,16 +246,16 @@ app.get("/admin", isAuthenticated, async (req, res) => {
         "events.totalparticipants",
         "events.eventstatus",
         knex.raw(
-          "SUM(CASE WHEN TRIM(LOWER(produceditems.produceditemname)) = 'pockets' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS pockets"
+          "SUM(CASE WHEN TRIM(produceditems.produceditemname) = 'Pockets' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS pockets"
         ),
         knex.raw(
-          "SUM(CASE WHEN TRIM(LOWER(produceditems.produceditemname)) = 'collars' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS collars"
+          "SUM(CASE WHEN TRIM(produceditems.produceditemname) = 'Collars' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS collars"
         ),
         knex.raw(
-          "SUM(CASE WHEN TRIM(LOWER(produceditems.produceditemname)) = 'envelopes' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS envelopes"
+          "SUM(CASE WHEN TRIM(produceditems.produceditemname) = 'Envelopes' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS envelopes"
         ),
         knex.raw(
-          "SUM(CASE WHEN TRIM(LOWER(produceditems.produceditemname)) = 'vests' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS vests"
+          "SUM(CASE WHEN TRIM(produceditems.produceditemname) = 'Vests' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS vests"
         ),
         knex.raw(
           "SUM(COALESCE(eventproduction.quantityproduced, 0)) AS total_items_produced"
@@ -284,131 +284,6 @@ app.get("/admin", isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error("Error loading admin page:", error);
     res.status(500).send("Error loading admin dashboard.");
-  }
-});
-
-// Mark Event Request as Completed
-app.post("/markAsCompleted/:requestid", async (req, res) => {
-  const { requestid } = req.params;
-  try {
-    const request = await knex("eventrequests").where({ requestid }).first();
-    if (request) {
-      // Insert the event into the events table
-      await knex("events").insert({
-        eventid: request.requestid,
-        eventdate: request.eventdate,
-        eventaddress: request.proposedeventaddress,
-        eventstatus: "Completed",
-        totalparticipants: req.body.totalparticipants || 0,
-        zipcode: request.zipcode,
-      });
-
-      // Delete the event request after marking as completed
-      await knex("eventrequests").where({ requestid }).del();
-    }
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error marking event request as completed:", error);
-    res.status(500).send("Failed to mark event request as completed.");
-  }
-});
-
-// Route to display the Add Event form with pre-filled data
-app.get("/addEvent/:requestid", isAuthenticated, async (req, res) => {
-  const { requestid } = req.params;
-
-  try {
-    const request = await knex("eventrequests")
-      .join("zipcodes", "eventrequests.zipcode", "=", "zipcodes.zipcode")
-      .select(
-        "eventrequests.requestid",
-        "eventrequests.eventdate",
-        "eventrequests.proposedeventaddress",
-        "zipcodes.city",
-        "zipcodes.state",
-        "eventrequests.zipcode"
-      )
-      .where({ requestid })
-      .first();
-
-    if (!request) {
-      return res.status(404).send("Event request not found.");
-    }
-
-    res.render("addEvent", {
-      title: "Complete Event",
-      event: request,
-    });
-  } catch (error) {
-    console.error("Error fetching event request:", error);
-    res.status(500).send("Failed to load event request.");
-  }
-});
-
-// Route to handle saving the event and produced items
-app.post("/saveEvent", isAuthenticated, async (req, res) => {
-  const {
-    requestid,
-    eventdate,
-    eventaddress,
-    zipcode,
-    totalparticipants,
-    pockets,
-    collars,
-    envelopes,
-    vests,
-  } = req.body;
-
-  try {
-    // Format eventdate to match PostgreSQL's expected format
-    const formattedDate = new Date(eventdate).toISOString().split("T")[0];
-
-    // Insert the event into the events table
-    const [eventid] = await knex("events")
-      .insert({
-        eventid: requestid,
-        eventdate: formattedDate,
-        eventaddress,
-        zipcode,
-        totalparticipants: parseInt(totalparticipants, 10),
-        eventstatus: "Completed",
-      })
-      .returning("eventid");
-
-    // Insert produced items into the eventproduction table
-    const producedItems = [
-      { name: "pockets", quantity: parseInt(pockets || 0, 10) },
-      { name: "collars", quantity: parseInt(collars || 0, 10) },
-      { name: "envelopes", quantity: parseInt(envelopes || 0, 10) },
-      { name: "vests", quantity: parseInt(vests || 0, 10) },
-    ];
-
-    for (const item of producedItems) {
-      if (item.quantity > 0) {
-        const producedItem = await knex("produceditems")
-          .select("produceditemid")
-          .where({ produceditemname: item.name })
-          .first();
-
-        if (producedItem) {
-          await knex("eventproduction").insert({
-            eventid,
-            produceditemid: producedItem.produceditemid,
-            quantityproduced: item.quantity,
-          });
-        } else {
-          console.warn(`Produced item '${item.name}' not found in database.`);
-        }
-      }
-    }
-
-    // Delete the original event request
-    await knex("eventrequests").where({ requestid }).del();
-
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error saving event:", error);
-    res.status(500).send("Failed to save event.");
   }
 });
 
@@ -451,10 +326,10 @@ app.post("/addEvent", isAuthenticated, async (req, res) => {
 
     // Prepare produced items data
     const producedItems = [
-      { name: "pockets", quantity: parseInt(pockets || 0, 10) },
-      { name: "collars", quantity: parseInt(collars || 0, 10) },
-      { name: "envelopes", quantity: parseInt(envelopes || 0, 10) },
-      { name: "vests", quantity: parseInt(vests || 0, 10) },
+      { name: "Pockets", quantity: parseInt(pockets || 0, 10) },
+      { name: "Collars", quantity: parseInt(collars || 0, 10) },
+      { name: "Envelopes", quantity: parseInt(envelopes || 0, 10) },
+      { name: "Vests", quantity: parseInt(vests || 0, 10) },
     ];
 
     // Insert produced items into the eventproduction table
@@ -481,6 +356,108 @@ app.post("/addEvent", isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error("Error adding event:", error);
     res.status(500).send("Failed to add event.");
+  }
+});
+
+// Route to render the Update Event page
+app.get("/updateEvent/:requestid", isAuthenticated, async (req, res) => {
+  const { requestid } = req.params;
+
+  try {
+    const request = await knex("eventrequests")
+      .select(
+        "eventrequests.requestid",
+        "eventrequests.eventdate",
+        "eventrequests.eventtime",
+        "eventrequests.proposedeventaddress",
+        "eventrequests.zipcode"
+      )
+      .where({ requestid })
+      .first();
+
+    if (!request) {
+      return res.status(404).send("Event request not found.");
+    }
+
+    res.render("updateEvent", {
+      title: "Complete Event",
+      event: request,
+    });
+  } catch (error) {
+    console.error("Error fetching event request:", error);
+    res.status(500).send("Failed to load event request.");
+  }
+});
+
+// Route to handle saving the event and produced items
+app.post("/saveEvent", isAuthenticated, async (req, res) => {
+  const {
+    requestid,
+    eventdate,
+    eventtime,
+    eventaddress,
+    zipcode,
+    totalparticipants,
+    pockets,
+    collars,
+    envelopes,
+    vests,
+  } = req.body;
+
+  try {
+    // Format eventdate and eventtime
+    const formattedDate = new Date(eventdate).toISOString().split("T")[0];
+    const formattedTime = eventtime; // Adjust as needed for your database
+
+    // Insert the event into the events table
+    const [event] = await knex("events")
+      .insert({
+        eventid: requestid, // Use the requestid as eventid
+        eventdate: formattedDate,
+        eventtime: formattedTime,
+        eventaddress,
+        zipcode,
+        totalparticipants: parseInt(totalparticipants, 10),
+        eventstatus: "Completed",
+      })
+      .returning("*");
+
+    const eventid = event.eventid;
+
+    // Insert produced items into the eventproduction table
+    const producedItems = [
+      { name: "Pockets", quantity: parseInt(pockets || 0, 10) },
+      { name: "Collars", quantity: parseInt(collars || 0, 10) },
+      { name: "Envelopes", quantity: parseInt(envelopes || 0, 10) },
+      { name: "Vests", quantity: parseInt(vests || 0, 10) },
+    ];
+
+    for (const item of producedItems) {
+      if (item.quantity > 0) {
+        const producedItem = await knex("produceditems")
+          .select("produceditemid")
+          .where({ produceditemname: item.name })
+          .first();
+
+        if (producedItem) {
+          await knex("eventproduction").insert({
+            eventid,
+            produceditemid: producedItem.produceditemid,
+            quantityproduced: item.quantity,
+          });
+        } else {
+          console.warn(`Produced item '${item.name}' not found in database.`);
+        }
+      }
+    }
+
+    // Delete the original event request
+    await knex("eventrequests").where({ requestid }).del();
+
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error saving event:", error);
+    res.status(500).send("Failed to save event.");
   }
 });
 
@@ -574,11 +551,6 @@ app.post("/updateEventStatus", isAuthenticated, async (req, res) => {
     console.error("Error updating event request status:", error);
     res.status(500).send("Failed to update event request status.");
   }
-});
-
-// Route for the Admin Dashboard
-app.get("/dashboard", isAuthenticated, (req, res) => {
-  res.render("dashboard", { title: "Admin Dashboard" });
 });
 
 // Add Volunteer Route

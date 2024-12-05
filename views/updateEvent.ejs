@@ -3,10 +3,10 @@
 
 <head>
   <title>
-    <%= Update Event %>
+    <%= title %>
   </title>
   <style>
-    /* Add your styles here */
+    /* Styles */
     body {
       font-family: Arial, sans-serif;
       background-color: #f9f9f9;
@@ -22,64 +22,89 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     }
 
+    h1 {
+      text-align: center;
+      color: #333;
+    }
+
     label {
       display: block;
-      margin-bottom: 8px;
+      margin-top: 15px;
       font-weight: bold;
+      color: #555;
     }
 
     input,
-    button {
+    select {
       width: 100%;
       padding: 10px;
-      margin-bottom: 20px;
+      margin-top: 5px;
       border: 1px solid #ddd;
       border-radius: 4px;
+      box-sizing: border-box;
     }
 
     button {
-      background-color: #4caf50;
-      color: white;
-      font-weight: bold;
+      width: 100%;
+      padding: 12px;
+      margin-top: 20px;
+      background-color: #556b2f;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
       cursor: pointer;
+      font-size: 1rem;
     }
 
     button:hover {
-      background-color: #45a049;
+      background-color: #6b8e23;
     }
   </style>
 </head>
 
 <body>
   <div class="form-container">
-    <h1>Complete Event</h1>
+    <h1>
+      <%= title %>
+    </h1>
     <form action="/saveEvent" method="POST">
+      <!-- Hidden input for requestid -->
       <input type="hidden" name="requestid" value="<%= event.requestid %>">
 
-      <label for="eventdate">Event Date</label>
-      <input type="date" name="eventdate" value="<%= new Date(event.eventdate).toISOString().split('T')[0] %>" required>
+      <label for="eventdate">Event Date:</label>
+      <input type="date" id="eventdate" name="eventdate"
+        value="<%= new Date(event.eventdate).toISOString().split('T')[0] %>" required>
 
-      <label for="eventaddress">Event Address</label>
-      <input type="text" id="eventaddress" name="eventaddress"
-        value="<%= event.proposedeventaddress %>, <%= event.city %>, <%= event.state %> <%= event.zipcode %>" readonly>
+      <label for="eventtime">Event Time:</label>
+      <input type="time" id="eventtime" name="eventtime"
+        value="<%= event.eventtime ? event.eventtime.slice(0,5) : '' %>" required>
 
-      <label for="totalparticipants">Total Participants</label>
-      <input type="number" id="totalparticipants" name="totalparticipants" placeholder="Enter number of participants"
-        required>
+      <label for="eventaddress">Event Address:</label>
+      <input type="text" id="eventaddress" name="eventaddress" value="<%= event.proposedeventaddress %>" required>
 
-      <label for="pockets">Pockets Produced</label>
-      <input type="number" id="pockets" name="pockets" placeholder="Enter number of pockets produced">
+      <label for="zipcode">Zip Code:</label>
+      <input type="text" id="zipcode" name="zipcode" value="<%= event.zipcode %>" required>
 
-      <label for="collars">Collars Produced</label>
-      <input type="number" id="collars" name="collars" placeholder="Enter number of collars produced">
+      <label for="totalparticipants">Total Participants:</label>
+      <input type="number" id="totalparticipants" name="totalparticipants" min="0"
+        placeholder="Enter actual number of participants" required>
 
-      <label for="envelopes">Envelopes Produced</label>
-      <input type="number" id="envelopes" name="envelopes" placeholder="Enter number of envelopes produced">
+      <!-- New Fields for Produced Items -->
+      <h2>Produced Items</h2>
 
-      <label for="vests">Vests Produced</label>
-      <input type="number" id="vests" name="vests" placeholder="Enter number of vests produced">
+      <label for="pockets">Pockets Completed:</label>
+      <input type="number" id="pockets" name="pockets" min="0" value="0">
 
-      <button type="submit">Save</button>
+      <label for="collars">Collars Completed:</label>
+      <input type="number" id="collars" name="collars" min="0" value="0">
+
+      <label for="envelopes">Envelopes Completed:</label>
+      <input type="number" id="envelopes" name="envelopes" min="0" value="0">
+
+      <label for="vests">Vests Completed:</label>
+      <input type="number" id="vests" name="vests" min="0" value="0">
+
+      <button type="submit">Save Event</button>
     </form>
   </div>
 </body>
