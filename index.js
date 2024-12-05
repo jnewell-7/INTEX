@@ -505,6 +505,50 @@ app.post('/submitVolunteerData', (req, res) => {
   }
 });
 
+app.post("/deleteAdmin", isAuthenticated, async (req, res) => {
+  const { adminid } = req.body;
+  try {
+    await knex("admins").where({ adminid }).del();
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error deleting admin:", error);
+    res.status(500).send("Failed to delete admin.");
+  }
+});
+
+app.post("/deleteVolunteer", isAuthenticated, async (req, res) => {
+  const { volunteerid } = req.body;
+  try {
+    await knex("volunteers").where({ volunteerid }).del();
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error deleting volunteer:", error);
+    res.status(500).send("Failed to delete volunteer.");
+  }
+});
+
+app.post("/deleteEventReq", isAuthenticated, async (req, res) => {
+  const { requestid } = req.body;
+  try {
+    await knex("eventrequests").where({ requestid }).del();
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error deleting event request:", error);
+    res.status(500).send("Failed to delete event request.");
+  }
+});
+
+app.post("/deleteEvent", isAuthenticated, async (req, res) => {
+  const { eventid } = req.body;
+  try {
+    await knex("events").where({ eventid }).del();
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    res.status(500).send("Failed to delete event.");
+  }
+});
+
 
 
 // Start Server

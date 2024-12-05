@@ -8,12 +8,13 @@
   <style>
     body {
       font-family: 'Roboto', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      background-color: #f0f0f0;
-      margin: 0;
+      min-height: 100vh;
     }
 
     .dashboard-container {
@@ -23,52 +24,88 @@
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
       width: 90%;
       max-width: 1200px;
-      text-align: center;
       overflow-y: auto;
       max-height: 90vh;
     }
 
     h1,
     h2 {
-      color: #7d8562;
+      color: #495057;
       font-weight: 700;
+      margin-bottom: 1rem;
+      text-align: left;
+    }
+
+    .table-container {
+      overflow-x: auto;
+      /* Allows horizontal scrolling for small screens */
     }
 
     table {
       width: 100%;
       border-collapse: collapse;
-      margin: 1.5rem 0;
-      font-size: 0.9rem;
+      margin-bottom: 2rem;
+      font-size: 0.85rem;
     }
 
     th,
     td {
-      padding: 0.75rem;
+      padding: 0.5rem;
       text-align: left;
-      border: 1px solid #d0d0d0;
+      vertical-align: middle;
+      border: 1px solid #dee2e6;
     }
 
     th {
-      background-color: #7d8562;
+      background-color: #495057;
       color: #ffffff;
+      text-transform: uppercase;
+      font-size: 0.85rem;
+    }
+
+    td div {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      /* Truncate long text */
+    }
+
+    .action-buttons {
+      display: flex;
+      flex-direction: column;
+      /* Stacks buttons vertically */
+      gap: 0.25rem;
     }
 
     .button {
-      padding: 0.75rem 1rem;
-      font-size: 0.9rem;
-      color: #ffffff;
+      padding: 0.5rem 1rem;
+      font-size: 0.85rem;
       border: none;
       border-radius: 4px;
       cursor: pointer;
+      display: inline-block;
+      text-align: center;
     }
 
     .button.add {
       background-color: #28a745;
+      color: #ffffff;
       margin-bottom: 1rem;
     }
 
     .button.edit {
       background-color: #ffc107;
+      color: #212529;
+    }
+
+    .button.delete {
+      background-color: #dc3545;
+      color: #ffffff;
+    }
+
+    .button.save {
+      background-color: #007bff;
+      color: #ffffff;
     }
 
     .button:hover {
@@ -76,10 +113,37 @@
     }
 
     select {
-      padding: 0.5rem;
-      border: 1px solid #d0d0d0;
+      max-width: 100px;
+      /* Limit the width of dropdowns */
+      padding: 0.25rem;
+      border: 1px solid #ced4da;
       border-radius: 4px;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      table {
+        font-size: 0.8rem;
+        /* Reduce table font size on smaller screens */
+      }
+
+      th,
+      td {
+        padding: 0.4rem;
+        /* Reduce padding for smaller screens */
+      }
+
+      .action-buttons {
+        flex-direction: row;
+        /* Align buttons side-by-side on smaller screens */
+        gap: 0.5rem;
+      }
+
+      .button {
+        font-size: 0.75rem;
+        /* Reduce button font size on smaller screens */
+      }
     }
   </style>
 </head>
@@ -128,7 +192,14 @@
               <%= admin.phonenumber %>
             </td>
             <td>
-              <a href="/editAdmin/<%= admin.adminid %>" class="button edit">Edit</a>
+              <div class="action-buttons">
+                <a href="/editAdmin/<%= admin.adminid %>" class="button edit">Edit</a>
+                <form action="/deleteAdmin" method="POST" style="display:inline;">
+                  <input type="hidden" name="adminid" value="<%= admin.adminid %>">
+                  <button type="submit" class="button delete"
+                    onclick="return confirm('Are you sure you want to delete this admin?')">Delete</button>
+                </form>
+              </div>
             </td>
           </tr>
           <% }); %>
@@ -184,7 +255,14 @@
               <%= volunteer.zipcode %>
             </td>
             <td>
-              <a href="/editVolunteer/<%= volunteer.volunteerid %>" class="button edit">Edit</a>
+              <div class="action-buttons">
+                <a href="/editVolunteer/<%= volunteer.volunteerid %>" class="button edit">Edit</a>
+                <form action="/deleteVolunteer" method="POST" style="display:inline;">
+                  <input type="hidden" name="volunteerid" value="<%= volunteer.volunteerid %>">
+                  <button type="submit" class="button delete"
+                    onclick="return confirm('Are you sure you want to delete this volunteer?')">Delete</button>
+                </form>
+              </div>
             </td>
           </tr>
           <% }); %>
@@ -194,79 +272,82 @@
 
     <!-- Event Requests Section -->
     <h2>Event Requests</h2>
-    <form id="eventRequestForm" action="/updateEventStatus" method="POST">
-      <table>
-        <thead>
-          <tr>
-            <th>Request ID</th>
-            <th>Event Date</th>
-            <th>Zip Code</th>
-            <th>Estimated Attendance</th>
-            <th>Activity Type</th>
-            <th>Contact First Name</th>
-            <th>Contact Last Name</th>
-            <th>Contact Email</th>
-            <th>Contact Phone</th>
-            <th>Proposed Event Address</th>
-            <th>Jen Story Request</th>
-            <th>Event Request Status</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <% eventRequests.forEach(function(request) { %>
+    <div class="table-container">
+      <form id="eventRequestForm" action="/updateEventStatus" method="POST">
+        <table>
+          <thead>
             <tr>
-              <td>
-                <%= request.requestid %>
-              </td>
-              <td>
-                <%= request.eventdate %>
-              </td>
-              <td>
-                <%= request.zipcode %>
-              </td>
-              <td>
-                <%= request.estimatedattendance %>
-              </td>
-              <td>
-                <%= request.activitytype %>
-              </td>
-              <td>
-                <%= request.contactfirstname %>
-              </td>
-              <td>
-                <%= request.contactlastname %>
-              </td>
-              <td>
-                <%= request.contactemail %>
-              </td>
-              <td>
-                <%= request.contactphone %>
-              </td>
-              <td>
-                <%= request.proposedeventaddress %>
-              </td>
-              <td>
-                <%= request.jenstoryrequest ? "Yes" : "No" %>
-              </td>
-              <td>
-                <select name="status_<%= request.requestid %>"
-                  onchange="handleStatusChange(event, '<%= request.requestid %>')">
-                  <option value="Pending" <%=request.eventreqstatus==="Pending" ? "selected" : "" %>>Pending</option>
-                  <option value="Approved" <%=request.eventreqstatus==="Approved" ? "selected" : "" %>>Approved</option>
-                  <option value="Completed" <%=request.eventreqstatus==="Completed" ? "selected" : "" %>>Completed
-                  </option>
-                </select>
-              </td>
-              <td>
-                <button type="submit" name="action" value="update_<%= request.requestid %>"
-                  class="button edit">Save</button>
-              </td>
+              <th>Request ID</th>
+              <th>Date</th>
+              <th>Zip</th>
+              <th>Attendance</th>
+              <th>Type</th>
+              <th>Contact</th>
+              <th>Address</th>
+              <th>Status</th>
+              <th>Actions</th>
             </tr>
-            <% }); %>
-        </tbody>
-      </table>
-    </form>
+          </thead>
+          <tbody>
+            <% eventRequests.forEach(function(request) { %>
+              <tr>
+                <td>
+                  <%= request.requestid %>
+                </td>
+                <td>
+                  <%= new Date(request.eventdate).toLocaleDateString() %>
+                </td>
+                <td>
+                  <%= request.zipcode %>
+                </td>
+                <td>
+                  <%= request.estimatedattendance %>
+                </td>
+                <td>
+                  <%= request.activitytype %>
+                </td>
+                <td>
+                  <div>
+                    <strong>
+                      <%= request.contactfirstname %>
+                        <%= request.contactlastname %>
+                    </strong><br>
+                    <a href="mailto:<%= request.contactemail %>">
+                      <%= request.contactemail %>
+                    </a><br>
+                    <%= request.contactphone %>
+                  </div>
+                </td>
+                <td>
+                  <%= request.proposedeventaddress %>
+                </td>
+                <td>
+                  <select name="status_<%= request.requestid %>"
+                    onchange="handleStatusChange(event, '<%= request.requestid %>')">
+                    <option value="Pending" <%=request.eventreqstatus==="Pending" ? "selected" : "" %>>Pending</option>
+                    <option value="Approved" <%=request.eventreqstatus==="Approved" ? "selected" : "" %>>Approved
+                    </option>
+                    <option value="Completed" <%=request.eventreqstatus==="Completed" ? "selected" : "" %>>Completed
+                    </option>
+                  </select>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button type="submit" name="action" value="update_<%= request.requestid %>"
+                      class="button save">Save</button>
+                    <form action="/deleteEventReq" method="POST" style="display:inline;">
+                      <input type="hidden" name="requestid" value="<%= request.requestid %>">
+                      <button type="submit" class="button delete"
+                        onclick="return confirm('Are you sure you want to delete this event request?')">Delete</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              <% }); %>
+          </tbody>
+        </table>
+      </form>
+    </div>
 
     <!-- Events Section -->
     <h2>Events</h2>
@@ -281,6 +362,7 @@
           <th>State</th>
           <th>Total Participants</th>
           <th>Status</th>
+          <th>Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -311,7 +393,14 @@
               <%= event.eventstatus %>
             </td>
             <td>
-              <a href="/editEvent/<%= event.eventid %>" class="button edit">Edit</a>
+              <div class="action-buttons">
+                <a href="/editEvent/<%= event.eventid %>" class="button edit">Edit</a>
+                <form action="/deleteEvent" method="POST" style="display:inline;">
+                  <input type="hidden" name="eventid" value="<%= event.eventid %>">
+                  <button type="submit" class="button delete"
+                    onclick="return confirm('Are you sure you want to delete this event?')">Delete</button>
+                </form>
+              </div>
             </td>
           </tr>
           <% }); %>
