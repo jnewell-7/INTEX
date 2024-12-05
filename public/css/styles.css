@@ -11856,6 +11856,52 @@ header.masthead .masthead-subheading {
 
 
 
+/* Photo Masthead Styles */
+header.photo-masthead {
+  position: relative;
+  padding-top: 10.5rem;
+  padding-bottom: 6rem;
+  text-align: center;
+  color: #fff;
+  background-image: url('/assets/img/header-bg.jpg'); /* Path to your header-bg.jpg */
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  overflow: hidden;
+}
+
+/* Text Content Layer */
+header.photo-masthead .masthead-content {
+  position: relative;
+  z-index: 2; /* Ensure text is above the image */
+}
+
+header.photo-masthead .masthead-heading,
+header.photo-masthead .masthead-subheading {
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9); /* Stronger shadow for contrast */
+}
+
+/* Responsive Design Adjustments */
+@media (min-width: 768px) {
+  header.photo-masthead {
+    padding-top: 17rem;
+    padding-bottom: 12.5rem;
+  }
+  header.photo-masthead .masthead-subheading {
+    font-size: 2.25rem;
+    font-style: italic;
+    line-height: 2.25rem;
+    margin-bottom: 2rem;
+  }
+  header.photo-masthead .masthead-heading {
+    font-size: 4.5rem;
+    font-weight: 700;
+    line-height: 4.5rem;
+    margin-bottom: 4rem;
+  }
+}
+
+
 
 
 header.masthead .masthead-subheading {
