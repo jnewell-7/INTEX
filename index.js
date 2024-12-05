@@ -487,6 +487,17 @@ app.get("/get-involved", (req, res) => {
   res.render("volunteer", { title: "Volunteer Today" });
 });
 
+// Route to render the volunteer form page
+app.get('/volunteer/add', (req, res) => {
+  res.render('volunteer', { title: 'Add New Volunteer' });
+});
+
+// Route to render the admin form page
+app.get('/admin/add', (req, res) => {
+  res.render('addAdmin', { title: 'Add New Admin' });
+});
+
+
 // Logout Route
 app.post("/logout", (req, res) => {
   req.session.destroy((err) => {
