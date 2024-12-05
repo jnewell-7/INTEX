@@ -14,7 +14,7 @@
       padding: 0;
       display: flex;
       justify-content: center;
-      align-items: center;
+      align-items: flex-start;
       min-height: 100vh;
     }
 
@@ -26,7 +26,7 @@
       width: 90%;
       max-width: 1200px;
       overflow-y: auto;
-      max-height: 90vh;
+      margin-top: 20px;
     }
 
     h1,
@@ -57,6 +57,9 @@
       color: #ffffff;
       text-transform: uppercase;
       font-size: 0.85rem;
+      position: sticky;
+      top: 0;
+      z-index: 2;
     }
 
     td a {
@@ -66,6 +69,16 @@
 
     td a:hover {
       text-decoration: underline;
+    }
+
+
+    /* Scrollable Table Body */
+    .table-container {
+      max-height: 300px;
+      /* Adjust height as needed */
+      overflow-y: scroll;
+      /* Changed from 'auto' to 'scroll' */
+      margin-bottom: 1rem;
     }
 
     /* Button Styles */
@@ -148,247 +161,282 @@
 
     <!-- Admin Management Section -->
     <h2>Manage Admins</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Admin ID</th>
-          <th>Name</th>
-          <th>Username</th>
-          <th>Password</th>
-          <th>Contact Info</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% admins.forEach(function(admin) { %>
+    <div class="table-container">
+      <table>
+        <thead>
           <tr>
-            <td>
-              <%= admin.adminid %>
-            </td>
-            <td>
-              <%= admin.name %>
-            </td>
-            <td>
-              <%= admin.username %>
-            </td>
-            <td>
-              <%= admin.password %>
-            </td>
-            <td>
-              <a href="mailto:<%= admin.email %>">
-                <%= admin.email %>
-              </a><br>
-              <%= admin.phonenumber %>
-            </td>
-            <td>
-              <div class="action-buttons">
-                <a href="/editAdmin/<%= admin.adminid %>" class="button edit">Edit</a>
-                <form action="/deleteAdmin/<%= admin.adminid %>" method="POST" style="display: inline;">
-                  <button type="submit" class="button delete"
-                    onclick="return confirm('Are you sure you want to delete this admin?')">Delete</button>
-                </form>
-              </div>
-            </td>
+            <th>Admin ID</th>
+            <th>Name</th>
+            <th>Username</th>
+            <th>Password</th>
+            <th>Contact Info</th>
+            <th>Actions</th>
           </tr>
-          <% }); %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% admins.forEach(function(admin, index) { %>
+            <% if (index < 5) { %>
+              <tr>
+                <td>
+                  <%= admin.adminid %>
+                </td>
+                <td>
+                  <%= admin.name %>
+                </td>
+                <td>
+                  <%= admin.username %>
+                </td>
+                <td>
+                  <%= admin.password %>
+                </td>
+                <td>
+                  <a href="mailto:<%= admin.email %>">
+                    <%= admin.email %>
+                  </a><br>
+                  <%= admin.phonenumber %>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="/editAdmin/<%= admin.adminid %>" class="button edit">Edit</a>
+                    <form action="/deleteAdmin/<%= admin.adminid %>" method="POST" style="display: inline;">
+                      <button type="submit" class="button delete"
+                        onclick="return confirm('Are you sure you want to delete this admin?')">Delete</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              <% } else { %>
+                <tr style="display: none;">
+                  <!-- Hidden rows beyond the first 5 -->
+                  <!-- You can keep this empty or include the data -->
+                </tr>
+                <% } %>
+                  <% }); %>
+        </tbody>
+      </table>
+    </div>
     <button onclick="window.location.href='/addAdmin'" class="button add">Add New Admin</button>
 
     <!-- Volunteer Management Section -->
     <h2>Manage Volunteers</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Volunteer ID</th>
-          <th>Name</th>
-          <th>Contact Info</th>
-          <th>Sewing Level</th>
-          <th>Monthly Hours</th>
-          <th>Heard About Opportunity</th>
-          <th>Zip Code</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% volunteers.forEach(function(volunteer) { %>
+    <div class="table-container">
+      <table>
+        <thead>
           <tr>
-            <td>
-              <%= volunteer.volunteerid %>
-            </td>
-            <td>
-              <%= volunteer.name %>
-            </td>
-            <td>
-              <a href="mailto:<%= volunteer.email %>">
-                <%= volunteer.email %>
-              </a><br>
-              <%= volunteer.phone %>
-            </td>
-            <td>
-              <%= volunteer.sewinglevel %>
-            </td>
-            <td>
-              <%= volunteer.monthlyhours %>
-            </td>
-            <td>
-              <%= volunteer.heardaboutopportunity %>
-            </td>
-            <td>
-              <%= volunteer.zipcode %>
-            </td>
-            <td>
-              <div class="action-buttons">
-                <a href="/editVolunteer/<%= volunteer.volunteerid %>" class="button edit">Edit</a>
-                <form action="/deleteVolunteer/<%= volunteer.volunteerid %>" method="POST" style="display: inline;">
-                  <button type="submit" class="button delete"
-                    onclick="return confirm('Are you sure you want to delete this volunteer?')">Delete</button>
-                </form>
-              </div>
-            </td>
+            <th>Volunteer ID</th>
+            <th>Name</th>
+            <th>Contact Info</th>
+            <th>Sewing Level</th>
+            <th>Monthly Hours</th>
+            <th>Heard About Opportunity</th>
+            <th>Zip Code</th>
+            <th>Actions</th>
           </tr>
-          <% }); %>
-      </tbody>
-    </table>
+        </thead>
+        <tbody>
+          <% volunteers.forEach(function(volunteer, index) { %>
+            <% if (index < 5) { %>
+              <tr>
+                <td>
+                  <%= volunteer.volunteerid %>
+                </td>
+                <td>
+                  <%= volunteer.name %>
+                </td>
+                <td>
+                  <a href="mailto:<%= volunteer.email %>">
+                    <%= volunteer.email %>
+                  </a><br>
+                  <%= volunteer.phone %>
+                </td>
+                <td>
+                  <%= volunteer.sewinglevel %>
+                </td>
+                <td>
+                  <%= volunteer.monthlyhours %>
+                </td>
+                <td>
+                  <%= volunteer.heardaboutopportunity %>
+                </td>
+                <td>
+                  <%= volunteer.zipcode %>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="/editVolunteer/<%= volunteer.volunteerid %>" class="button edit">Edit</a>
+                    <form action="/deleteVolunteer/<%= volunteer.volunteerid %>" method="POST" style="display: inline;">
+                      <button type="submit" class="button delete"
+                        onclick="return confirm('Are you sure you want to delete this volunteer?')">Delete</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              <% } else { %>
+                <tr style="display: none;">
+                  <!-- Hidden rows beyond the first 5 -->
+                </tr>
+                <% } %>
+                  <% }); %>
+        </tbody>
+      </table>
+    </div>
     <button onclick="window.location.href='/volunteer/add'" class="button add">Add New Volunteer</button>
 
     <!-- Event Requests Section -->
     <h2>Event Requests</h2>
     <form id="eventRequestForm" action="/updateEventStatus" method="POST">
+      <div class="table-container">
+        <table>
+          <thead>
+            <tr>
+              <th>Request ID</th>
+              <th>Date/Time</th>
+              <th>Estimated Attendance</th>
+              <th>Type</th>
+              <th>Contact</th>
+              <th>Address</th>
+              <th>Hear Jen's Story</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% eventRequests.forEach(function(request, index) { %>
+              <% if (index < 5) { %>
+                <tr>
+                  <td>
+                    <%= request.requestid %>
+                  </td>
+                  <td>
+                    <%= request.eventdatetime %>
+                  </td>
+                  <td>
+                    <%= request.estimatedattendance %>
+                  </td>
+                  <td>
+                    <%= request.activitytype %>
+                  </td>
+                  <td>
+                    <strong>
+                      <%= request.name %>
+                    </strong><br>
+                    <a href="mailto:<%= request.contactemail %>">
+                      <%= request.contactemail %>
+                    </a><br>
+                    <%= request.contactphone %>
+                  </td>
+                  <td>
+                    <%= request.proposedeventaddress %><br>
+                      <%= request.city %>, <%= request.state %>
+                          <%= request.zipcode %>
+                  </td>
+                  <td>
+                    <%= request.jenstoryrequest ? "Yes" : "No" %>
+                  </td>
+                  <td>
+                    <select name="status_<%= request.requestid %>">
+                      <option value="Pending" <%=request.eventreqstatus==="Pending" ? "selected" : "" %>>Pending
+                      </option>
+                      <option value="Approved" <%=request.eventreqstatus==="Approved" ? "selected" : "" %>>Approved
+                      </option>
+                    </select>
+                  </td>
+                  <td>
+                    <div class="action-buttons">
+                      <button type="submit" name="action" value="update_<%= request.requestid %>" class="button save">
+                        Save
+                      </button>
+                      <!-- Complete button -->
+                      <a href="/updateEvent/<%= request.requestid %>" class="button complete"
+                        onclick="return confirm('Mark this request as completed?')">Complete</a>
+                      <form action="/deleteEventReq/<%= request.requestid %>" method="POST" style="display: inline;">
+                        <button type="submit" class="button delete"
+                          onclick="return confirm('Are you sure you want to decline this event request?')">Decline</button>
+                      </form>
+                    </div>
+                  </td>
+                </tr>
+                <% } else { %>
+                  <tr style="display: none;">
+                    <!-- Hidden rows beyond the first 5 -->
+                  </tr>
+                  <% } %>
+                    <% }); %>
+          </tbody>
+        </table>
+      </div>
+    </form>
+
+    <!-- Events Section -->
+    <h2>Events</h2>
+    <div class="table-container">
       <table>
         <thead>
           <tr>
-            <th>Request ID</th>
-            <th>Date/Time</th>
-            <th>Estimated Attendance</th>
-            <th>Type</th>
-            <th>Contact</th>
+            <th>Event ID</th>
+            <th>Event Date</th>
             <th>Address</th>
-            <th>Hear Jen's Story</th>
+            <th>Total Participants</th>
+            <th>Pockets</th>
+            <th>Collars</th>
+            <th>Envelopes</th>
+            <th>Vests</th>
+            <th>Total Items Produced</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
-          <% eventRequests.forEach(function(request) { %>
-            <tr>
-              <td>
-                <%= request.requestid %>
-              </td>
-              <td>
-                <%= request.eventdatetime %>
-              </td>
-              <td>
-                <%= request.estimatedattendance %>
-              </td>
-              <td>
-                <%= request.activitytype %>
-              </td>
-              <td>
-                <strong>
-                  <%= request.name %>
-                </strong><br>
-                <a href="mailto:<%= request.contactemail %>">
-                  <%= request.contactemail %>
-                </a><br>
-                <%= request.contactphone %>
-              </td>
-              <td>
-                <%= request.proposedeventaddress %><br>
-                  <%= request.city %>, <%= request.state %>
-                      <%= request.zipcode %>
-              </td>
-              <td>
-                <%= request.jenstoryrequest ? "Yes" : "No" %>
-              </td>
-              <td>
-                <select name="status_<%= request.requestid %>">
-                  <option value="Pending" <%=request.eventreqstatus==="Pending" ? "selected" : "" %>>Pending</option>
-                  <option value="Approved" <%=request.eventreqstatus==="Approved" ? "selected" : "" %>>Approved</option>
-                </select>
-              </td>
-              <td>
-                <div class="action-buttons">
-                  <button type="submit" name="action" value="update_<%= request.requestid %>" class="button save">
-                    Save
-                  </button>
-                  <!-- Updated Complete button -->
-                  <a href="/updateEvent/<%= request.requestid %>" class="button complete"
-                    onclick="return confirm('Mark this request as completed?')">Complete</a>
-                  <form action="/deleteEventReq/<%= request.requestid %>" method="POST" style="display: inline;">
-                    <button type="submit" class="button delete"
-                      onclick="return confirm('Are you sure you want to decline this event request?')">Decline</button>
-                  </form>
-                </div>
-              </td>
-            </tr>
-            <% }); %>
+          <% events.forEach(function(event, index) { %>
+            <% if (index < 5) { %>
+              <tr>
+                <td>
+                  <%= event.eventid %>
+                </td>
+                <td>
+                  <%= event.eventdate %>
+                </td>
+                <td><%- event.fulladdress %></td>
+                <td>
+                  <%= event.totalparticipants %>
+                </td>
+                <td>
+                  <%= event.pockets %>
+                </td>
+                <td>
+                  <%= event.collars %>
+                </td>
+                <td>
+                  <%= event.envelopes %>
+                </td>
+                <td>
+                  <%= event.vests %>
+                </td>
+                <td>
+                  <%= event.total_items_produced %>
+                </td>
+                <td>
+                  <%= event.eventstatus %>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <a href="/editEvent/<%= event.eventid %>" class="button edit">Edit</a>
+                    <form action="/deleteEvent/<%= event.eventid %>" method="POST" style="display: inline;">
+                      <button type="submit" class="button delete"
+                        onclick="return confirm('Are you sure you want to delete this event?')">Delete</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              <% } else { %>
+                <tr style="display: none;">
+                  <!-- Hidden rows beyond the first 5 -->
+                </tr>
+                <% } %>
+                  <% }); %>
         </tbody>
       </table>
-    </form>
-
-    <!-- Events Section -->
-    <h2>Events</h2>
-    <table>
-      <thead>
-        <tr>
-          <th>Event ID</th>
-          <th>Event Date</th>
-          <th>Address</th>
-          <th>Total Participants</th>
-          <th>Pockets</th>
-          <th>Collars</th>
-          <th>Envelopes</th>
-          <th>Vests</th>
-          <th>Total Items Produced</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% events.forEach(function(event) { %>
-          <tr>
-            <td>
-              <%= event.eventid %>
-            </td>
-            <td>
-              <%= event.eventdate %>
-            </td>
-            <td><%- event.fulladdress %></td>
-            <td>
-              <%= event.totalparticipants %>
-            </td>
-            <td>
-              <%= event.pockets %>
-            </td>
-            <td>
-              <%= event.collars %>
-            </td>
-            <td>
-              <%= event.envelopes %>
-            </td>
-            <td>
-              <%= event.vests %>
-            </td>
-            <td>
-              <%= event.total_items_produced %>
-            </td>
-            <td>
-              <%= event.eventstatus %>
-            </td>
-            <td>
-              <div class="action-buttons">
-                <a href="/editEvent/<%= event.eventid %>" class="button edit">Edit</a>
-                <form action="/deleteEvent/<%= event.eventid %>" method="POST" style="display: inline;">
-                  <button type="submit" class="button delete"
-                    onclick="return confirm('Are you sure you want to delete this event?')">Delete</button>
-                </form>
-              </div>
-            </td>
-          </tr>
-          <% }); %>
-      </tbody>
-    </table>
+    </div>
     <!-- Add Event Button -->
     <button type="button" onclick="window.location.href='/addEvent'" class="button add">Add New Event</button>
   </div>

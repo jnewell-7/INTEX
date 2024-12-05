@@ -309,11 +309,14 @@ app.post("/addEvent", isAuthenticated, async (req, res) => {
   } = req.body;
 
   try {
-    // Insert the event into the events table
+    // Format eventdate
+    const formattedDate = new Date(eventdate).toISOString().split("T")[0];
+
+    // Insert the event into the events table without specifying eventid
     const [event] = await knex("events")
       .insert({
-        requestid: requestid || null,
-        eventdate: new Date(eventdate).toISOString().split("T")[0],
+        requestid: requestid || null, // Store requestid if available
+        eventdate: formattedDate,
         eventaddress,
         eventstatus: eventstatus || "Pending",
         totalparticipants: parseInt(totalparticipants, 10) || 0,
@@ -368,7 +371,6 @@ app.get("/updateEvent/:requestid", isAuthenticated, async (req, res) => {
       .select(
         "eventrequests.requestid",
         "eventrequests.eventdate",
-        "eventrequests.eventtime",
         "eventrequests.proposedeventaddress",
         "eventrequests.zipcode"
       )
@@ -394,7 +396,6 @@ app.post("/saveEvent", isAuthenticated, async (req, res) => {
   const {
     requestid,
     eventdate,
-    eventtime,
     eventaddress,
     zipcode,
     totalparticipants,
@@ -405,16 +406,14 @@ app.post("/saveEvent", isAuthenticated, async (req, res) => {
   } = req.body;
 
   try {
-    // Format eventdate and eventtime
+    // Format eventdate
     const formattedDate = new Date(eventdate).toISOString().split("T")[0];
-    const formattedTime = eventtime; // Adjust as needed for your database
 
-    // Insert the event into the events table
+    // Insert the event into the events table without specifying eventid
     const [event] = await knex("events")
       .insert({
-        eventid: requestid, // Use the requestid as eventid
+        requestid, // Store requestid as a foreign key
         eventdate: formattedDate,
-        eventtime: formattedTime,
         eventaddress,
         zipcode,
         totalparticipants: parseInt(totalparticipants, 10),
@@ -422,7 +421,7 @@ app.post("/saveEvent", isAuthenticated, async (req, res) => {
       })
       .returning("*");
 
-    const eventid = event.eventid;
+    const eventid = event.eventid; // Auto-generated eventid
 
     // Insert produced items into the eventproduction table
     const producedItems = [
@@ -458,6 +457,29 @@ app.post("/saveEvent", isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error("Error saving event:", error);
     res.status(500).send("Failed to save event.");
+  }
+});
+
+// Update Event Request Status
+app.post("/updateEventStatus", isAuthenticated, async (req, res) => {
+  try {
+    const updates = Object.entries(req.body);
+
+    for (const [key, value] of updates) {
+      if (key.startsWith("status_")) {
+        const requestid = key.split("_")[1];
+
+        // Update the event request status
+        await knex("eventrequests")
+          .where({ requestid })
+          .update({ eventreqstatus: value });
+      }
+    }
+
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error updating event request status:", error);
+    res.status(500).send("Failed to update event request status.");
   }
 });
 
@@ -507,49 +529,6 @@ app.post("/deleteEvent/:eventid", isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error("Error deleting event:", error);
     res.status(500).send("Failed to delete event.");
-  }
-});
-
-// Update Event Request Status
-app.post("/updateEventStatus", isAuthenticated, async (req, res) => {
-  try {
-    const updates = Object.entries(req.body);
-
-    for (const [key, value] of updates) {
-      if (key.startsWith("status_")) {
-        const requestid = key.split("_")[1];
-
-        if (value === "Completed") {
-          const request = await knex("eventrequests")
-            .where({ requestid })
-            .first();
-          if (request) {
-            const totalParticipants =
-              req.body[`participants_${requestid}`] || 0;
-
-            await knex("events").insert({
-              eventid: request.requestid,
-              eventdate: request.eventdate,
-              eventaddress: request.proposedeventaddress,
-              eventstatus: value,
-              totalparticipants: totalParticipants,
-              zipcode: request.zipcode,
-            });
-
-            await knex("eventrequests").where({ requestid }).del();
-          }
-        } else {
-          await knex("eventrequests")
-            .where({ requestid })
-            .update({ eventreqstatus: value });
-        }
-      }
-    }
-
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error updating event request status:", error);
-    res.status(500).send("Failed to update event request status.");
   }
 });
 
