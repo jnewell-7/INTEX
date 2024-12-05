@@ -6,12 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Admin Dashboard</title>
     <link rel="stylesheet" href="/css/sb-admin-2.css">
+    <style>
+        .turtle-image {
+            position: absolute;
+            top: -700px; /* Adjust this for vertical positioning */
+            right: -30px; /* Adjust this for horizontal positioning */
+            width: 960px; /* Adjust the size */
+            height: auto; /* Maintain aspect ratio */
+            z-index: 0; /* Ensure it appears above other elements */
+            opacity: 0.8; 
+        }
+    </style>
 </head>
-
 <body id="page-top">
-
     <div id="wrapper">
-
+        <!-- Turtle Image -->
+        <img src="/assets/img/turtleadmin.png" alt="Turtle Admin" class="turtle-image">
+        
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
             <!-- Sidebar - Brand -->
