@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>
+    <%= title %>
+  </title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .form-container {
+      background-color: #ffffff;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 600px;
+    }
+
+    h1 {
+      color: #495057;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+
+    h2 {
+      color: #495057;
+      font-weight: 600;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    label {
+      font-weight: bold;
+      color: #495057;
+    }
+
+    input,
+    select {
+      padding: 0.5rem;
+      border: 1px solid #e9ecef;
+      border-radius: 4px;
+      font-size: 1rem;
+      width: 100%;
+    }
+
+    button {
+      padding: 0.5rem;
+      background-color: #556b2f;
+      color: #ffffff;
+      border: none;
+      border-radius: 4px;
+      font-size: 1rem;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.85;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="form-container">
+    <h1>
+      <%= title %>
+    </h1>
+    <form action="/addEvent" method="POST">
+      <!-- Existing Event Fields -->
+      <label for="eventdate">Event Date:</label>
+      <input type="date" id="eventdate" name="eventdate" required>
+
+      <label for="eventaddress">Event Address:</label>
+      <input type="text" id="eventaddress" name="eventaddress" required>
+
+      <label for="zipcode">Zip Code:</label>
+      <input type="text" id="zipcode" name="zipcode" required>
+
+      <label for="totalparticipants">Total Participants:</label>
+      <input type="number" id="totalparticipants" name="totalparticipants" min="0" required>
+
+      <label for="eventstatus">Event Status:</label>
+      <select id="eventstatus" name="eventstatus">
+        <option value="Pending">Pending</option>
+        <option value="Completed">Completed</option>
+      </select>
+
+      <label for="adminid">Admin ID (optional):</label>
+      <input type="text" id="adminid" name="adminid">
+
+      <label for="requestid">Linked Request ID (optional):</label>
+      <input type="text" id="requestid" name="requestid">
+
+      <!-- New Fields for Produced Items -->
+      <h2>Produced Items</h2>
+
+      <label for="pockets">Pockets Completed:</label>
+      <input type="number" id="pockets" name="pockets" min="0" value="0">
+
+      <label for="collars">Collars Completed:</label>
+      <input type="number" id="collars" name="collars" min="0" value="0">
+
+      <label for="envelopes">Envelopes Completed:</label>
+      <input type="number" id="envelopes" name="envelopes" min="0" value="0">
+
+      <label for="vests">Vests Completed:</label>
+      <input type="number" id="vests" name="vests" min="0" value="0">
+
+      <button type="submit">Save Event</button>
+    </form>
+  </div>
+</body>
+
+</html>

@@ -82,7 +82,7 @@ app.get("/get-involved", (req, res) => {
   });
 });
 
-// event request Page Route
+// Event Request Page Route
 app.get("/reqEvent", (req, res) => {
   res.render("reqEvent", { title: "Request Event" });
 });
@@ -174,7 +174,7 @@ app.get("/admin", isAuthenticated, async (req, res) => {
     const admins = await knex("admins")
       .select(
         "admins.adminid",
-        knex.raw("CONCAT(admins.firstname, ' ', admins.lastname) AS name"), // Combine first and last names
+        knex.raw("CONCAT(admins.firstname, ' ', admins.lastname) AS name"),
         "admins.username",
         "admins.password",
         "admins.email",
@@ -202,7 +202,7 @@ app.get("/admin", isAuthenticated, async (req, res) => {
         "zipcodes.state",
         "eventrequests.zipcode",
         "eventrequests.eventreqstatus",
-        "eventrequests.jenstoryrequest" // Add Jen's Story request field
+        "eventrequests.jenstoryrequest"
       )
       .orderBy("eventrequests.requestid", "asc");
 
@@ -213,7 +213,7 @@ app.get("/admin", isAuthenticated, async (req, res) => {
         "volunteers.volunteerid",
         knex.raw(
           "CONCAT(volunteers.volfirstname, ' ', volunteers.vollastname) AS name"
-        ), // Combine first and last names
+        ),
         "volunteers.phone",
         "volunteers.email",
         "volunteers.sewinglevel",
@@ -224,8 +224,8 @@ app.get("/admin", isAuthenticated, async (req, res) => {
         "zipcodes.state"
       )
       .orderBy([
-        { column: "volunteers.volfirstname", order: "asc" }, // Order by first name
-        { column: "volunteers.vollastname", order: "asc" }, // Then by last name
+        { column: "volunteers.volfirstname", order: "asc" },
+        { column: "volunteers.vollastname", order: "asc" },
       ]);
 
     // Fetch Events Data with Produced Items and Totals
@@ -272,6 +272,7 @@ app.get("/admin", isAuthenticated, async (req, res) => {
         "events.eventstatus"
       )
       .orderBy("events.eventid", "asc");
+
     // Render the Admin Dashboard
     res.render("admin", {
       title: "Admin Dashboard",
@@ -298,7 +299,7 @@ app.post("/markAsCompleted/:requestid", async (req, res) => {
         eventdate: request.eventdate,
         eventaddress: request.proposedeventaddress,
         eventstatus: "Completed",
-        totalparticipants: req.body.totalparticipants || 0, // Replace with actual participants count if available
+        totalparticipants: req.body.totalparticipants || 0,
         zipcode: request.zipcode,
       });
 
@@ -309,6 +310,177 @@ app.post("/markAsCompleted/:requestid", async (req, res) => {
   } catch (error) {
     console.error("Error marking event request as completed:", error);
     res.status(500).send("Failed to mark event request as completed.");
+  }
+});
+
+// Route to display the Add Event form with pre-filled data
+app.get("/addEvent/:requestid", isAuthenticated, async (req, res) => {
+  const { requestid } = req.params;
+
+  try {
+    const request = await knex("eventrequests")
+      .join("zipcodes", "eventrequests.zipcode", "=", "zipcodes.zipcode")
+      .select(
+        "eventrequests.requestid",
+        "eventrequests.eventdate",
+        "eventrequests.proposedeventaddress",
+        "zipcodes.city",
+        "zipcodes.state",
+        "eventrequests.zipcode"
+      )
+      .where({ requestid })
+      .first();
+
+    if (!request) {
+      return res.status(404).send("Event request not found.");
+    }
+
+    res.render("addEvent", {
+      title: "Complete Event",
+      event: request,
+    });
+  } catch (error) {
+    console.error("Error fetching event request:", error);
+    res.status(500).send("Failed to load event request.");
+  }
+});
+
+// Route to handle saving the event and produced items
+app.post("/saveEvent", isAuthenticated, async (req, res) => {
+  const {
+    requestid,
+    eventdate,
+    eventaddress,
+    zipcode,
+    totalparticipants,
+    pockets,
+    collars,
+    envelopes,
+    vests,
+  } = req.body;
+
+  try {
+    // Format eventdate to match PostgreSQL's expected format
+    const formattedDate = new Date(eventdate).toISOString().split("T")[0];
+
+    // Insert the event into the events table
+    const [eventid] = await knex("events")
+      .insert({
+        eventid: requestid,
+        eventdate: formattedDate,
+        eventaddress,
+        zipcode,
+        totalparticipants: parseInt(totalparticipants, 10),
+        eventstatus: "Completed",
+      })
+      .returning("eventid");
+
+    // Insert produced items into the eventproduction table
+    const producedItems = [
+      { name: "pockets", quantity: parseInt(pockets || 0, 10) },
+      { name: "collars", quantity: parseInt(collars || 0, 10) },
+      { name: "envelopes", quantity: parseInt(envelopes || 0, 10) },
+      { name: "vests", quantity: parseInt(vests || 0, 10) },
+    ];
+
+    for (const item of producedItems) {
+      if (item.quantity > 0) {
+        const producedItem = await knex("produceditems")
+          .select("produceditemid")
+          .where({ produceditemname: item.name })
+          .first();
+
+        if (producedItem) {
+          await knex("eventproduction").insert({
+            eventid,
+            produceditemid: producedItem.produceditemid,
+            quantityproduced: item.quantity,
+          });
+        } else {
+          console.warn(`Produced item '${item.name}' not found in database.`);
+        }
+      }
+    }
+
+    // Delete the original event request
+    await knex("eventrequests").where({ requestid }).del();
+
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error saving event:", error);
+    res.status(500).send("Failed to save event.");
+  }
+});
+
+// Route to render the Add Event page
+app.get("/addEvent", isAuthenticated, (req, res) => {
+  res.render("addEvent", { title: "Add New Event" });
+});
+
+// Route to handle the Add Event form submission
+app.post("/addEvent", isAuthenticated, async (req, res) => {
+  const {
+    requestid,
+    eventdate,
+    eventaddress,
+    eventstatus,
+    totalparticipants,
+    zipcode,
+    adminid,
+    pockets,
+    collars,
+    envelopes,
+    vests,
+  } = req.body;
+
+  try {
+    // Insert the event into the events table
+    const [event] = await knex("events")
+      .insert({
+        requestid: requestid || null,
+        eventdate: new Date(eventdate).toISOString().split("T")[0],
+        eventaddress,
+        eventstatus: eventstatus || "Pending",
+        totalparticipants: parseInt(totalparticipants, 10) || 0,
+        zipcode,
+        adminid: adminid || null,
+      })
+      .returning("*");
+
+    const eventid = event.eventid;
+
+    // Prepare produced items data
+    const producedItems = [
+      { name: "pockets", quantity: parseInt(pockets || 0, 10) },
+      { name: "collars", quantity: parseInt(collars || 0, 10) },
+      { name: "envelopes", quantity: parseInt(envelopes || 0, 10) },
+      { name: "vests", quantity: parseInt(vests || 0, 10) },
+    ];
+
+    // Insert produced items into the eventproduction table
+    for (const item of producedItems) {
+      if (item.quantity > 0) {
+        const producedItem = await knex("produceditems")
+          .select("produceditemid")
+          .where({ produceditemname: item.name })
+          .first();
+
+        if (producedItem) {
+          await knex("eventproduction").insert({
+            eventid,
+            produceditemid: producedItem.produceditemid,
+            quantityproduced: item.quantity,
+          });
+        } else {
+          console.warn(`Produced item '${item.name}' not found in database.`);
+        }
+      }
+    }
+
+    res.redirect("/admin"); // Redirect back to Admin Dashboard
+  } catch (error) {
+    console.error("Error adding event:", error);
+    res.status(500).send("Failed to add event.");
   }
 });
 
@@ -337,24 +509,17 @@ app.post("/deleteVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
 });
 
 // Delete EventRequest Route
-app.post('/deleteEventReq/:requestid', (req, res) => {
-  const { requestid } = req.params; // Extract request ID from URL
-  console.log('Route hit for deleting event request');
-  console.log('Request ID:', requestid); // Log the ID being processed
+app.post("/deleteEventReq/:requestid", isAuthenticated, async (req, res) => {
+  const { requestid } = req.params;
 
-  knex('eventrequests')
-    .where('requestid', requestid) // Match the record by ID
-    .del() // Delete the record
-    .then(() => {
-      console.log(`Event request with ID ${requestid} deleted successfully.`);
-      res.redirect('/admin'); // Redirect to the event requests list page
-    })
-    .catch((error) => {
-      console.error('Error deleting event request:', error);
-      res.status(500).send('Failed to delete event request.');
-    });
+  try {
+    await knex("eventrequests").where("requestid", requestid).del();
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error deleting event request:", error);
+    res.status(500).send("Failed to delete event request.");
+  }
 });
-
 
 // Delete Event Route
 app.post("/deleteEvent/:eventid", isAuthenticated, async (req, res) => {
@@ -367,8 +532,9 @@ app.post("/deleteEvent/:eventid", isAuthenticated, async (req, res) => {
     res.status(500).send("Failed to delete event.");
   }
 });
+
 // Update Event Request Status
-app.post("/updateEventStatus", async (req, res) => {
+app.post("/updateEventStatus", isAuthenticated, async (req, res) => {
   try {
     const updates = Object.entries(req.body);
 
@@ -411,8 +577,7 @@ app.post("/updateEventStatus", async (req, res) => {
 });
 
 // Route for the Admin Dashboard
-app.get("/dashboard", (req, res) => {
-  // Render the dashboard.ejs file
+app.get("/dashboard", isAuthenticated, (req, res) => {
   res.render("dashboard", { title: "Admin Dashboard" });
 });
 
@@ -455,39 +620,8 @@ app.post("/submitVolunteerData", async (req, res) => {
   }
 });
 
-//delete volunteer route
-app.post("/deleteVolunteer/:volunteerid", (req, res) => {
-  const { volunteerid } = req.params; // Extract volunteer ID from URL
-
-  knex("volunteers")
-    .where("volunteerid", volunteerid) // Match the record by ID
-    .del() // Delete the record
-    .then(() => {
-      res.redirect("/admin"); // Redirect to the volunteers list page
-    })
-    .catch((error) => {
-      console.error("Error deleting volunteer:", error);
-      res.status(500).send("Failed to delete volunteer.");
-    });
-});
-
-//delete admin route
-app.post("/deleteAdmin/:adminid", (req, res) => {
-  const adminid = req.params.adminid;
-  knex("admins")
-    .where("adminid", adminid)
-    .del()
-    .then(() => {
-      res.redirect("/admin");
-    })
-    .catch((error) => {
-      console.error("Error deleting admin:", error);
-      res.status(500).send("Internal Server Error");
-    });
-});
-
 // Add Admin Route
-app.get("/addAdmin", (req, res) => {
+app.get("/addAdmin", isAuthenticated, (req, res) => {
   res.render("addAdmin", { title: "Add Admin" });
 });
 
@@ -499,7 +633,7 @@ app.post("/addAdmin", isAuthenticated, async (req, res) => {
     // Directly insert the provided password without hashing
     await knex("admins").insert({
       username,
-      password, // Store the plain-text password
+      password,
       firstname,
       lastname,
       email,
@@ -538,7 +672,7 @@ app.get("/editAdmin/:id", isAuthenticated, async (req, res) => {
 app.post("/editAdmin/:adminid", isAuthenticated, async (req, res) => {
   const { adminid } = req.params;
   const { username, password, firstname, lastname, email, phonenumber } =
-    req.body; // Include all fields from the form
+    req.body;
   try {
     await knex("admins")
       .where({ adminid })
@@ -649,17 +783,13 @@ app.get("/realDonate", (req, res) => {
   );
 });
 
-app.get("/get-involved", (req, res) => {
-  res.render("volunteer", { title: "Volunteer Today" });
-});
-
 // Route to render the volunteer form page
 app.get("/volunteer/add", (req, res) => {
   res.render("volunteer", { title: "Add New Volunteer" });
 });
 
 // Route to render the admin form page
-app.get("/admin/add", (req, res) => {
+app.get("/admin/add", isAuthenticated, (req, res) => {
   res.render("addAdmin", { title: "Add New Admin" });
 });
 
@@ -674,65 +804,6 @@ app.post("/logout", (req, res) => {
 // Error Handling
 app.use((req, res) => {
   res.status(404).send("Page not found.");
-});
-
-//Post route to put volunteer data into the database
-app.post("/submitVolunteerData", (req, res) => {
-  // Extract form values from req.body with necessary validation and transformation
-  try {
-    const first_name = req.body.first_name?.trim().toUpperCase(); // Ensure first name is uppercase and trimmed
-    const last_name = req.body.last_name?.trim().toUpperCase(); // Ensure last name is uppercase and trimmed
-    const phone = req.body.phone?.trim(); // Phone number (validated in frontend, ensure trimmed)
-    const email = req.body.email?.trim().toLowerCase(); // Ensure email is lowercase and trimmed
-    const city = req.body.city?.trim().toUpperCase(); // Ensure city is uppercase and trimmed
-    const state = req.body.state?.trim().toUpperCase(); // Ensure state is uppercase and trimmed
-    const zipcode = req.body.zipcode?.trim(); // Zipcode
-    const sewing_level = req.body.sewing_level?.trim(); // Sewing level (dropdown value)
-    const monthly_hours = parseInt(req.body.monthly_hours, 10); // Convert to integer
-    const heard_about =
-      req.body.heard_about === "Other"
-        ? req.body.other_input?.trim()
-        : req.body.heard_about?.trim(); // Handle 'Other' case, ensure trimmed
-
-    // Validate 'Other' input if 'Other' is selected for heard_about
-    if (
-      req.body.heard_about === "Other" &&
-      (!req.body.other_input || req.body.other_input.trim() === "")
-    ) {
-      return res.status(400).send("Please specify how you heard about us.");
-    }
-
-    // Insert the new volunteer into the database
-    knex("volunteers")
-      .insert({
-        volfirstname: first_name,
-        vollastname: last_name,
-        phone: phone,
-        email: email,
-        city: city,
-        state: state,
-        zipcode: zipcode,
-        sewinglevel: sewing_level,
-        monthlyhours: monthly_hours,
-        heardaboutopportunity: heard_about,
-      })
-      .then(() => {
-        res.redirect("/"); // Redirect to the homepage after adding the volunteer
-      })
-      .catch((error) => {
-        console.error("Error adding volunteer:", error);
-        // Handle common errors like duplicate email or database constraint violations
-        if (error.code === "23505") {
-          // Assuming 23505 is the unique violation error code for your database
-          res.status(400).send("A volunteer with this email already exists.");
-        } else {
-          res.status(500).send("Internal Server Error");
-        }
-      });
-  } catch (err) {
-    console.error("Unexpected error:", err);
-    res.status(500).send("Internal Server Error");
-  }
 });
 
 // Start Server

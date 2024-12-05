@@ -303,9 +303,11 @@
                   <button type="submit" name="action" value="update_<%= request.requestid %>" class="button save">
                     Save
                   </button>
-                  <form action="/markAsCompleted/<%= request.requestid %>" method="POST" style="display: inline;">
+                  <form action="/addEvent/<%= request.requestid %>" method="GET" style="display: inline;">
                     <button type="submit" class="button save"
-                      onclick="return confirm('Mark this request as completed?')">Completed</button>
+                      onclick="return confirm('Mark this request as completed?')">
+                      Completed
+                    </button>
                   </form>
                   <form action="/deleteEventReq/<%= request.requestid %>" method="POST" style="display: inline;">
                     <button type="submit" class="button delete"
@@ -384,6 +386,8 @@
           <% }); %>
       </tbody>
     </table>
+    <!-- Add Event Button -->
+    <button type="button" onclick="window.location.href='/addEvent'" class="button add">Add New Event</button>
   </div>
 </body>
 
