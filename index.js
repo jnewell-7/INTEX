@@ -286,6 +286,32 @@ app.get("/admin", isAuthenticated, async (req, res) => {
   }
 });
 
+// Mark Event Request as Completed
+app.post("/markAsCompleted/:requestid", async (req, res) => {
+  const { requestid } = req.params;
+  try {
+    const request = await knex("eventrequests").where({ requestid }).first();
+    if (request) {
+      // Insert the event into the events table
+      await knex("events").insert({
+        eventid: request.requestid,
+        eventdate: request.eventdate,
+        eventaddress: request.proposedeventaddress,
+        eventstatus: "Completed",
+        totalparticipants: req.body.totalparticipants || 0, // Replace with actual participants count if available
+        zipcode: request.zipcode,
+      });
+
+      // Delete the event request after marking as completed
+      await knex("eventrequests").where({ requestid }).del();
+    }
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error marking event request as completed:", error);
+    res.status(500).send("Failed to mark event request as completed.");
+  }
+});
+
 // Delete Admin Route
 app.post("/deleteAdmin/:adminid", isAuthenticated, async (req, res) => {
   const { adminid } = req.params;
