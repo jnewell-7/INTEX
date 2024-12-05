@@ -92,11 +92,16 @@ app.get("/reqEvent", (req, res) => {
   res.render("reqEvent", { title: "Request Event" });
 });
 
+
+
+
 app.post("/submitEventRequest", async (req, res) => {
   const {
     eventdate,
     eventtime,
     proposedeventaddress,
+    city,
+    state,
     zipcode,
     estimatedattendance,
     activitytype,
@@ -108,18 +113,33 @@ app.post("/submitEventRequest", async (req, res) => {
   } = req.body;
 
   try {
-    // Check if zip code exists in the zipcodes table
+    // Check if the ZIP code exists in the zipcodes table
     let zipcodeRecord = await knex("zipcodes").where({ zipcode }).first();
 
     if (!zipcodeRecord) {
-      return res.status(400).send("Invalid zip code. Please try again.");
+      // Insert ZIP code into zipcodes table
+      await knex("zipcodes").insert({
+        zipcode,
+        city: city.toUpperCase(),
+        state: state.toUpperCase(),
+      });
+    } else {
+      // Verify the city and state match the existing ZIP code record
+      if (
+        zipcodeRecord.city.toUpperCase() !== city.toUpperCase() ||
+        zipcodeRecord.state.toUpperCase() !== state.toUpperCase()
+      ) {
+        return res
+          .status(400)
+          .send("City and state do not match the existing ZIP code.");
+      }
     }
 
-    // Insert the event request into the eventrequests table
+    // Insert event request into eventrequests table
     await knex("eventrequests").insert({
       eventdate,
       eventtime,
-      proposedeventaddress,
+      proposedeventaddress: proposedeventaddress.toUpperCase(),
       zipcode,
       estimatedattendance: parseInt(estimatedattendance, 10),
       activitytype,
@@ -137,6 +157,7 @@ app.post("/submitEventRequest", async (req, res) => {
     res.status(500).send("Failed to submit event request.");
   }
 });
+
 
 // Donate Page Route
 app.get("/donate", (req, res) => {
