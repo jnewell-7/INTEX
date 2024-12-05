@@ -30,7 +30,9 @@ app.use(
 const knex = require("knex")({
   client: "pg",
   connection: {
-    host: process.env.RDS_HOSTNAME || "awseb-e-it3xmpabbx-stack-awsebrdsdatabase-5vjxonr0zyvk.chiykskmafi4.us-east-1.rds.amazonaws.com",
+    host:
+      process.env.RDS_HOSTNAME ||
+      "awseb-e-it3xmpabbx-stack-awsebrdsdatabase-5vjxonr0zyvk.chiykskmafi4.us-east-1.rds.amazonaws.com",
     user: process.env.RDS_USERNAME || "postgres",
     password: process.env.RDS_PASSWORD || "gocougs123",
     database: process.env.RDS_DB_NAME || "ebdb",
@@ -73,9 +75,55 @@ app.get("/jen-story", (req, res) => {
   res.render("jen", { title: "Jen's Story" });
 });
 
-// Help Page Route
-app.get("/help", (req, res) => {
-  res.render("help", { title: "Request Event" });
+// event request Page Route
+app.get("/reqEvent", (req, res) => {
+  res.render("reqEvent", { title: "Request Event" });
+});
+
+app.post("/submitEventRequest", async (req, res) => {
+  const {
+    eventdate,
+    eventtime,
+    proposedeventaddress,
+    zipcode,
+    estimatedattendance,
+    activitytype,
+    contactfirstname,
+    contactlastname,
+    contactphone,
+    contactemail,
+    jenstoryrequest,
+  } = req.body;
+
+  try {
+    // Check if zip code exists in the zipcodes table
+    let zipcodeRecord = await knex("zipcodes").where({ zipcode }).first();
+
+    if (!zipcodeRecord) {
+      return res.status(400).send("Invalid zip code. Please try again.");
+    }
+
+    // Insert the event request into the eventrequests table
+    await knex("eventrequests").insert({
+      eventdate,
+      eventtime,
+      proposedeventaddress,
+      zipcode,
+      estimatedattendance: parseInt(estimatedattendance, 10),
+      activitytype,
+      contactfirstname: contactfirstname.toUpperCase(),
+      contactlastname: contactlastname.toUpperCase(),
+      contactphone,
+      contactemail: contactemail.toLowerCase(),
+      jenstoryrequest: jenstoryrequest === "Y",
+      eventreqstatus: "Pending",
+    });
+
+    res.redirect("/");
+  } catch (error) {
+    console.error("Error submitting event request:", error);
+    res.status(500).send("Failed to submit event request.");
+  }
 });
 
 // Donate Page Route
@@ -98,11 +146,19 @@ app.post("/login", async (req, res) => {
       req.session.username = admin.username;
       res.redirect("/admin");
     } else {
-      res.render("login", { title: "Admin Login", errorMessage: "Invalid username or password." });
+      res.render("login", {
+        title: "Admin Login",
+        errorMessage: "Invalid username or password.",
+      });
     }
   } catch (error) {
     console.error("Error during login:", error);
-    res.status(500).render("login", { title: "Admin Login", errorMessage: "An error occurred." });
+    res
+      .status(500)
+      .render("login", {
+        title: "Admin Login",
+        errorMessage: "An error occurred.",
+      });
   }
 });
 
@@ -141,7 +197,13 @@ app.get("/admin", isAuthenticated, async (req, res) => {
       )
       .orderBy("events.eventdate", "asc");
 
-    res.render("admin", { title: "Admin Dashboard", admins, eventRequests, volunteers, events });
+    res.render("admin", {
+      title: "Admin Dashboard",
+      admins,
+      eventRequests,
+      volunteers,
+      events,
+    });
   } catch (error) {
     console.error("Error loading admin page:", error);
     res.status(500).send("Error loading admin dashboard.");
@@ -158,9 +220,12 @@ app.post("/updateEventStatus", async (req, res) => {
         const requestid = key.split("_")[1];
 
         if (value === "Completed") {
-          const request = await knex("eventrequests").where({ requestid }).first();
+          const request = await knex("eventrequests")
+            .where({ requestid })
+            .first();
           if (request) {
-            const totalParticipants = req.body[`participants_${requestid}`] || 0;
+            const totalParticipants =
+              req.body[`participants_${requestid}`] || 0;
 
             await knex("events").insert({
               eventid: request.requestid,
@@ -174,7 +239,9 @@ app.post("/updateEventStatus", async (req, res) => {
             await knex("eventrequests").where({ requestid }).del();
           }
         } else {
-          await knex("eventrequests").where({ requestid }).update({ eventreqstatus: value });
+          await knex("eventrequests")
+            .where({ requestid })
+            .update({ eventreqstatus: value });
         }
       }
     }
@@ -188,7 +255,18 @@ app.post("/updateEventStatus", async (req, res) => {
 
 // Add Volunteer Route
 app.post("/submitVolunteerData", async (req, res) => {
-  const { first_name, last_name, phone, email, zipcode, sewing_level, monthly_hours, heard_about, city, state } = req.body;
+  const {
+    first_name,
+    last_name,
+    phone,
+    email,
+    zipcode,
+    sewing_level,
+    monthly_hours,
+    heard_about,
+    city,
+    state,
+  } = req.body;
 
   try {
     let zipcodeRecord = await knex("zipcodes").where({ zipcode }).first();
@@ -277,19 +355,30 @@ app.get("/editVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
 
 app.post("/editVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
   const { volunteerid } = req.params;
-  const { first_name, last_name, phone, email, sewing_level, monthly_hours, heard_about, zipcode } = req.body;
+  const {
+    first_name,
+    last_name,
+    phone,
+    email,
+    sewing_level,
+    monthly_hours,
+    heard_about,
+    zipcode,
+  } = req.body;
 
   try {
-    await knex("volunteers").where({ volunteerid }).update({
-      volfirstname: first_name.toUpperCase(),
-      vollastname: last_name.toUpperCase(),
-      phone,
-      email: email.toLowerCase(),
-      sewinglevel: sewing_level,
-      monthlyhours: parseInt(monthly_hours, 10),
-      heardaboutopportunity: heard_about,
-      zipcode,
-    });
+    await knex("volunteers")
+      .where({ volunteerid })
+      .update({
+        volfirstname: first_name.toUpperCase(),
+        vollastname: last_name.toUpperCase(),
+        phone,
+        email: email.toLowerCase(),
+        sewinglevel: sewing_level,
+        monthlyhours: parseInt(monthly_hours, 10),
+        heardaboutopportunity: heard_about,
+        zipcode,
+      });
 
     res.redirect("/admin");
   } catch (error) {
@@ -315,16 +404,24 @@ app.get("/editEvent/:eventid", isAuthenticated, async (req, res) => {
 
 app.post("/editEvent/:eventid", isAuthenticated, async (req, res) => {
   const { eventid } = req.params;
-  const { event_date, event_address, zipcode, total_participants, event_status } = req.body;
+  const {
+    event_date,
+    event_address,
+    zipcode,
+    total_participants,
+    event_status,
+  } = req.body;
 
   try {
-    await knex("events").where({ eventid }).update({
-      eventdate: event_date,
-      eventaddress: event_address,
-      zipcode,
-      totalparticipants: parseInt(total_participants, 10),
-      eventstatus: event_status,
-    });
+    await knex("events")
+      .where({ eventid })
+      .update({
+        eventdate: event_date,
+        eventaddress: event_address,
+        zipcode,
+        totalparticipants: parseInt(total_participants, 10),
+        eventstatus: event_status,
+      });
 
     res.redirect("/admin");
   } catch (error) {
@@ -358,7 +455,7 @@ app.use((req, res) => {
 });
 
 //Post route to put volunteer data into the database
-app.post('/submitVolunteerData', (req, res) => {
+app.post("/submitVolunteerData", (req, res) => {
   // Extract form values from req.body with necessary validation and transformation
   try {
     const first_name = req.body.first_name?.trim().toUpperCase(); // Ensure first name is uppercase and trimmed
@@ -370,15 +467,21 @@ app.post('/submitVolunteerData', (req, res) => {
     const zipcode = req.body.zipcode?.trim(); // Zipcode
     const sewing_level = req.body.sewing_level?.trim(); // Sewing level (dropdown value)
     const monthly_hours = parseInt(req.body.monthly_hours, 10); // Convert to integer
-    const heard_about = req.body.heard_about === 'Other' ? req.body.other_input?.trim() : req.body.heard_about?.trim(); // Handle 'Other' case, ensure trimmed
+    const heard_about =
+      req.body.heard_about === "Other"
+        ? req.body.other_input?.trim()
+        : req.body.heard_about?.trim(); // Handle 'Other' case, ensure trimmed
 
     // Validate 'Other' input if 'Other' is selected for heard_about
-    if (req.body.heard_about === 'Other' && (!req.body.other_input || req.body.other_input.trim() === '')) {
-      return res.status(400).send('Please specify how you heard about us.');
+    if (
+      req.body.heard_about === "Other" &&
+      (!req.body.other_input || req.body.other_input.trim() === "")
+    ) {
+      return res.status(400).send("Please specify how you heard about us.");
     }
 
     // Insert the new volunteer into the database
-    knex('volunteers')
+    knex("volunteers")
       .insert({
         volfirstname: first_name,
         vollastname: last_name,
@@ -392,24 +495,23 @@ app.post('/submitVolunteerData', (req, res) => {
         heardaboutopportunity: heard_about,
       })
       .then(() => {
-        res.redirect('/'); // Redirect to the homepage after adding the volunteer
+        res.redirect("/"); // Redirect to the homepage after adding the volunteer
       })
-      .catch(error => {
-        console.error('Error adding volunteer:', error);
+      .catch((error) => {
+        console.error("Error adding volunteer:", error);
         // Handle common errors like duplicate email or database constraint violations
-        if (error.code === '23505') { // Assuming 23505 is the unique violation error code for your database
-          res.status(400).send('A volunteer with this email already exists.');
+        if (error.code === "23505") {
+          // Assuming 23505 is the unique violation error code for your database
+          res.status(400).send("A volunteer with this email already exists.");
         } else {
-          res.status(500).send('Internal Server Error');
+          res.status(500).send("Internal Server Error");
         }
       });
   } catch (err) {
-    console.error('Unexpected error:', err);
-    res.status(500).send('Internal Server Error');
+    console.error("Unexpected error:", err);
+    res.status(500).send("Internal Server Error");
   }
 });
-
-
 
 // Start Server
 app.listen(port, () => console.log(`Server is running on port ${port}!`));
