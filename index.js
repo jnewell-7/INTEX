@@ -69,10 +69,17 @@ app.get("/about", (req, res) => {
   res.render("about", { title: "About - Turtle Shelter Project" });
 });
 
-// Jen's Story Page Route
+// Jen's Story Page Get Route
 app.get("/jen-story", (req, res) => {
   res.render("jen", { title: "Jen's Story" });
 });
+
+// Get Involved Page Get Route
+app.get("/get-involved", (req, res) => {
+  res.render("get-involved", { title: "Get Involved - Turtle Shelter Project" });
+});
+
+
 
 // event request Page Route
 app.get("/reqEvent", (req, res) => {
