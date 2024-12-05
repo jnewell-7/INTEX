@@ -257,11 +257,11 @@
             <td>
               <div class="action-buttons">
                 <a href="/editVolunteer/<%= volunteer.volunteerid %>" class="button edit">Edit</a>
-                <form action="/deleteVolunteer" method="POST" style="display:inline;">
-                  <input type="hidden" name="volunteerid" value="<%= volunteer.volunteerid %>">
+                <form action="/deleteVolunteer/<%= volunteer.volunteerid %>" method="POST" style="display: inline;">
                   <button type="submit" class="button delete"
                     onclick="return confirm('Are you sure you want to delete this volunteer?')">Delete</button>
                 </form>
+                
               </div>
             </td>
           </tr>

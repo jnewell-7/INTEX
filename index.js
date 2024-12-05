@@ -318,6 +318,27 @@ app.post("/submitVolunteerData", async (req, res) => {
 
 
 
+
+
+//delete volunteer route 
+app.post('/deleteVolunteer/:volunteerid', (req, res) => {
+  const { volunteerid } = req.params; // Extract volunteer ID from URL
+
+  knex('volunteers')
+    .where('volunteerid', volunteerid) // Match the record by ID
+    .del() // Delete the record
+    .then(() => {
+      res.redirect('/admin'); // Redirect to the volunteers list page
+    })
+    .catch((error) => {
+      console.error('Error deleting volunteer:', error);
+      res.status(500).send('Failed to delete volunteer.');
+    });
+});
+
+
+
+
 //delete admin route 
 app.post('/deleteAdmin/:adminid', (req, res) => {
   const adminid = req.params.adminid;
@@ -584,16 +605,7 @@ app.post('/submitVolunteerData', (req, res) => {
 
 
 
-app.post("/deleteVolunteer", isAuthenticated, async (req, res) => {
-  const { volunteerid } = req.body;
-  try {
-    await knex("volunteers").where({ volunteerid }).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting volunteer:", error);
-    res.status(500).send("Failed to delete volunteer.");
-  }
-});
+
 
 app.post("/deleteEventReq", isAuthenticated, async (req, res) => {
   const { requestid } = req.body;
