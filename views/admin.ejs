@@ -384,7 +384,6 @@
         </thead>
         <tbody>
           <% events.forEach(function(event, index) { %>
-            <% if (index < 5) { %>
               <tr>
                 <td>
                   <%= event.eventid %>
@@ -424,11 +423,6 @@
                   </div>
                 </td>
               </tr>
-              <% } else { %>
-                <tr style="display: none;">
-                  <!-- Hidden rows beyond the first 5 -->
-                </tr>
-                <% } %>
                   <% }); %>
         </tbody>
       </table>
