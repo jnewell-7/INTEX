@@ -31,7 +31,8 @@ const knex = require("knex")({
   client: "pg",
   connection: {
     host:
-      process.env.RDS_HOSTNAME || "awseb-e-it3xmpabbx-stack-awsebrdsdatabase-5vjxonr0zyvk.chiykskmafi4.us-east-1.rds.amazonaws.com",
+      process.env.RDS_HOSTNAME ||
+      "awseb-e-it3xmpabbx-stack-awsebrdsdatabase-5vjxonr0zyvk.chiykskmafi4.us-east-1.rds.amazonaws.com",
     user: process.env.RDS_USERNAME || "postgres",
     password: process.env.RDS_PASSWORD || "gocougs123",
     database: process.env.RDS_DB_NAME || "ebdb",
@@ -152,34 +153,50 @@ app.post("/login", async (req, res) => {
     }
   } catch (error) {
     console.error("Error during login:", error);
-    res
-      .status(500)
-      .render("login", {
-        title: "Admin Login",
-        errorMessage: "An error occurred.",
-      });
+    res.status(500).render("login", {
+      title: "Admin Login",
+      errorMessage: "An error occurred.",
+    });
   }
 });
 
 // Admin Page Route
 app.get("/admin", isAuthenticated, async (req, res) => {
   try {
-    const admins = await knex("admins").select("*").orderBy("adminid", "asc");
+    const admins = await knex("admins")
+      .select(
+        "admins.adminid",
+        knex.raw("CONCAT(admins.firstname, ' ', admins.lastname) AS name"), // Combine first and last names
+        "admins.username",
+        "admins.password",
+        "admins.email",
+        "admins.phonenumber"
+      )
+      .orderBy("admins.adminid", "asc");
 
     const eventRequests = await knex("eventrequests")
-      .join("zipcodes", "eventrequests.zipcode", "=", "zipcodes.zipcode") // Join with zipcodes table
+      .join("zipcodes", "eventrequests.zipcode", "=", "zipcodes.zipcode")
       .select(
-        "eventrequests.*", // Select all fields from eventrequests
-        "zipcodes.city", // Add city from zipcodes
-        "zipcodes.state" // Add state from zipcodes
-      );
+        "eventrequests.requestid",
+        "eventrequests.eventdate",
+        "eventrequests.estimatedattendance",
+        "eventrequests.activitytype",
+        knex.raw("CONCAT(eventrequests.contactfirstname, ' ', eventrequests.contactlastname) AS name"), // Combine first and last names
+        "eventrequests.contactemail",
+        "eventrequests.contactphone",
+        "eventrequests.proposedeventaddress",
+        "zipcodes.city",
+        "zipcodes.state",
+        "eventrequests.zipcode",
+        "eventrequests.eventreqstatus"
+      )
+      .orderBy("eventrequests.requestid", "asc"); // Order by request ID
 
     const volunteers = await knex("volunteers")
       .join("zipcodes", "volunteers.zipcode", "=", "zipcodes.zipcode")
       .select(
         "volunteers.volunteerid",
-        "volunteers.volfirstname",
-        "volunteers.vollastname",
+        knex.raw("CONCAT(volunteers.volfirstname, ' ', volunteers.vollastname) AS name"), // Combine first and last names
         "volunteers.phone",
         "volunteers.email",
         "volunteers.sewinglevel",
@@ -189,7 +206,10 @@ app.get("/admin", isAuthenticated, async (req, res) => {
         "zipcodes.city",
         "zipcodes.state"
       )
-      .orderBy("volunteers.volfirstname", "asc");
+      .orderBy([
+        { column: "volunteers.volfirstname", order: "asc" }, // Order by first name
+        { column: "volunteers.vollastname", order: "asc" }  // Then by last name
+      ]);
 
     const events = await knex("events")
       .join("zipcodes", "events.zipcode", "=", "zipcodes.zipcode")
@@ -197,13 +217,13 @@ app.get("/admin", isAuthenticated, async (req, res) => {
         "events.eventid",
         "events.eventdate",
         "events.eventaddress",
-        "events.zipcode",
         "zipcodes.city",
         "zipcodes.state",
+        "events.zipcode",
         "events.totalparticipants",
         "events.eventstatus"
       )
-      .orderBy("events.eventdate", "asc");
+      .orderBy("events.eventid", "asc"); // Order by event ID
 
     res.render("admin", {
       title: "Admin Dashboard",
@@ -218,6 +238,53 @@ app.get("/admin", isAuthenticated, async (req, res) => {
   }
 });
 
+// Delete Admin Route
+app.post("/deleteAdmin/:adminid", isAuthenticated, async (req, res) => {
+  const { adminid } = req.params;
+  try {
+    await knex("admins").where("adminid", adminid).del();
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error deleting admin:", error);
+    res.status(500).send("Failed to delete admin.");
+  }
+});
+
+// Delete Volunteer Route
+app.post("/deleteVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
+  const { volunteerid } = req.params;
+  try {
+    await knex("volunteers").where("volunteerid", volunteerid).del();
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error deleting volunteer:", error);
+    res.status(500).send("Failed to delete volunteer.");
+  }
+});
+
+// Delete Event Request Route
+app.post("/deleteEventReq/:requestid", isAuthenticated, async (req, res) => {
+  const { requestid } = req.params;
+  try {
+    await knex("eventrequests").where("requestid", requestid).del();
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error deleting event request:", error);
+    res.status(500).send("Failed to delete event request.");
+  }
+});
+
+// Delete Event Route
+app.post("/deleteEvent/:eventid", isAuthenticated, async (req, res) => {
+  const { eventid } = req.params;
+  try {
+    await knex("events").where("eventid", eventid).del();
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error deleting event:", error);
+    res.status(500).send("Failed to delete event.");
+  }
+});
 // Update Event Request Status
 app.post("/updateEventStatus", async (req, res) => {
   try {
@@ -336,7 +403,8 @@ app.get("/editAdmin/:id", isAuthenticated, async (req, res) => {
 // Edit Admin Route
 app.post("/editAdmin/:adminid", isAuthenticated, async (req, res) => {
   const { adminid } = req.params;
-  const { username, password, firstname, lastname, email, phonenumber } = req.body; // Include all fields from the form
+  const { username, password, firstname, lastname, email, phonenumber } =
+    req.body; // Include all fields from the form
   try {
     await knex("admins")
       .where({ adminid })
@@ -465,7 +533,7 @@ app.use((req, res) => {
 });
 
 //Post route to put volunteer data into the database
-app.post('/submitVolunteerData', (req, res) => {
+app.post("/submitVolunteerData", (req, res) => {
   // Extract form values from req.body with necessary validation and transformation
   try {
     const first_name = req.body.first_name?.trim().toUpperCase(); // Ensure first name is uppercase and trimmed
@@ -477,15 +545,21 @@ app.post('/submitVolunteerData', (req, res) => {
     const zipcode = req.body.zipcode?.trim(); // Zipcode
     const sewing_level = req.body.sewing_level?.trim(); // Sewing level (dropdown value)
     const monthly_hours = parseInt(req.body.monthly_hours, 10); // Convert to integer
-    const heard_about = req.body.heard_about === 'Other' ? req.body.other_input?.trim() : req.body.heard_about?.trim(); // Handle 'Other' case, ensure trimmed
+    const heard_about =
+      req.body.heard_about === "Other"
+        ? req.body.other_input?.trim()
+        : req.body.heard_about?.trim(); // Handle 'Other' case, ensure trimmed
 
     // Validate 'Other' input if 'Other' is selected for heard_about
-    if (req.body.heard_about === 'Other' && (!req.body.other_input || req.body.other_input.trim() === '')) {
-      return res.status(400).send('Please specify how you heard about us.');
+    if (
+      req.body.heard_about === "Other" &&
+      (!req.body.other_input || req.body.other_input.trim() === "")
+    ) {
+      return res.status(400).send("Please specify how you heard about us.");
     }
 
     // Insert the new volunteer into the database
-    knex('volunteers')
+    knex("volunteers")
       .insert({
         volfirstname: first_name,
         vollastname: last_name,
@@ -499,68 +573,23 @@ app.post('/submitVolunteerData', (req, res) => {
         heardaboutopportunity: heard_about,
       })
       .then(() => {
-        res.redirect('/'); // Redirect to the homepage after adding the volunteer
+        res.redirect("/"); // Redirect to the homepage after adding the volunteer
       })
-      .catch(error => {
-        console.error('Error adding volunteer:', error);
+      .catch((error) => {
+        console.error("Error adding volunteer:", error);
         // Handle common errors like duplicate email or database constraint violations
-        if (error.code === '23505') { // Assuming 23505 is the unique violation error code for your database
-          res.status(400).send('A volunteer with this email already exists.');
+        if (error.code === "23505") {
+          // Assuming 23505 is the unique violation error code for your database
+          res.status(400).send("A volunteer with this email already exists.");
         } else {
-          res.status(500).send('Internal Server Error');
+          res.status(500).send("Internal Server Error");
         }
       });
   } catch (err) {
-    console.error('Unexpected error:', err);
-    res.status(500).send('Internal Server Error');
+    console.error("Unexpected error:", err);
+    res.status(500).send("Internal Server Error");
   }
 });
-
-app.post("/deleteAdmin", isAuthenticated, async (req, res) => {
-  const { adminid } = req.body;
-  try {
-    await knex("admins").where({ adminid }).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting admin:", error);
-    res.status(500).send("Failed to delete admin.");
-  }
-});
-
-app.post("/deleteVolunteer", isAuthenticated, async (req, res) => {
-  const { volunteerid } = req.body;
-  try {
-    await knex("volunteers").where({ volunteerid }).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting volunteer:", error);
-    res.status(500).send("Failed to delete volunteer.");
-  }
-});
-
-app.post("/deleteEventReq", isAuthenticated, async (req, res) => {
-  const { requestid } = req.body;
-  try {
-    await knex("eventrequests").where({ requestid }).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting event request:", error);
-    res.status(500).send("Failed to delete event request.");
-  }
-});
-
-app.post("/deleteEvent", isAuthenticated, async (req, res) => {
-  const { eventid } = req.body;
-  try {
-    await knex("events").where({ eventid }).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting event:", error);
-    res.status(500).send("Failed to delete event.");
-  }
-});
-
-
 
 // Start Server
 app.listen(port, () => console.log(`Server is running on port ${port}!`));

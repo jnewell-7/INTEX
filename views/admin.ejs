@@ -2,9 +2,7 @@
 <html>
 
 <head>
-  <title>
-    <%= title %>
-  </title>
+  <title><%= title %></title>
   <style>
     body {
       font-family: 'Roboto', sans-serif;
@@ -38,7 +36,6 @@
 
     .table-container {
       overflow-x: auto;
-      /* Allows horizontal scrolling for small screens */
     }
 
     table {
@@ -63,18 +60,9 @@
       font-size: 0.85rem;
     }
 
-    td div {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      /* Truncate long text */
-    }
-
     .action-buttons {
       display: flex;
-      flex-direction: column;
-      /* Stacks buttons vertically */
-      gap: 0.25rem;
+      gap: 0.5rem;
     }
 
     .button {
@@ -83,7 +71,6 @@
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      display: inline-block;
       text-align: center;
     }
 
@@ -114,35 +101,29 @@
 
     select {
       max-width: 100px;
-      /* Limit the width of dropdowns */
       padding: 0.25rem;
       border: 1px solid #ced4da;
       border-radius: 4px;
       font-size: 0.85rem;
-      width: 100%;
     }
 
     @media (max-width: 768px) {
       table {
         font-size: 0.8rem;
-        /* Reduce table font size on smaller screens */
       }
 
       th,
       td {
         padding: 0.4rem;
-        /* Reduce padding for smaller screens */
       }
 
       .action-buttons {
-        flex-direction: row;
-        /* Align buttons side-by-side on smaller screens */
-        gap: 0.5rem;
+        flex-wrap: wrap;
+        gap: 0.25rem;
       }
 
       .button {
         font-size: 0.75rem;
-        /* Reduce button font size on smaller screens */
       }
     }
   </style>
@@ -158,10 +139,9 @@
       <thead>
         <tr>
           <th>Admin ID</th>
+          <th>Name</th>
           <th>Username</th>
           <th>Password</th>
-          <th>First Name</th>
-          <th>Last Name</th>
           <th>Email</th>
           <th>Phone</th>
           <th>Actions</th>
@@ -170,27 +150,12 @@
       <tbody>
         <% admins.forEach(function(admin) { %>
           <tr>
-            <td>
-              <%= admin.adminid %>
-            </td>
-            <td>
-              <%= admin.username %>
-            </td>
-            <td>
-              <%= admin.password %>
-            </td>
-            <td>
-              <%= admin.firstname %>
-            </td>
-            <td>
-              <%= admin.lastname %>
-            </td>
-            <td>
-              <%= admin.email %>
-            </td>
-            <td>
-              <%= admin.phonenumber %>
-            </td>
+            <td><%= admin.adminid %></td>
+            <td><%= admin.name %></td>
+            <td><%= admin.username %></td>
+            <td><%= admin.password %></td>
+            <td><%= admin.email %></td>
+            <td><%= admin.phonenumber %></td>
             <td>
               <div class="action-buttons">
                 <a href="/editAdmin/<%= admin.adminid %>" class="button edit">Edit</a>
@@ -202,7 +167,7 @@
               </div>
             </td>
           </tr>
-          <% }); %>
+        <% }); %>
       </tbody>
     </table>
     <button onclick="window.location.href='/admin/add'" class="button add">Add New Admin</button>
@@ -213,8 +178,7 @@
       <thead>
         <tr>
           <th>Volunteer ID</th>
-          <th>First Name</th>
-          <th>Last Name</th>
+          <th>Name</th>
           <th>Phone</th>
           <th>Email</th>
           <th>Sewing Level</th>
@@ -227,33 +191,14 @@
       <tbody>
         <% volunteers.forEach(function(volunteer) { %>
           <tr>
-            <td>
-              <%= volunteer.volunteerid %>
-            </td>
-            <td>
-              <%= volunteer.volfirstname %>
-            </td>
-            <td>
-              <%= volunteer.vollastname %>
-            </td>
-            <td>
-              <%= volunteer.phone %>
-            </td>
-            <td>
-              <%= volunteer.email %>
-            </td>
-            <td>
-              <%= volunteer.sewinglevel %>
-            </td>
-            <td>
-              <%= volunteer.monthlyhours %>
-            </td>
-            <td>
-              <%= volunteer.heardaboutopportunity %>
-            </td>
-            <td>
-              <%= volunteer.zipcode %>
-            </td>
+            <td><%= volunteer.volunteerid %></td>
+            <td><%= volunteer.name %></td>
+            <td><%= volunteer.phone %></td>
+            <td><%= volunteer.email %></td>
+            <td><%= volunteer.sewinglevel %></td>
+            <td><%= volunteer.monthlyhours %></td>
+            <td><%= volunteer.heardaboutopportunity %></td>
+            <td><%= volunteer.zipcode %></td>
             <td>
               <div class="action-buttons">
                 <a href="/editVolunteer/<%= volunteer.volunteerid %>" class="button edit">Edit</a>
@@ -265,70 +210,66 @@
               </div>
             </td>
           </tr>
-          <% }); %>
+        <% }); %>
       </tbody>
     </table>
     <button onclick="window.location.href='/volunteer/add'" class="button add">Add New Volunteer</button>
 
     <!-- Event Requests Section -->
     <h2>Event Requests</h2>
-<div class="table-container">
-  <form id="eventRequestForm" action="/updateEventStatus" method="POST">
-    <table>
-      <thead>
-        <tr>
-          <th>Request ID</th>
-          <th>Date</th>
-          <th>Attendance</th>
-          <th>Type</th>
-          <th>Contact</th>
-          <th>Address</th>
-          <th>Status</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
-        <% eventRequests.forEach(function(request) { %>
-          <tr>
-            <td><%= request.requestid %></td>
-            <td><%= new Date(request.eventdate).toLocaleDateString() %></td>
-            <td><%= request.estimatedattendance %></td>
-            <td><%= request.activitytype %></td>
-            <td>
-              <div>
-                <strong><%= request.contactfirstname %> <%= request.contactlastname %></strong><br>
-                <a href="mailto:<%= request.contactemail %>"><%= request.contactemail %></a><br>
-                <%= request.contactphone %>
-              </div>
-            </td>
-            <td>
-              <div>
-                <strong><%= request.proposedeventaddress %></strong><br>
-                <%= request.city %>, <%= request.state %> <%= request.zipcode %>
-              </div>
-            </td>
-            <td>
-              <select name="status_<%= request.requestid %>" onchange="handleStatusChange(event, '<%= request.requestid %>')">
-                <option value="Pending" <%= request.eventreqstatus === "Pending" ? "selected" : "" %>>Pending</option>
-                <option value="Approved" <%= request.eventreqstatus === "Approved" ? "selected" : "" %>>Approved</option>
-                <option value="Completed" <%= request.eventreqstatus === "Completed" ? "selected" : "" %>>Completed</option>
-              </select>
-            </td>
-            <td>
-              <div class="action-buttons">
-                <button type="submit" name="action" value="update_<%= request.requestid %>" class="button save">Save</button>
-                <form action="/deleteEventReq" method="POST" style="display:inline;">
-                  <input type="hidden" name="requestid" value="<%= request.requestid %>">
-                  <button type="submit" class="button delete" onclick="return confirm('Are you sure you want to delete this event request?')">Delete</button>
-                </form>
-              </div>
-            </td>
-          </tr>
-        <% }); %>
-      </tbody>
-    </table>
-  </form>
-</div>
+    <div class="table-container">
+      <form id="eventRequestForm" action="/updateEventStatus" method="POST">
+        <table>
+          <thead>
+            <tr>
+              <th>Request ID</th>
+              <th>Date</th>
+              <th>Attendance</th>
+              <th>Type</th>
+              <th>Contact</th>
+              <th>Address</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% eventRequests.forEach(function(request) { %>
+              <tr>
+                <td><%= request.requestid %></td>
+                <td><%= new Date(request.eventdate).toLocaleDateString() %></td>
+                <td><%= request.estimatedattendance %></td>
+                <td><%= request.activitytype %></td>
+                <td><%= request.name %></td>
+                <td>
+                  <div>
+                    <strong><%= request.proposedeventaddress %></strong><br>
+                    <%= request.city %>, <%= request.state %> <%= request.zipcode %>
+                  </div>
+                </td>
+                <td>
+                  <select name="status_<%= request.requestid %>" onchange="handleStatusChange(event, '<%= request.requestid %>')">
+                    <option value="Pending" <%= request.eventreqstatus === "Pending" ? "selected" : "" %>>Pending</option>
+                    <option value="Approved" <%= request.eventreqstatus === "Approved" ? "selected" : "" %>>Approved</option>
+                    <option value="Completed" <%= request.eventreqstatus === "Completed" ? "selected" : "" %>>Completed</option>
+                  </select>
+                </td>
+                <td>
+                  <div class="action-buttons">
+                    <button type="submit" name="action" value="update_<%= request.requestid %>" class="button save">Save</button>
+                    <form action="/deleteEventReq" method="POST" style="display:inline;">
+                      <input type="hidden" name="requestid" value="<%= request.requestid %>">
+                      <button type="submit" class="button delete"
+                        onclick="return confirm('Are you sure you want to delete this event request?')">Delete</button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      </form>
+    </div>
+
     <!-- Events Section -->
     <h2>Events</h2>
     <table>
@@ -348,30 +289,14 @@
       <tbody>
         <% events.forEach(function(event) { %>
           <tr>
-            <td>
-              <%= event.eventid %>
-            </td>
-            <td>
-              <%= event.eventdate %>
-            </td>
-            <td>
-              <%= event.eventaddress %>
-            </td>
-            <td>
-              <%= event.zipcode %>
-            </td>
-            <td>
-              <%= event.city %>
-            </td>
-            <td>
-              <%= event.state %>
-            </td>
-            <td>
-              <%= event.totalparticipants %>
-            </td>
-            <td>
-              <%= event.eventstatus %>
-            </td>
+            <td><%= event.eventid %></td>
+            <td><%= new Date(event.eventdate).toLocaleDateString() %></td>
+            <td><%= event.eventaddress %></td>
+            <td><%= event.zipcode %></td>
+            <td><%= event.city %></td>
+            <td><%= event.state %></td>
+            <td><%= event.totalparticipants %></td>
+            <td><%= event.eventstatus %></td>
             <td>
               <div class="action-buttons">
                 <a href="/editEvent/<%= event.eventid %>" class="button edit">Edit</a>
@@ -383,7 +308,7 @@
               </div>
             </td>
           </tr>
-          <% }); %>
+        <% }); %>
       </tbody>
     </table>
   </div>
