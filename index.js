@@ -124,6 +124,7 @@ app.get("/reqEvent", (req, res) => {
   res.render("reqEvent", { title: "Request Event" });
 });
 
+// Submit Event Request Route
 app.post("/submitEventRequest", async (req, res) => {
   const {
     eventdate,
@@ -266,14 +267,6 @@ app.get("/dashboard", isAuthenticated, (req, res) => {
   res.render("dashboard", { title: "Admin Dashboard" });
 });
 
-// Prevent URL bypass
-function isAuthenticated(req, res, next) {
-  if (req.session && req.session.isLoggedIn) {
-    return next();
-  }
-  res.redirect("/login"); // Redirect to login if not authenticated
-}
-
 // Manage Volunteer
 app.get("/manageVolunteers", isAuthenticated, async (req, res) => {
   try {
@@ -307,7 +300,6 @@ app.get("/manageVolunteers", isAuthenticated, async (req, res) => {
     res.status(500).send("Failed to load volunteers.");
   }
 });
-
 
 // Manage Event Requests Route
 app.get("/manage-event-requests", isAuthenticated, async (req, res) => {
@@ -345,6 +337,46 @@ app.get("/manage-event-requests", isAuthenticated, async (req, res) => {
   }
 });
 
+// NEW: Edit Event Request Routes
+
+// Edit Event Request (GET)
+app.get("/editReq/:requestid", isAuthenticated, async (req, res) => {
+  try {
+    const { requestid } = req.params;
+    const request = await knex("eventrequests").where({ requestid }).first();
+    if (request) {
+      res.render("editReq", { request });
+    } else {
+      res.status(404).send("Event request not found.");
+    }
+  } catch (error) {
+    console.error("Failed to fetch event request:", error);
+    res.status(500).send("Server error while retrieving event request.");
+  }
+});
+
+// Edit Event Request (POST)
+app.post("/editReq/:requestid", isAuthenticated, async (req, res) => {
+  const { requestid } = req.params;
+  const { eventdate, eventtime, proposedeventaddress, city, state, zipcode } =
+    req.body;
+
+  try {
+    await knex("eventrequests").where({ requestid }).update({
+      eventdate,
+      eventtime,
+      proposedeventaddress: proposedeventaddress.toUpperCase(),
+      city: city.toUpperCase(),
+      state: state.toUpperCase(),
+      zipcode,
+    });
+
+    res.redirect("/admin");
+  } catch (error) {
+    console.error("Error updating event request:", error);
+    res.status(500).send("Failed to update event request.");
+  }
+});
 
 // Manage Events Route
 app.get("/manageEvents", isAuthenticated, async (req, res) => {
@@ -402,10 +434,6 @@ app.get("/manageEvents", isAuthenticated, async (req, res) => {
     res.status(500).send("Failed to load events.");
   }
 });
-
-
-
-
 
 // Admin Page Route
 app.get("/admin", isAuthenticated, async (req, res) => {
@@ -986,679 +1014,6 @@ app.post("/editEvent/:eventid", isAuthenticated, async (req, res) => {
   } catch (error) {
     console.error("Error updating event:", error);
     res.status(500).send("Failed to update event.");
-  }
-});
-
-// NEW: Edit Event Request Routes
-app.get("/editReq/:requestid", isAuthenticated, async (req, res) => {
-  const { requestid } = req.params;
-
-  try {
-    const request = await knex("eventrequests").where({ requestid }).first();
-
-    if (!request) {
-      return res.status(404).send("Event request not found");
-    }
-
-    res.render("editReq", { title: "Edit Event Request", request });
-  } catch (error) {
-    console.error("Error fetching event request:", error);
-    res.status(500).send("Failed to load event request");
-  }
-});
-
-app.post("/editReq/:requestid", isAuthenticated, async (req, res) => {
-  const { requestid } = req.params;
-  const { eventdate, eventtime, proposedeventaddress, city, state, zipcode } =
-    req.body;
-
-  try {
-    await knex("eventrequests").where({ requestid }).update({
-      eventdate,
-      eventtime,
-      proposedeventaddress: proposedeventaddress.toUpperCase(),
-      city: city.toUpperCase(),
-      state: state.toUpperCase(),
-      zipcode,
-    });
-
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error updating event request:", error);
-    res.status(500).send("Failed to update event request");
-  }
-});
-
-// NEW: Update Event Request Status using JSON request
-app.post("/updateEventStatus/:requestid", isAuthenticated, async (req, res) => {
-  const { requestid } = req.params;
-  const { status } = req.body;
-
-  try {
-    await knex("eventrequests")
-      .where({ requestid })
-      .update({ eventreqstatus: status });
-    res.status(200).send("Status updated successfully");
-  } catch (error) {
-    console.error("Error updating event request status:", error);
-    res.status(500).send("Failed to update status");
-  }
-});
-
-// Delete Admin Route
-app.post("/deleteAdmin/:adminid", isAuthenticated, async (req, res) => {
-  const { adminid } = req.params;
-  try {
-    await knex("admins").where("adminid", adminid).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting admin:", error);
-    res.status(500).send("Failed to delete admin.");
-  }
-});
-
-// Delete Volunteer Route
-app.post("/deleteVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
-  const { volunteerid } = req.params;
-  try {
-    await knex("volunteers").where("volunteerid", volunteerid).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting volunteer:", error);
-    res.status(500).send("Failed to delete volunteer.");
-  }
-});
-
-// Delete EventRequest Route
-app.post("/deleteEventReq/:requestid", isAuthenticated, async (req, res) => {
-  const { requestid } = req.params;
-
-  try {
-    await knex("eventrequests").where("requestid", requestid).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting event request:", error);
-    res.status(500).send("Failed to delete event request.");
-  }
-});
-
-// Delete Event Route
-app.post("/deleteEvent/:eventid", isAuthenticated, async (req, res) => {
-  const { eventid } = req.params;
-  try {
-    await knex("events").where("eventid", eventid).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting event:", error);
-    res.status(500).send("Failed to delete event.");
-  }
-});
-
-// Add Volunteer Route
-app.post("/submitVolunteerData", async (req, res) => {
-  const {
-    first_name,
-    last_name,
-    phone,
-    email,
-    zipcode,
-    sewing_level,
-    monthly_hours,
-    heard_about,
-    city,
-    state,
-  } = req.body;
-
-  try {
-    let zipcodeRecord = await knex("zipcodes").where({ zipcode }).first();
-    if (!zipcodeRecord) {
-      await knex("zipcodes").insert({ zipcode, city, state });
-    }
-
-    await knex("volunteers").insert({
-      volfirstname: first_name.toUpperCase(),
-      vollastname: last_name.toUpperCase(),
-      phone,
-      email: email.toLowerCase(),
-      zipcode,
-      sewinglevel: sewing_level,
-      monthlyhours: parseInt(monthly_hours, 10),
-      heardaboutopportunity: heard_about,
-    });
-
-    res.redirect("/");
-  } catch (error) {
-    console.error("Error adding volunteer:", error);
-    res.status(500).send("Failed to add volunteer.");
-  }
-});
-
-// Add Admin Route
-app.get("/addAdmin", isAuthenticated, (req, res) => {
-  res.render("addAdmin", { title: "Add Admin" });
-});
-
-app.post("/addAdmin", isAuthenticated, async (req, res) => {
-  const { username, password, firstname, lastname, email, phonenumber } =
-    req.body;
-  try {
-    // Directly insert the provided password without hashing (consider hashing in production)
-    await knex("admins").insert({
-      username,
-      password,
-      firstname,
-      lastname,
-      email,
-      phonenumber,
-    });
-
-    res.redirect("/admin"); // Redirect to the admin list after adding
-  } catch (error) {
-    console.error("Error adding admin:", error);
-    res.status(500).send("Failed to create a new admin.");
-  }
-});
-
-// Edit Admin (GET)
-app.get("/editAdmin/:id", isAuthenticated, async (req, res) => {
-  const adminid = req.params.id;
-
-  try {
-    const admin = await knex("admins").where({ adminid }).first();
-
-    if (!admin) {
-      return res.status(404).send("Admin not found.");
-    }
-
-    res.render("editAdmin", {
-      title: `Edit Admin - ${admin.firstname} ${admin.lastname}`,
-      admin,
-    });
-  } catch (error) {
-    console.error("Error fetching admin data:", error);
-    res.status(500).send("Failed to load admin data.");
-  }
-});
-
-// Edit Admin Route
-app.post("/editAdmin/:adminid", isAuthenticated, async (req, res) => {
-  const { adminid } = req.params;
-  const { username, password, firstname, lastname, email, phonenumber } =
-    req.body;
-  try {
-    await knex("admins")
-      .where({ adminid })
-      .update({ username, password, firstname, lastname, email, phonenumber });
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error editing admin:", error);
-    res.status(500).send("Failed to edit admin.");
-  }
-});
-
-// Edit Volunteer (GET)
-app.get("/editVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
-  const { volunteerid } = req.params;
-  try {
-    const volunteer = await knex("volunteers").where({ volunteerid }).first();
-    if (volunteer) {
-      res.render("editVolunteer", { title: "Edit Volunteer", volunteer });
-    } else {
-      res.status(404).send("Volunteer not found.");
-    }
-  } catch (error) {
-    console.error("Error loading volunteer data:", error);
-    res.status(500).send("Error loading volunteer data.");
-  }
-});
-
-// Edit Volunteer Route
-app.post("/editVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
-  const { volunteerid } = req.params;
-  const {
-    first_name,
-    last_name,
-    phone,
-    email,
-    sewing_level,
-    monthly_hours,
-    heard_about,
-    zipcode,
-  } = req.body;
-
-  try {
-    await knex("volunteers")
-      .where({ volunteerid })
-      .update({
-        volfirstname: first_name.toUpperCase(),
-        vollastname: last_name.toUpperCase(),
-        phone,
-        email: email.toLowerCase(),
-        sewinglevel: sewing_level,
-        monthlyhours: parseInt(monthly_hours, 10),
-        heardaboutopportunity: heard_about,
-        zipcode,
-      });
-
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error updating volunteer:", error);
-    res.status(500).send("Failed to update volunteer.");
-  }
-});
-
-// Edit Event (GET)
-app.get("/editEvent/:eventid", isAuthenticated, async (req, res) => {
-  const { eventid } = req.params;
-  try {
-    const event = await knex("events").where({ eventid }).first();
-    if (event) {
-      res.render("editEvent", { title: "Edit Event", event });
-    } else {
-      res.status(404).send("Event not found.");
-    }
-  } catch (error) {
-    console.error("Error loading event data:", error);
-    res.status(500).send("Error loading event data.");
-  }
-});
-
-// Edit Event Route
-app.post("/editEvent/:eventid", isAuthenticated, async (req, res) => {
-  const { eventid } = req.params;
-  const {
-    event_date,
-    event_address,
-    zipcode,
-    total_participants,
-    event_status,
-  } = req.body;
-
-  try {
-    // Ensure zipcode exists in zipcodes
-    let zipcodeRecord = await knex("zipcodes").where({ zipcode }).first();
-
-    if (!zipcodeRecord) {
-      // Fetch city and state from API
-      const { city, state } = await getCityStateFromApi(zipcode);
-      await knex("zipcodes").insert({
-        zipcode,
-        city: city.toUpperCase(),
-        state: state.toUpperCase(),
-      });
-    }
-
-    await knex("events")
-      .where({ eventid })
-      .update({
-        eventdate: event_date,
-        eventaddress: event_address,
-        zipcode,
-        totalparticipants: parseInt(total_participants, 10),
-        eventstatus: event_status,
-      });
-
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error updating event:", error);
-    res.status(500).send("Failed to update event.");
-  }
-});
-
-// NEW: Update Event Request Status using JSON request
-app.post("/updateEventStatus/:requestid", isAuthenticated, async (req, res) => {
-  const { requestid } = req.params;
-  const { status } = req.body;
-
-  try {
-    await knex("eventrequests")
-      .where({ requestid })
-      .update({ eventreqstatus: status });
-    res.status(200).send("Status updated successfully");
-  } catch (error) {
-    console.error("Error updating event request status:", error);
-    res.status(500).send("Failed to update status");
-  }
-});
-
-// Delete Admin Route
-app.post("/deleteAdmin/:adminid", isAuthenticated, async (req, res) => {
-  const { adminid } = req.params;
-  try {
-    await knex("admins").where("adminid", adminid).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting admin:", error);
-    res.status(500).send("Failed to delete admin.");
-  }
-});
-
-// Delete Volunteer Route
-app.post("/deleteVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
-  const { volunteerid } = req.params;
-  try {
-    await knex("volunteers").where("volunteerid", volunteerid).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting volunteer:", error);
-    res.status(500).send("Failed to delete volunteer.");
-  }
-});
-
-// Delete EventRequest Route
-app.post("/deleteEventReq/:requestid", isAuthenticated, async (req, res) => {
-  const { requestid } = req.params;
-
-  try {
-    await knex("eventrequests").where("requestid", requestid).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting event request:", error);
-    res.status(500).send("Failed to delete event request.");
-  }
-});
-
-// Delete Event Route
-app.post("/deleteEvent/:eventid", isAuthenticated, async (req, res) => {
-  const { eventid } = req.params;
-  try {
-    await knex("events").where("eventid", eventid).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting event:", error);
-    res.status(500).send("Failed to delete event.");
-  }
-});
-
-// Add Volunteer Route
-app.post("/submitVolunteerData", async (req, res) => {
-  const {
-    first_name,
-    last_name,
-    phone,
-    email,
-    zipcode,
-    sewing_level,
-    monthly_hours,
-    heard_about,
-    city,
-    state,
-  } = req.body;
-
-  try {
-    let zipcodeRecord = await knex("zipcodes").where({ zipcode }).first();
-    if (!zipcodeRecord) {
-      await knex("zipcodes").insert({ zipcode, city, state });
-    }
-
-    await knex("volunteers").insert({
-      volfirstname: first_name.toUpperCase(),
-      vollastname: last_name.toUpperCase(),
-      phone,
-      email: email.toLowerCase(),
-      zipcode,
-      sewinglevel: sewing_level,
-      monthlyhours: parseInt(monthly_hours, 10),
-      heardaboutopportunity: heard_about,
-    });
-
-    res.redirect("/");
-  } catch (error) {
-    console.error("Error adding volunteer:", error);
-    res.status(500).send("Failed to add volunteer.");
-  }
-});
-
-// Add Admin Route
-app.get("/addAdmin", isAuthenticated, (req, res) => {
-  res.render("addAdmin", { title: "Add Admin" });
-});
-
-app.post("/addAdmin", isAuthenticated, async (req, res) => {
-  const { username, password, firstname, lastname, email, phonenumber } =
-    req.body;
-  try {
-    // Directly insert the provided password without hashing (consider hashing in production)
-    await knex("admins").insert({
-      username,
-      password,
-      firstname,
-      lastname,
-      email,
-      phonenumber,
-    });
-
-    res.redirect("/admin"); // Redirect to the admin list after adding
-  } catch (error) {
-    console.error("Error adding admin:", error);
-    res.status(500).send("Failed to create a new admin.");
-  }
-});
-
-// Edit Admin (GET)
-app.get("/editAdmin/:id", isAuthenticated, async (req, res) => {
-  const adminid = req.params.id;
-
-  try {
-    const admin = await knex("admins").where({ adminid }).first();
-
-    if (!admin) {
-      return res.status(404).send("Admin not found.");
-    }
-
-    res.render("editAdmin", {
-      title: `Edit Admin - ${admin.firstname} ${admin.lastname}`,
-      admin,
-    });
-  } catch (error) {
-    console.error("Error fetching admin data:", error);
-    res.status(500).send("Failed to load admin data.");
-  }
-});
-
-// Edit Admin Route
-app.post("/editAdmin/:adminid", isAuthenticated, async (req, res) => {
-  const { adminid } = req.params;
-  const { username, password, firstname, lastname, email, phonenumber } =
-    req.body;
-  try {
-    await knex("admins")
-      .where({ adminid })
-      .update({ username, password, firstname, lastname, email, phonenumber });
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error editing admin:", error);
-    res.status(500).send("Failed to edit admin.");
-  }
-});
-
-// Edit Volunteer (GET)
-app.get("/editVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
-  const { volunteerid } = req.params;
-  try {
-    const volunteer = await knex("volunteers").where({ volunteerid }).first();
-    if (volunteer) {
-      res.render("editVolunteer", { title: "Edit Volunteer", volunteer });
-    } else {
-      res.status(404).send("Volunteer not found.");
-    }
-  } catch (error) {
-    console.error("Error loading volunteer data:", error);
-    res.status(500).send("Error loading volunteer data.");
-  }
-});
-
-// Edit Volunteer Route
-app.post("/editVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
-  const { volunteerid } = req.params;
-  const {
-    first_name,
-    last_name,
-    phone,
-    email,
-    sewing_level,
-    monthly_hours,
-    heard_about,
-    zipcode,
-  } = req.body;
-
-  try {
-    await knex("volunteers")
-      .where({ volunteerid })
-      .update({
-        volfirstname: first_name.toUpperCase(),
-        vollastname: last_name.toUpperCase(),
-        phone,
-        email: email.toLowerCase(),
-        sewinglevel: sewing_level,
-        monthlyhours: parseInt(monthly_hours, 10),
-        heardaboutopportunity: heard_about,
-        zipcode,
-      });
-
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error updating volunteer:", error);
-    res.status(500).send("Failed to update volunteer.");
-  }
-});
-
-// Edit Event (GET)
-app.get("/editEvent/:eventid", isAuthenticated, async (req, res) => {
-  const { eventid } = req.params;
-  try {
-    const event = await knex("events").where({ eventid }).first();
-    if (event) {
-      res.render("editEvent", { title: "Edit Event", event });
-    } else {
-      res.status(404).send("Event not found.");
-    }
-  } catch (error) {
-    console.error("Error loading event data:", error);
-    res.status(500).send("Error loading event data.");
-  }
-});
-
-// Edit Event Route
-app.post("/editEvent/:eventid", isAuthenticated, async (req, res) => {
-  const { eventid } = req.params;
-  const {
-    event_date,
-    event_address,
-    zipcode,
-    total_participants,
-    event_status,
-  } = req.body;
-
-  try {
-    // Ensure zipcode exists in zipcodes
-    let zipcodeRecord = await knex("zipcodes").where({ zipcode }).first();
-
-    if (!zipcodeRecord) {
-      // Fetch city and state from API
-      const { city, state } = await getCityStateFromApi(zipcode);
-      await knex("zipcodes").insert({
-        zipcode,
-        city: city.toUpperCase(),
-        state: state.toUpperCase(),
-      });
-    }
-
-    await knex("events")
-      .where({ eventid })
-      .update({
-        eventdate: event_date,
-        eventaddress: event_address,
-        zipcode,
-        totalparticipants: parseInt(total_participants, 10),
-        eventstatus: event_status,
-      });
-
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error updating event:", error);
-    res.status(500).send("Failed to update event.");
-  }
-});
-
-// NEW: Update Event Request Status using JSON request
-app.post("/updateEventStatus/:requestid", isAuthenticated, async (req, res) => {
-  const { requestid } = req.params;
-  const { status } = req.body;
-
-  try {
-    await knex("eventrequests")
-      .where({ requestid })
-      .update({ eventreqstatus: status });
-    res.status(200).send("Status updated successfully");
-  } catch (error) {
-    console.error("Error updating event request status:", error);
-    res.status(500).send("Failed to update status");
-  }
-});
-
-// NEW: Update Event Request Status using JSON request
-app.post("/updateEventStatus/:requestid", isAuthenticated, async (req, res) => {
-  const { requestid } = req.params;
-  const { status } = req.body;
-
-  try {
-    await knex("eventrequests")
-      .where({ requestid })
-      .update({ eventreqstatus: status });
-    res.status(200).send("Status updated successfully");
-  } catch (error) {
-    console.error("Error updating event request status:", error);
-    res.status(500).send("Failed to update status");
-  }
-});
-
-// Delete Admin Route
-app.post("/deleteAdmin/:adminid", isAuthenticated, async (req, res) => {
-  const { adminid } = req.params;
-  try {
-    await knex("admins").where("adminid", adminid).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting admin:", error);
-    res.status(500).send("Failed to delete admin.");
-  }
-});
-
-// Delete Volunteer Route
-app.post("/deleteVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
-  const { volunteerid } = req.params;
-  try {
-    await knex("volunteers").where("volunteerid", volunteerid).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting volunteer:", error);
-    res.status(500).send("Failed to delete volunteer.");
-  }
-});
-
-// Delete EventRequest Route
-app.post("/deleteEventReq/:requestid", isAuthenticated, async (req, res) => {
-  const { requestid } = req.params;
-
-  try {
-    await knex("eventrequests").where("requestid", requestid).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting event request:", error);
-    res.status(500).send("Failed to delete event request.");
-  }
-});
-
-// Delete Event Route
-app.post("/deleteEvent/:eventid", isAuthenticated, async (req, res) => {
-  const { eventid } = req.params;
-  try {
-    await knex("events").where("eventid", eventid).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting event:", error);
-    res.status(500).send("Failed to delete event.");
   }
 });
 
