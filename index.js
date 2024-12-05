@@ -311,7 +311,26 @@ app.post("/submitVolunteerData", async (req, res) => {
 
 
 
+//delete admin route 
+app.post('/deleteAdmin/:adminid', (req, res) => {
+  console.log('Route hit');
+  console.log('Admin ID:', req.params.adminid);
+  const adminid = req.params.adminid;
+  knex('admins')
+    .where('adminid', adminid)
+    .del()
+    .then(() => {
+      res.redirect('/admin');
+    })
+    .catch(error => {
+      console.error('Error deleting admin:', error);
+      res.status(500).send('Internal Server Error');
+    });
+});
 
+
+
+// Add Admin Route
 app.get("/addAdmin", (req, res) => {
   res.render("addAdmin", { title: "Add Admin" });
 });
@@ -545,18 +564,8 @@ app.post('/submitVolunteerData', (req, res) => {
   }
 });
 
-//delete admin route 
-app.post("/deleteAdmin/:adminid", isAuthenticated, async (req, res) => {
-  const { adminid } = req.params; // Extract `adminid` from the URL
-  try {
-    // Delete the admin with the specified ID
-    await knex("admins").where({ adminid }).del();
-    res.redirect("/admin"); // Redirect to the admin list after deletion
-  } catch (error) {
-    console.error("Error deleting admin:", error);
-    res.status(500).send("Failed to delete admin.");
-  }
-});
+
+
 
 
 app.post("/deleteVolunteer", isAuthenticated, async (req, res) => {
