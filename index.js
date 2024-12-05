@@ -236,6 +236,8 @@ app.get("/login", (req, res) => {
   res.render("login", { title: "Admin Login", errorMessage: null });
 });
 
+
+
 // Login Submit Route
 app.post("/login", async (req, res) => {
   const { username, password } = req.body;
@@ -244,7 +246,7 @@ app.post("/login", async (req, res) => {
     if (admin && admin.password === password) {
       req.session.isLoggedIn = true;
       req.session.username = admin.username;
-      res.redirect("/admin");
+      res.redirect("/dashboard"); // Redirect to the new dashboard
     } else {
       res.render("login", {
         title: "Admin Login",
@@ -259,6 +261,26 @@ app.post("/login", async (req, res) => {
     });
   }
 });
+
+
+
+// Dashboard Route
+app.get("/dashboard", isAuthenticated, (req, res) => {
+  res.render("dashboard", { title: "Admin Dashboard" });
+});
+
+
+// Prevent URL bypass
+function isAuthenticated(req, res, next) {
+  if (req.session && req.session.isLoggedIn) {
+    return next();
+  }
+  res.redirect("/login"); // Redirect to login if not authenticated
+}
+
+
+
+
 
 // Admin Page Route
 app.get("/admin", isAuthenticated, async (req, res) => {
