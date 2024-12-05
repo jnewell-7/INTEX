@@ -228,6 +228,14 @@ app.get("/api/zip/:zipcode", async (req, res) => {
   }
 });
 
+// Redirect to Real Donation Page
+app.get("/realDonate", (req, res) => {
+  res.redirect(
+    "https://turtleshelterproject.org/checkout/donate?donatePageId=5b6a44c588251b72932df5a0"
+  );
+});
+
+
 // Donate Page Route
 app.get("/donate", (req, res) => {
   res.render("donate", { title: "Donate Today" });
@@ -760,6 +768,8 @@ app.post("/saveEvent", isAuthenticated, async (req, res) => {
         }
       }
     }
+
+
 
     // Delete the original event request
     await knex("eventrequests").where({ requestid }).del();
