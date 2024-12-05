@@ -5,71 +5,109 @@
   <title>Edit Event</title>
   <style>
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Arial', sans-serif;
+      background-color: #f9f9f9;
+      margin: 0;
+      padding: 0;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
-      background-color: #f0f0f0;
-      margin: 0;
+      min-height: 100vh;
     }
 
-    .edit-form-container {
+    .form-container {
       background-color: #ffffff;
       padding: 2rem;
       border-radius: 8px;
       box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-      width: 100%;
+      width: 90%;
       max-width: 600px;
     }
 
     h1 {
-      text-align: center;
-      color: #7d8562;
+      color: #495057;
+      font-weight: 700;
       margin-bottom: 1rem;
+      text-align: center;
     }
 
-    form {
+    /* form {
       display: flex;
       flex-direction: column;
-    }
+    } */
 
     label {
+      display: block;
       margin-bottom: 0.5rem;
       font-weight: bold;
+      color: #495057;
     }
 
     input,
     select {
+      width: 100%;
+      padding: 0.5rem;
       margin-bottom: 1rem;
-      padding: 0.75rem;
-      border: 1px solid #d0d0d0;
+      border: 1px solid #ccc;
       border-radius: 4px;
-      font-size: 1rem;
+    }
+
+    input:focus,
+    select:focus {
+      outline: none;
+      border-color: #6b8e23;
+      box-shadow: 0 0 5px rgba(107, 142, 35, 0.5);
     }
 
     .button {
-      padding: 0.75rem 1rem;
-      font-size: 1rem;
-      color: #ffffff;
-      background-color: #28a745;
+      padding: 0.6rem 1rem;
       border: none;
-      border-radius: 4px;
+      background-color: #6b8e23;
+      color: white;
+      font-size: 1rem;
       cursor: pointer;
+      border-radius: 4px;
+      text-align: center;
+      margin-top: 2rem;
+      margin-right: 1rem;
     }
 
     .button:hover {
       opacity: 0.9;
     }
+
+    .button.cancel {
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      border: none;
+      background-color: #8f9775;
+      /* Olive green */
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+      text-decoration: none;
+
+    } 
+
+    .button.cancel:hover {
+      opacity: 0.9;
+    }
+    
+    .buttons-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
+    }
   </style>
 </head>
 
 <body>
-  <div class="edit-form-container">
+  <div class="form-container">
     <h1>Edit Event</h1>
     <form action="/editEvent/<%= event.eventid %>" method="POST">
       <label for="event_date">Event Date</label>
-      <input type="date" id="event_date" name="event_date" value="<%= event.eventdate.toISOString().split('T')[0] %>" required>
+      <input type="date" id="event_date" name="event_date" value="<%= event.eventdate.toISOString().split('T')[0] %>"
+        required>
 
       <label for="event_address">Event Address</label>
       <input type="text" id="event_address" name="event_address" value="<%= event.eventaddress %>" required>
@@ -78,16 +116,18 @@
       <input type="text" id="zipcode" name="zipcode" value="<%= event.zipcode %>" required>
 
       <label for="total_participants">Total Participants</label>
-      <input type="number" id="total_participants" name="total_participants" value="<%= event.totalparticipants %>" required>
+      <input type="number" id="total_participants" name="total_participants" value="<%= event.totalparticipants %>"
+        required>
 
       <label for="event_status">Event Status</label>
       <select id="event_status" name="event_status" required>
-        <option value="Scheduled" <%= event.eventstatus === "Scheduled" ? "selected" : "" %>>Scheduled</option>
-        <option value="Completed" <%= event.eventstatus === "Completed" ? "selected" : "" %>>Completed</option>
-        <option value="Cancelled" <%= event.eventstatus === "Cancelled" ? "selected" : "" %>>Cancelled</option>
+        <option value="Scheduled" <%=event.eventstatus==="Scheduled" ? "selected" : "" %>>Scheduled</option>
+        <option value="Completed" <%=event.eventstatus==="Completed" ? "selected" : "" %>>Completed</option>
+        <option value="Cancelled" <%=event.eventstatus==="Cancelled" ? "selected" : "" %>>Cancelled</option>
       </select>
 
-      <button type="submit" class="button">Save Changes</button>
+      <button type="submit" class="button save">Save Changes</button>
+      <a href="/admin" class="button cancel">Cancel</a>
     </form>
   </div>
 </body>

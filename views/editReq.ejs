@@ -11,7 +11,7 @@
       padding: 0;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
+      align-items: center;
       min-height: 100vh;
     }
 
@@ -28,12 +28,14 @@
       color: #495057;
       font-weight: 700;
       margin-bottom: 1rem;
+      text-align: center;
     }
 
     label {
       display: block;
       margin-bottom: 0.5rem;
       font-weight: bold;
+      color: #495057;
     }
 
     input,
@@ -46,7 +48,14 @@
       border-radius: 4px;
     }
 
-    button {
+    input:focus,
+    select:focus,
+    textarea:focus {
+      outline: none;
+      border-color: #6b8e23;
+      box-shadow: 0 0 5px rgba(107, 142, 35, 0.5);
+    }
+    .button {
       padding: 0.6rem 1rem;
       border: none;
       background-color: #6b8e23;
@@ -54,10 +63,35 @@
       font-size: 1rem;
       cursor: pointer;
       border-radius: 4px;
+      text-align: center;
+      margin-top: 2rem;
+      margin-right: 1rem;
     }
 
-    button:hover {
+    .button:hover {
       opacity: 0.9;
+    }
+
+    .button.cancel {
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      border: none;
+      background-color: #8f9775;
+      /* Olive green */
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+      text-decoration: none;
+    }
+
+    .button.cancel:hover {
+      opacity: 0.9;
+    }
+
+    .buttons-container {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 1rem;
     }
   </style>
 </head>
@@ -85,7 +119,9 @@
       <label for="zipcode">Zip Code</label>
       <input type="text" id="zipcode" name="zipcode" value="<%= request.zipcode %>" required>
 
-      <button type="submit">Save Changes</button>
+
+      <button type="submit" class="button save">Save Changes</button>
+      <a href="/admin" class="button cancel">Cancel</a>
     </form>
   </div>
 </body>
