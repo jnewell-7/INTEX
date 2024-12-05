@@ -69,10 +69,17 @@ app.get("/about", (req, res) => {
   res.render("about", { title: "About - Turtle Shelter Project" });
 });
 
-// Jen's Story Page Route
+// Jen's Story Page Get Route
 app.get("/jen-story", (req, res) => {
   res.render("jen", { title: "Jen's Story" });
 });
+
+// Get Involved Page Get Route
+app.get("/get-involved", (req, res) => {
+  res.render("get-involved", { title: "Get Involved - Turtle Shelter Project" });
+});
+
+
 
 // event request Page Route
 app.get("/reqEvent", (req, res) => {
@@ -498,6 +505,17 @@ app.get("/realDonate", (req, res) => {
 app.get("/get-involved", (req, res) => {
   res.render("volunteer", { title: "Volunteer Today" });
 });
+
+// Route to render the volunteer form page
+app.get('/volunteer/add', (req, res) => {
+  res.render('volunteer', { title: 'Add New Volunteer' });
+});
+
+// Route to render the admin form page
+app.get('/admin/add', (req, res) => {
+  res.render('addAdmin', { title: 'Add New Admin' });
+});
+
 
 // Logout Route
 app.post("/logout", (req, res) => {
