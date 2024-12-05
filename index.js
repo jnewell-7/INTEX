@@ -261,6 +261,15 @@ app.post("/updateEventStatus", async (req, res) => {
   }
 });
 
+
+// Route for the Admin Dashboard
+app.get("/dashboard", (req, res) => {
+  // Render the dashboard.ejs file
+  res.render("dashboard", { title: "Admin Dashboard" });
+});
+
+
+
 // Add Volunteer Route
 app.post("/submitVolunteerData", async (req, res) => {
   const {
