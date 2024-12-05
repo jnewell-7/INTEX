@@ -8,35 +8,14 @@
 
 window.addEventListener('DOMContentLoaded', event => {
 
-    // Navbar shrink function
-    var navbarShrink = function () {
-        const navbarCollapsible = document.body.querySelector('#mainNav');
-        if (!navbarCollapsible) {
-            return;
-        }
-        if (window.scrollY === 0) {
-            navbarCollapsible.classList.remove('navbar-shrink');
-            navbarCollapsible.classList.add('scrolled-top');
-        } else {
-            navbarCollapsible.classList.add('navbar-shrink');
-            navbarCollapsible.classList.remove('scrolled-top');
-        }
-    };
+// Updated Navbar shrink function
+var navbarShrink = function () {
+    // No-op since we no longer toggle classes
+};
 
-    // Shrink the navbar 
-    navbarShrink();
+document.removeEventListener('scroll', navbarShrink);
 
-    // Shrink the navbar when page is scrolled
-    document.addEventListener('scroll', navbarShrink);
 
-    // Activate Bootstrap scrollspy on the main nav element
-    const mainNav = document.body.querySelector('#mainNav');
-    if (mainNav) {
-        new bootstrap.ScrollSpy(document.body, {
-            target: '#mainNav',
-            rootMargin: '0px 0px -40%',
-        });
-    };
 
     // Collapse responsive navbar when toggler is visible
     const navbarToggler = document.body.querySelector('.navbar-toggler');
@@ -51,16 +30,7 @@ window.addEventListener('DOMContentLoaded', event => {
         });
     });
 
-    // Handle navbar text color change on scroll
-    const navbar = document.getElementById("mainNav");
-    document.addEventListener("scroll", function () {
-        const scrolledTop = window.scrollY === 0;
-        if (scrolledTop) {
-            navbar.classList.add("scrolled-top");
-        } else {
-            navbar.classList.remove("scrolled-top");
-        }
-    });
+
 
     // Fade-in animations using Intersection Observer
     const fadeInElements = document.querySelectorAll(".fade-in-left, .fade-in-right");
@@ -114,18 +84,6 @@ document.addEventListener("DOMContentLoaded", () => {
     );
 
     fadeInElements.forEach((element) => observer.observe(element));
-});
-
-
-// Handle navbar text color change on scroll
-const navbar = document.getElementById("mainNav");
-document.addEventListener("scroll", function () {
-    const scrolledTop = window.scrollY === 0;
-    if (scrolledTop) {
-        navbar.classList.add("scrolled-top");
-    } else {
-        navbar.classList.remove("scrolled-top");
-    }
 });
 
 

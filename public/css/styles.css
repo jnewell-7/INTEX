@@ -604,12 +604,22 @@
 }
 
 
-
 /* FAQ Section */
 #faq {
   padding: 60px 0;
-  background-color: #343a40;
+  background-color: #212529;
   color: #f8f9fa;
+  display: flex; /* Flexbox for centering */
+  flex-direction: column; /* Align content vertically */
+  align-items: center; /* Horizontally center all items */
+  justify-content: center; /* Vertically center all items */
+  text-align: center; /* Center the text within the section */
+}
+
+#faq .container {
+  width: 100%;
+  max-width: 800px; /* Restrict the container width for readability */
+  margin: 0 auto; /* Center the container within the page */
 }
 
 #faq .section-heading {
@@ -618,10 +628,16 @@
   margin-bottom: 40px;
 }
 
+.accordion {
+  width: 100%; /* Make accordion fill the container */
+  text-align: left; /* Left-align text within the accordion */
+}
+
 .accordion-button {
   background-color: var(--bs-dark);
   color: var(--bs-light);
   border: none;
+  text-align: left; /* Left-align text within the button */
 }
 
 .accordion-button:hover {
@@ -638,6 +654,8 @@
   font-size: 1rem;
   line-height: 1.5;
 }
+
+
 
 
 
@@ -11681,11 +11699,17 @@ p {
   border-radius: 100%;
 }
 
+
 #mainNav {
-  padding-top: 1rem;
-  padding-bottom: 1rem;
-  background-color: #212529;
+  position: fixed; /* Ensures the navbar stays at the top of the viewport */
+  top: 0; /* Aligns it with the top of the screen */
+  width: 100%; /* Ensures it spans the full width of the viewport */
+  z-index: 1030; /* Keeps it above all other elements, including the video */
+  background-color: #212529 !important; /* Consistent gray background */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Optional: Add subtle shadow for emphasis */
 }
+
+
 #mainNav .navbar-toggler {
   padding: 0.75rem;
   font-size: 0.75rem;
@@ -11693,13 +11717,31 @@ p {
   text-transform: uppercase;
   font-weight: 700;
 }
+
+/* COME BACK HERE */
 #mainNav .navbar-brand {
-  color: #ffc800;
+  color: #A9BA9D;
   font-family: "Montserrat", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
   font-weight: 700;
   letter-spacing: 0.0625em;
   text-transform: uppercase;
 }
+#mainNav {
+  background-color: #212529 !important; /* Keep the navbar gray at all times */
+  transition: none !important; /* Remove any transition effects */
+}
+
+#mainNav .nav-link {
+  color: #ffffff !important; /* Ensure the text color remains white */
+}
+
+#mainNav .nav-link:hover,
+#mainNav .nav-link:focus {
+  color: #ffffff !important; /* Prevent hover effects from altering the text color */
+}
+
+
+
 #mainNav .navbar-brand img {
   height: 1.5rem;
 }
@@ -11768,17 +11810,54 @@ p {
     margin-right: 0;
   }
 }
+/* General Masthead Styles */
 header.masthead {
+  position: relative;
   padding-top: 10.5rem;
   padding-bottom: 6rem;
   text-align: center;
   color: #fff;
-  background-image: url("../assets/img/header-bg.jpg");
-  background-repeat: no-repeat;
-  background-attachment: scroll;
-  background-position: center center;
-  background-size: cover;
+  overflow: hidden;
 }
+
+
+
+/* Video Background Layer */
+#background-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1; /* Middle layer, above green background */
+  opacity: 0.7; /* Adjust transparency for blending effect */
+}
+
+/* Text Content Layer */
+.masthead-content {
+  position: relative;
+  z-index: 2; /* Top layer, above video */
+}
+
+/* Optional: Improve Text Readability */
+header.masthead .masthead-heading,
+header.masthead .masthead-subheading {
+  text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.9); /* Stronger shadow for contrast */
+}
+
+/* Responsive Design Adjustments */
+@media (min-width: 768px) {
+  header.masthead {
+    padding-top: 17rem;
+    padding-bottom: 12.5rem;
+  }
+}
+
+
+
+
+
 header.masthead .masthead-subheading {
   font-size: 1.5rem;
   font-style: italic;
