@@ -300,10 +300,9 @@
                 <div class="action-buttons">
                   <button type="submit" name="action" value="update_<%= request.requestid %>"
                     class="button save">Save</button>
-                  <form action="/deleteEventReq" method="POST" style="display: inline;">
-                    <input type="hidden" name="requestid" value="<%= request.requestid %>">
+                  <form action="/deleteEventReq/<%= request.requestid %>" method="POST" style="display: inline;">
                     <button type="submit" class="button delete"
-                      onclick="return confirm('Are you sure you want to delete this event request?')">Delete</button>
+                      onclick="return confirm('Are you sure you want to decline this event request?')">Decline</button>
                   </form>
                 </div>
               </td>

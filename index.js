@@ -308,17 +308,25 @@ app.post("/deleteVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
   }
 });
 
-// Delete Event Request Route
-app.post("/deleteEventReq/:requestid", isAuthenticated, async (req, res) => {
-  const { requestid } = req.params;
-  try {
-    await knex("eventrequests").where("requestid", requestid).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting event request:", error);
-    res.status(500).send("Failed to delete event request.");
-  }
+// Delete EventRequest Route
+app.post('/deleteEventReq/:requestid', (req, res) => {
+  const { requestid } = req.params; // Extract request ID from URL
+  console.log('Route hit for deleting event request');
+  console.log('Request ID:', requestid); // Log the ID being processed
+
+  knex('eventrequests')
+    .where('requestid', requestid) // Match the record by ID
+    .del() // Delete the record
+    .then(() => {
+      console.log(`Event request with ID ${requestid} deleted successfully.`);
+      res.redirect('/admin'); // Redirect to the event requests list page
+    })
+    .catch((error) => {
+      console.error('Error deleting event request:', error);
+      res.status(500).send('Failed to delete event request.');
+    });
 });
+
 
 // Delete Event Route
 app.post("/deleteEvent/:eventid", isAuthenticated, async (req, res) => {
