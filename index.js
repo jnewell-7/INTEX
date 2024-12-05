@@ -757,6 +757,11 @@ app.post("/logout", (req, res) => {
   });
 });
 
+// Admin Dashboard Get Route
+app.get('/dashboard', (req, res) => {
+  res.render('dashboard'); // Render the dashboard.ejs
+});
+
 // Error Handling
 app.use((req, res) => {
   res.status(404).send("Page not found.");
