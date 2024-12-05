@@ -67,11 +67,12 @@
     <h1>Edit Event Request</h1>
     <form action="/editReq/<%= request.requestid %>" method="POST">
       <label for="eventdate">Event Date</label>
-      <input type="date" id="eventdate" name="eventdate" value="<%= request.eventdate %>" required>
+      <input type="date" id="eventdate" name="eventdate"
+        value="<%= new Date(request.eventdate).toISOString().split('T')[0] %>" required>
 
       <label for="eventtime">Event Time</label>
       <input type="time" id="eventtime" name="eventtime" value="<%= request.eventtime %>" required>
-      
+
       <label for="address">Proposed Address</label>
       <input type="text" id="address" name="proposedeventaddress" value="<%= request.proposedeventaddress %>" required>
 
