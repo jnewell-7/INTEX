@@ -77,10 +77,10 @@ app.get("/jen-story", (req, res) => {
 
 // Get Involved Page Get Route
 app.get("/get-involved", (req, res) => {
-  res.render("get-involved", { title: "Get Involved - Turtle Shelter Project" });
+  res.render("get-involved", {
+    title: "Get Involved - Turtle Shelter Project",
+  });
 });
-
-
 
 // event request Page Route
 app.get("/reqEvent", (req, res) => {
@@ -170,6 +170,7 @@ app.post("/login", async (req, res) => {
 // Admin Page Route
 app.get("/admin", isAuthenticated, async (req, res) => {
   try {
+    // Fetch Admins Data
     const admins = await knex("admins")
       .select(
         "admins.adminid",
@@ -181,6 +182,7 @@ app.get("/admin", isAuthenticated, async (req, res) => {
       )
       .orderBy("admins.adminid", "asc");
 
+    // Fetch Event Requests Data
     const eventRequests = await knex("eventrequests")
       .join("zipcodes", "eventrequests.zipcode", "=", "zipcodes.zipcode")
       .select(
@@ -188,7 +190,9 @@ app.get("/admin", isAuthenticated, async (req, res) => {
         "eventrequests.eventdate",
         "eventrequests.estimatedattendance",
         "eventrequests.activitytype",
-        knex.raw("CONCAT(eventrequests.contactfirstname, ' ', eventrequests.contactlastname) AS name"), // Combine first and last names
+        knex.raw(
+          "CONCAT(eventrequests.contactfirstname, ' ', eventrequests.contactlastname) AS name"
+        ),
         "eventrequests.contactemail",
         "eventrequests.contactphone",
         "eventrequests.proposedeventaddress",
@@ -197,13 +201,16 @@ app.get("/admin", isAuthenticated, async (req, res) => {
         "eventrequests.zipcode",
         "eventrequests.eventreqstatus"
       )
-      .orderBy("eventrequests.requestid", "asc"); // Order by request ID
+      .orderBy("eventrequests.requestid", "asc");
 
+    // Fetch Volunteers Data
     const volunteers = await knex("volunteers")
       .join("zipcodes", "volunteers.zipcode", "=", "zipcodes.zipcode")
       .select(
         "volunteers.volunteerid",
-        knex.raw("CONCAT(volunteers.volfirstname, ' ', volunteers.vollastname) AS name"), // Combine first and last names
+        knex.raw(
+          "CONCAT(volunteers.volfirstname, ' ', volunteers.vollastname) AS name"
+        ), // Combine first and last names
         "volunteers.phone",
         "volunteers.email",
         "volunteers.sewinglevel",
@@ -215,12 +222,44 @@ app.get("/admin", isAuthenticated, async (req, res) => {
       )
       .orderBy([
         { column: "volunteers.volfirstname", order: "asc" }, // Order by first name
-        { column: "volunteers.vollastname", order: "asc" }  // Then by last name
+        { column: "volunteers.vollastname", order: "asc" }, // Then by last name
       ]);
 
+    // Fetch Events Data with Produced Items and Totals
     const events = await knex("events")
       .join("zipcodes", "events.zipcode", "=", "zipcodes.zipcode")
+      .leftJoin("eventproduction", "events.eventid", "eventproduction.eventid")
+      .leftJoin(
+        "produceditems",
+        "eventproduction.produceditemid",
+        "produceditems.produceditemid"
+      )
       .select(
+        "events.eventid",
+        "events.eventdate",
+        "events.eventaddress",
+        "zipcodes.city",
+        "zipcodes.state",
+        "events.zipcode",
+        "events.totalparticipants",
+        "events.eventstatus",
+        knex.raw(
+          "SUM(CASE WHEN TRIM(LOWER(produceditems.produceditemname)) = 'pockets' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS pockets"
+        ),
+        knex.raw(
+          "SUM(CASE WHEN TRIM(LOWER(produceditems.produceditemname)) = 'collars' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS collars"
+        ),
+        knex.raw(
+          "SUM(CASE WHEN TRIM(LOWER(produceditems.produceditemname)) = 'envelopes' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS envelopes"
+        ),
+        knex.raw(
+          "SUM(CASE WHEN TRIM(LOWER(produceditems.produceditemname)) = 'vests' THEN COALESCE(eventproduction.quantityproduced, 0) ELSE 0 END) AS vests"
+        ),
+        knex.raw(
+          "SUM(COALESCE(eventproduction.quantityproduced, 0)) AS total_items_produced"
+        ) // Total items produced for each event
+      )
+      .groupBy(
         "events.eventid",
         "events.eventdate",
         "events.eventaddress",
@@ -230,8 +269,8 @@ app.get("/admin", isAuthenticated, async (req, res) => {
         "events.totalparticipants",
         "events.eventstatus"
       )
-      .orderBy("events.eventid", "asc"); // Order by event ID
-
+      .orderBy("events.eventid", "asc");
+    // Render the Admin Dashboard
     res.render("admin", {
       title: "Admin Dashboard",
       admins,
@@ -335,14 +374,11 @@ app.post("/updateEventStatus", async (req, res) => {
   }
 });
 
-
 // Route for the Admin Dashboard
 app.get("/dashboard", (req, res) => {
   // Render the dashboard.ejs file
   res.render("dashboard", { title: "Admin Dashboard" });
 });
-
-
 
 // Add Volunteer Route
 app.post("/submitVolunteerData", async (req, res) => {
@@ -383,56 +419,46 @@ app.post("/submitVolunteerData", async (req, res) => {
   }
 });
 
-
-
-
-
-//delete volunteer route 
-app.post('/deleteVolunteer/:volunteerid', (req, res) => {
+//delete volunteer route
+app.post("/deleteVolunteer/:volunteerid", (req, res) => {
   const { volunteerid } = req.params; // Extract volunteer ID from URL
 
-  knex('volunteers')
-    .where('volunteerid', volunteerid) // Match the record by ID
+  knex("volunteers")
+    .where("volunteerid", volunteerid) // Match the record by ID
     .del() // Delete the record
     .then(() => {
-      res.redirect('/admin'); // Redirect to the volunteers list page
+      res.redirect("/admin"); // Redirect to the volunteers list page
     })
     .catch((error) => {
-      console.error('Error deleting volunteer:', error);
-      res.status(500).send('Failed to delete volunteer.');
+      console.error("Error deleting volunteer:", error);
+      res.status(500).send("Failed to delete volunteer.");
     });
 });
 
-
-
-
-//delete admin route 
-app.post('/deleteAdmin/:adminid', (req, res) => {
+//delete admin route
+app.post("/deleteAdmin/:adminid", (req, res) => {
   const adminid = req.params.adminid;
-  knex('admins')
-    .where('adminid', adminid)
+  knex("admins")
+    .where("adminid", adminid)
     .del()
     .then(() => {
-      res.redirect('/admin');
+      res.redirect("/admin");
     })
-    .catch(error => {
-      console.error('Error deleting admin:', error);
-      res.status(500).send('Internal Server Error');
+    .catch((error) => {
+      console.error("Error deleting admin:", error);
+      res.status(500).send("Internal Server Error");
     });
 });
-
-
 
 // Add Admin Route
 app.get("/addAdmin", (req, res) => {
   res.render("addAdmin", { title: "Add Admin" });
 });
 
-
-
 // Add Admin Route
 app.post("/addAdmin", isAuthenticated, async (req, res) => {
-  const { username, password, firstname, lastname, email, phonenumber } = req.body;
+  const { username, password, firstname, lastname, email, phonenumber } =
+    req.body;
   try {
     // Directly insert the provided password without hashing
     await knex("admins").insert({
@@ -450,8 +476,6 @@ app.post("/addAdmin", isAuthenticated, async (req, res) => {
     res.status(500).send("Failed to create a new admin.");
   }
 });
-
-
 
 // Edit Admin (GET)
 app.get("/editAdmin/:id", isAuthenticated, async (req, res) => {
@@ -594,15 +618,14 @@ app.get("/get-involved", (req, res) => {
 });
 
 // Route to render the volunteer form page
-app.get('/volunteer/add', (req, res) => {
-  res.render('volunteer', { title: 'Add New Volunteer' });
+app.get("/volunteer/add", (req, res) => {
+  res.render("volunteer", { title: "Add New Volunteer" });
 });
 
 // Route to render the admin form page
-app.get('/admin/add', (req, res) => {
-  res.render('addAdmin', { title: 'Add New Admin' });
+app.get("/admin/add", (req, res) => {
+  res.render("addAdmin", { title: "Add New Admin" });
 });
-
 
 // Logout Route
 app.post("/logout", (req, res) => {

@@ -6,8 +6,9 @@
     <%= title %>
   </title>
   <style>
+    /* Global Styles */
     body {
-      font-family: 'Roboto', sans-serif;
+      font-family: 'Arial', sans-serif;
       background-color: #f9f9f9;
       margin: 0;
       padding: 0;
@@ -36,10 +37,7 @@
       text-align: left;
     }
 
-    .table-container {
-      overflow-x: auto;
-    }
-
+    /* Table Styles */
     table {
       width: 100%;
       border-collapse: collapse;
@@ -51,64 +49,73 @@
     td {
       padding: 0.5rem;
       text-align: left;
-      vertical-align: middle;
-      border: 1px solid #dee2e6;
+      border: 1px solid #e9ecef;
     }
 
     th {
-      background-color: #495057;
+      background-color: #6c757d;
       color: #ffffff;
       text-transform: uppercase;
       font-size: 0.85rem;
     }
 
+    td a {
+      color: #007bff;
+      text-decoration: none;
+    }
+
+    td a:hover {
+      text-decoration: underline;
+    }
+
+    /* Button Styles (Using Uploaded Color Palette) */
     .action-buttons {
       display: flex;
       gap: 0.5rem;
     }
 
     .button {
-      padding: 0.5rem 1rem;
+      padding: 0.4rem 0.8rem;
       font-size: 0.85rem;
       border: none;
       border-radius: 4px;
       cursor: pointer;
-      text-align: center;
+      transition: background-color 0.3s ease, color 0.3s ease;
     }
 
     .button.add {
-      background-color: #28a745;
+      background-color: #a3a69a;
+      /* Light green-gray */
       color: #ffffff;
-      margin-bottom: 1rem;
     }
 
     .button.edit {
-      background-color: #ffc107;
-      color: #212529;
+      background-color: #8f9775;
+      /* Medium sage green */
+      color: #ffffff;
     }
 
     .button.delete {
-      background-color: #dc3545;
+      background-color: #6b8e23;
+      /* Olive green */
       color: #ffffff;
     }
 
     .button.save {
-      background-color: #007bff;
+      background-color: #556b2f;
+      /* Dark olive green */
       color: #ffffff;
     }
 
     .button:hover {
-      opacity: 0.9;
+      opacity: 0.85;
     }
 
-    select {
-      max-width: 100px;
-      padding: 0.25rem;
-      border: 1px solid #ced4da;
-      border-radius: 4px;
-      font-size: 0.85rem;
+    .button:focus {
+      outline: none;
     }
 
+    /* Responsive Design */
     @media (max-width: 768px) {
       table {
         font-size: 0.8rem;
@@ -117,11 +124,6 @@
       th,
       td {
         padding: 0.4rem;
-      }
-
-      .action-buttons {
-        flex-wrap: wrap;
-        gap: 0.25rem;
       }
 
       .button {
@@ -164,12 +166,10 @@
               <%= admin.password %>
             </td>
             <td>
-              <div>
-                <strong>Email:</strong>
-                <%= admin.email %><br>
-                  <strong>Phone:</strong>
-                  <%= admin.phonenumber %>
-              </div>
+              <a href="mailto:<%= admin.email %>">
+                <%= admin.email %>
+              </a><br>
+              <%= admin.phonenumber %>
             </td>
             <td>
               <div class="action-buttons">
@@ -211,12 +211,10 @@
               <%= volunteer.name %>
             </td>
             <td>
-              <div>
-                <strong>Email:</strong>
-                <%= volunteer.email %><br>
-                  <strong>Phone:</strong>
-                  <%= volunteer.phone %>
-              </div>
+              <a href="mailto:<%= volunteer.email %>">
+                <%= volunteer.email %>
+              </a><br>
+              <%= volunteer.phone %>
             </td>
             <td>
               <%= volunteer.sewinglevel %>
@@ -247,82 +245,73 @@
 
     <!-- Event Requests Section -->
     <h2>Event Requests</h2>
-    <div class="table-container">
-      <form id="eventRequestForm" action="/updateEventStatus" method="POST">
-        <table>
-          <thead>
+    <form id="eventRequestForm" action="/updateEventStatus" method="POST">
+      <table>
+        <thead>
+          <tr>
+            <th>Request ID</th>
+            <th>Date</th>
+            <th>Attendance</th>
+            <th>Type</th>
+            <th>Contact</th>
+            <th>Address</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% eventRequests.forEach(function(request) { %>
             <tr>
-              <th>Request ID</th>
-              <th>Date</th>
-              <th>Attendance</th>
-              <th>Type</th>
-              <th>Contact</th>
-              <th>Address</th>
-              <th>Status</th>
-              <th>Actions</th>
+              <td>
+                <%= request.requestid %>
+              </td>
+              <td>
+                <%= new Date(request.eventdate).toLocaleDateString() %>
+              </td>
+              <td>
+                <%= request.estimatedattendance %>
+              </td>
+              <td>
+                <%= request.activitytype %>
+              </td>
+              <td>
+                <strong>
+                  <%= request.name %>
+                </strong><br>
+                <a href="mailto:<%= request.contactemail %>">
+                  <%= request.contactemail %>
+                </a><br>
+                <%= request.contactphone %>
+              </td>
+              <td>
+                <%= request.proposedeventaddress %><br>
+                  <%= request.city %>, <%= request.state %>
+                      <%= request.zipcode %>
+              </td>
+              <td>
+                <select name="status_<%= request.requestid %>">
+                  <option value="Pending" <%=request.eventreqstatus==="Pending" ? "selected" : "" %>>Pending</option>
+                  <option value="Approved" <%=request.eventreqstatus==="Approved" ? "selected" : "" %>>Approved</option>
+                  <option value="Completed" <%=request.eventreqstatus==="Completed" ? "selected" : "" %>>Completed
+                  </option>
+                </select>
+              </td>
+              <td>
+                <div class="action-buttons">
+                  <button type="submit" name="action" value="update_<%= request.requestid %>"
+                    class="button save">Save</button>
+                  <form action="/deleteEventReq" method="POST" style="display: inline;">
+                    <input type="hidden" name="requestid" value="<%= request.requestid %>">
+                    <button type="submit" class="button delete"
+                      onclick="return confirm('Are you sure you want to delete this event request?')">Delete</button>
+                  </form>
+                </div>
+              </td>
             </tr>
-          </thead>
-          <tbody>
-            <% eventRequests.forEach(function(request) { %>
-              <tr>
-                <td>
-                  <%= request.requestid %>
-                </td>
-                <td>
-                  <%= new Date(request.eventdate).toLocaleDateString() %>
-                </td>
-                <td>
-                  <%= request.estimatedattendance %>
-                </td>
-                <td>
-                  <%= request.activitytype %>
-                </td>
-                <td>
-                  <div>
-                    <strong>Name:</strong>
-                    <%= request.name %><br>
-                      <strong>Email:</strong>
-                      <%= request.contactemail %><br>
-                        <strong>Phone:</strong>
-                        <%= request.contactphone %>
-                  </div>
-                </td>
-                <td>
-                  <div>
-                    <strong>
-                      <%= request.proposedeventaddress %>
-                    </strong><br>
-                    <%= request.city %>, <%= request.state %>
-                        <%= request.zipcode %>
-                  </div>
-                </td>
-                <td>
-                  <select name="status_<%= request.requestid %>"
-                    onchange="handleStatusChange(event, '<%= request.requestid %>')">
-                    <option value="Pending" <%=request.eventreqstatus==="Pending" ? "selected" : "" %>>Pending</option>
-                    <option value="Approved" <%=request.eventreqstatus==="Approved" ? "selected" : "" %>>Approved
-                    </option>
-                    <option value="Completed" <%=request.eventreqstatus==="Completed" ? "selected" : "" %>>Completed
-                    </option>
-                  </select>
-                </td>
-                <td>
-                  <div class="action-buttons">
-                    <button type="submit" name="action" value="update_<%= request.requestid %>"
-                      class="button save">Save</button>
-                    <form action="/deleteEventReq" method="POST" style="display:inline;">
-                      <input type="hidden" name="requestid" value="<%= request.requestid %>">
-                      <button type="submit" class="button delete"
-                        onclick="return confirm('Are you sure you want to delete this event request?')">Delete</button>
-                    </form>
-                  </div>
-                </td>
-              </tr>
-              <% }); %>
-          </tbody>
-        </table>
-      </form>
-    </div>
+            <% }); %>
+        </tbody>
+      </table>
+    </form>
 
     <!-- Events Section -->
     <h2>Events</h2>
@@ -336,6 +325,11 @@
           <th>City</th>
           <th>State</th>
           <th>Total Participants</th>
+          <th>Pockets</th>
+          <th>Collars</th>
+          <th>Envelopes</th>
+          <th>Vests</th>
+          <th>Total Items Produced</th> <!-- New Column -->
           <th>Status</th>
           <th>Actions</th>
         </tr>
@@ -365,12 +359,27 @@
               <%= event.totalparticipants %>
             </td>
             <td>
+              <%= event.pockets %>
+            </td>
+            <td>
+              <%= event.collars %>
+            </td>
+            <td>
+              <%= event.envelopes %>
+            </td>
+            <td>
+              <%= event.vests %>
+            </td>
+            <td>
+              <%= event.total_items_produced %>
+            </td> <!-- Display Total -->
+            <td>
               <%= event.eventstatus %>
             </td>
             <td>
               <div class="action-buttons">
                 <a href="/editEvent/<%= event.eventid %>" class="button edit">Edit</a>
-                <form action="/deleteEvent" method="POST" style="display:inline;">
+                <form action="/deleteEvent" method="POST" style="display: inline;">
                   <input type="hidden" name="eventid" value="<%= event.eventid %>">
                   <button type="submit" class="button delete"
                     onclick="return confirm('Are you sure you want to delete this event?')">Delete</button>
@@ -382,21 +391,6 @@
       </tbody>
     </table>
   </div>
-
-  <script>
-    function handleStatusChange(event, requestId) {
-      if (event.target.value === "Completed") {
-        const confirmed = confirm(
-          "Are you sure you want to mark this event request as completed? This will move it to the events table."
-        );
-        if (!confirmed) {
-          event.target.value = "Pending";
-        } else {
-          document.getElementById("eventRequestForm").submit();
-        }
-      }
-    }
-  </script>
 </body>
 
 </html>
