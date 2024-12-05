@@ -250,11 +250,12 @@
         <thead>
           <tr>
             <th>Request ID</th>
-            <th>Date</th>
-            <th>Attendance</th>
+            <th>Date/Time</th>
+            <th>Estimated Attendance</th>
             <th>Type</th>
             <th>Contact</th>
             <th>Address</th>
+            <th>Hear Jen's Story</th>
             <th>Status</th>
             <th>Actions</th>
           </tr>
@@ -266,7 +267,7 @@
                 <%= request.requestid %>
               </td>
               <td>
-                <%= new Date(request.eventdate).toLocaleDateString() %>
+                <%= request.eventdatetime %>
               </td>
               <td>
                 <%= request.estimatedattendance %>
@@ -287,6 +288,9 @@
                 <%= request.proposedeventaddress %><br>
                   <%= request.city %>, <%= request.state %>
                       <%= request.zipcode %>
+              </td>
+              <td>
+                <%= request.jenstoryrequest ? "Yes" : "No" %>
               </td>
               <td>
                 <select name="status_<%= request.requestid %>">
@@ -320,9 +324,6 @@
           <th>Event ID</th>
           <th>Event Date</th>
           <th>Address</th>
-          <th>Zip Code</th>
-          <th>City</th>
-          <th>State</th>
           <th>Total Participants</th>
           <th>Pockets</th>
           <th>Collars</th>
@@ -343,16 +344,7 @@
               <%= new Date(event.eventdate).toLocaleDateString() %>
             </td>
             <td>
-              <%= event.eventaddress %>
-            </td>
-            <td>
-              <%= event.zipcode %>
-            </td>
-            <td>
-              <%= event.city %>
-            </td>
-            <td>
-              <%= event.state %>
+              <%- event.fulladdress %>
             </td>
             <td>
               <%= event.totalparticipants %>
