@@ -671,48 +671,10 @@ app.post("/submitVolunteerData", (req, res) => {
         }
       });
   } catch (err) {
-<<<<<<< HEAD
     console.error("Unexpected error:", err);
     res.status(500).send("Internal Server Error");
   }
 });
 
-=======
-    console.error('Unexpected error:', err);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-
-
-
-
-
-
-app.post("/deleteEventReq", isAuthenticated, async (req, res) => {
-  const { requestid } = req.body;
-  try {
-    await knex("eventrequests").where({ requestid }).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting event request:", error);
-    res.status(500).send("Failed to delete event request.");
-  }
-});
-
-app.post("/deleteEvent", isAuthenticated, async (req, res) => {
-  const { eventid } = req.body;
-  try {
-    await knex("events").where({ eventid }).del();
-    res.redirect("/admin");
-  } catch (error) {
-    console.error("Error deleting event:", error);
-    res.status(500).send("Failed to delete event.");
-  }
-});
-
-
-
->>>>>>> e41c1a44d05b21c8cd7e223133938c11a24130a2
 // Start Server
 app.listen(port, () => console.log(`Server is running on port ${port}!`));
