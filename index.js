@@ -29,6 +29,8 @@ app.use(
 );
 
 // Connect to PostgreSQL using Knex object
+//TESTING TO SEE IF THIS WORKS. 
+
 const knex = require("knex")({
   client: "pg",
   connection: {
