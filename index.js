@@ -841,7 +841,17 @@ app.post("/deleteEventReq/:requestid", isAuthenticated, async (req, res) => {
 app.post("/deleteEvent/:eventid", isAuthenticated, async (req, res) => {
   const { eventid } = req.params;
   try {
-    await knex("events").where("eventid", eventid).del();
+    // Start a transaction
+    await knex.transaction(async trx => {
+      // First, delete related records in the eventproduction table
+      await trx("eventproduction").where("eventid", eventid).del();
+
+      // Then, delete the event itself
+      await trx("events").where("eventid", eventid).del();
+
+      // No need to manually commit; Knex handles it automatically
+    });
+
     res.redirect("/admin");
   } catch (error) {
     console.error("Error deleting event:", error);

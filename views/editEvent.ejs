@@ -123,7 +123,6 @@
       <select id="event_status" name="event_status" required>
         <option value="Scheduled" <%=event.eventstatus==="Scheduled" ? "selected" : "" %>>Scheduled</option>
         <option value="Completed" <%=event.eventstatus==="Completed" ? "selected" : "" %>>Completed</option>
-        <option value="Cancelled" <%=event.eventstatus==="Cancelled" ? "selected" : "" %>>Cancelled</option>
       </select>
 
       <button type="submit" class="button save">Save Changes</button>
