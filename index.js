@@ -130,14 +130,67 @@ app.get("/reqEvent", (req, res) => {
   res.render("reqEvent", { title: "Request Event" });
 });
 
-// Submit Event Request Route
+const stateAbbreviationsToFull = {
+  AL: "ALABAMA",
+  AK: "ALASKA",
+  AZ: "ARIZONA",
+  AR: "ARKANSAS",
+  CA: "CALIFORNIA",
+  CO: "COLORADO",
+  CT: "CONNECTICUT",
+  DE: "DELAWARE",
+  FL: "FLORIDA",
+  GA: "GEORGIA",
+  HI: "HAWAII",
+  ID: "IDAHO",
+  IL: "ILLINOIS",
+  IN: "INDIANA",
+  IA: "IOWA",
+  KS: "KANSAS",
+  KY: "KENTUCKY",
+  LA: "LOUISIANA",
+  ME: "MAINE",
+  MD: "MARYLAND",
+  MA: "MASSACHUSETTS",
+  MI: "MICHIGAN",
+  MN: "MINNESOTA",
+  MS: "MISSISSIPPI",
+  MO: "MISSOURI",
+  MT: "MONTANA",
+  NE: "NEBRASKA",
+  NV: "NEVADA",
+  NH: "NEW HAMPSHIRE",
+  NJ: "NEW JERSEY",
+  NM: "NEW MEXICO",
+  NY: "NEW YORK",
+  NC: "NORTH CAROLINA",
+  ND: "NORTH DAKOTA",
+  OH: "OHIO",
+  OK: "OKLAHOMA",
+  OR: "OREGON",
+  PA: "PENNSYLVANIA",
+  RI: "RHODE ISLAND",
+  SC: "SOUTH CAROLINA",
+  SD: "SOUTH DAKOTA",
+  TN: "TENNESSEE",
+  TX: "TEXAS",
+  UT: "UTAH",
+  VT: "VERMONT",
+  VA: "VIRGINIA",
+  WA: "WASHINGTON",
+  WV: "WEST VIRGINIA",
+  WI: "WISCONSIN",
+  WY: "WYOMING",
+};
+
+
 app.post("/submitEventRequest", async (req, res) => {
   const {
     eventdate,
     eventtime,
     proposedeventaddress,
     city,
-    state,
+    state, // This is the abbreviation from the form (e.g., "UT")
     zipcode,
     estimatedattendance,
     activitytype,
@@ -149,22 +202,31 @@ app.post("/submitEventRequest", async (req, res) => {
   } = req.body;
 
   try {
+    // Convert state abbreviation to full name for comparison
+    const fullStateName = stateAbbreviationsToFull[state.toUpperCase()];
+
     // Check if the ZIP code exists in the zipcodes table
     let zipcodeRecord = await knex("zipcodes").where({ zipcode }).first();
 
     if (!zipcodeRecord) {
-      // Insert ZIP code into zipcodes table
+      // Insert ZIP code into zipcodes table with full state name
       await knex("zipcodes").insert({
         zipcode,
         city: city.toUpperCase(),
-        state: state.toUpperCase(),
+        state: fullStateName,
       });
     } else {
       // Verify the city and state match the existing ZIP code record
       if (
         zipcodeRecord.city.toUpperCase() !== city.toUpperCase() ||
-        zipcodeRecord.state.toUpperCase() !== state.toUpperCase()
+        zipcodeRecord.state.toUpperCase() !== fullStateName
       ) {
+        console.log("Mismatch:", {
+          formCity: city.toUpperCase(),
+          dbCity: zipcodeRecord.city.toUpperCase(),
+          formState: fullStateName,
+          dbState: zipcodeRecord.state.toUpperCase(),
+        });
         return res
           .status(400)
           .send("City and state do not match the existing ZIP code.");
@@ -193,6 +255,9 @@ app.post("/submitEventRequest", async (req, res) => {
     res.status(500).send("Failed to submit event request.");
   }
 });
+
+
+
 
 // API Route: Get City/State from Zip
 app.get("/api/zip/:zipcode", async (req, res) => {
