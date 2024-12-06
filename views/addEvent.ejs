@@ -60,14 +60,32 @@
       width: 100%;
     }
 
-    button {
-      padding: 0.5rem;
-      background-color: #556b2f;
-      color: #ffffff;
+    .button {
+      padding: 0.6rem 1rem;
       border: none;
-      border-radius: 4px;
+      background-color: #6b8e23;
+      color: white;
       font-size: 1rem;
       cursor: pointer;
+      border-radius: 4px;
+      text-align: center;
+      margin-top: 2rem;
+      margin-right: 1rem;
+    }
+    .button.cancel {
+      padding: 0.6rem 1rem;
+      font-size: 1rem;
+      border: none;
+      background-color: #8f9775;
+      /* Olive green */
+      color: white;
+      cursor: pointer;
+      border-radius: 4px;
+      text-decoration: none;
+
+    } 
+    .button.cancel:hover {
+      opacity: 0.9;
     }
 
     button:hover {
@@ -122,7 +140,8 @@
       <label for="vests">Vests Completed:</label>
       <input type="number" id="vests" name="vests" min="0" value="0">
 
-      <button type="submit">Save Event</button>
+      <button type="submit" class="button save">Save Event</button>
+      <a href="/admin" class="button cancel">Cancel</a>
     </form>
   </div>
 </body>
