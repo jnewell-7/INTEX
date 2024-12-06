@@ -2,7 +2,9 @@ const express = require("express");
 const session = require("express-session");
 const app = express();
 const path = require("path");
-const axios = require("axios"); // Added for external API calls
+const axios = require("axios");
+require('dotenv').config();
+
 
 // Establishes port using .env file or default
 const port = process.env.PORT || 3000;
@@ -65,7 +67,8 @@ function isAuthenticated(req, res, next) {
 
 // FUNCTION: Fetch city/state from external API if not found in DB
 async function getCityStateFromApi(zipcode) {
-  const apiKey = process.env.ZIP_API_KEY; // Ensure this is set in your environment variables
+  const apiKey = process.env.ZIP_API_KEY;
+ 
   if (!apiKey) {
     throw new Error(
       "ZIP_API_KEY is not set. Please configure it in your environment."
@@ -199,6 +202,7 @@ app.get("/api/zip/:zipcode", async (req, res) => {
     let zipcodeRecord = await knex("zipcodes").where({ zipcode }).first();
     if (!zipcodeRecord) {
       // Not in DB, fetch from external API
+
       const { city, state } = await getCityStateFromApi(zipcode);
       if (!city || !state) {
         return res
@@ -277,6 +281,59 @@ app.post("/login", async (req, res) => {
 app.get("/dashboard", isAuthenticated, (req, res) => {
   res.render("dashboard", { title: "Admin Dashboard" });
 });
+
+
+
+app.get('/addVolunteer', (req, res) => {
+  console.log('Navigated to /addVolunteer');
+  res.render('addVolunteer');
+});
+
+
+
+/*
+app.post('/submitVolunteerData', async (req, res) => {
+  const {
+    first_name,
+    last_name,
+    phone,
+    email,
+    city,
+    state,
+    zipcode,
+    sewing_level,
+    monthly_hours,
+    heard_about,
+    other_input,
+  } = req.body;
+
+  try {
+    // Insert data into the 'volunteers' table
+    await knex('volunteers').insert({
+      volfirstname: first_name.toUpperCase(),
+      vollastname: last_name.toUpperCase(),
+      phone,
+      email: email.toLowerCase(),
+      city: city.toUpperCase(),
+      state: state.toUpperCase(),
+      zipcode,
+      sewinglevel: sewing_level,
+      monthlyhours: parseInt(monthly_hours, 10),
+      heardaboutopportunity: heard_about === 'Other' ? other_input : heard_about,
+    });
+
+    res.redirect('/dashboard'); // Redirect to the admin dashboard
+  } catch (error) {
+    console.error('Error inserting data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
+*/
+
+
+
+
 
 // Manage Volunteer
 app.get("/manageVolunteers", isAuthenticated, async (req, res) => {
@@ -565,6 +622,12 @@ app.get("/admin", isAuthenticated, async (req, res) => {
         "events.eventstatus"
       )
       .orderBy("events.eventid", "asc");
+
+
+
+
+
+
 
     // Render the Admin Dashboard
     res.render("admin", {
@@ -870,33 +933,49 @@ app.post("/submitVolunteerData", async (req, res) => {
     sewing_level,
     monthly_hours,
     heard_about,
-    city,
-    state,
   } = req.body;
 
   try {
+    // Check if the ZIP code already exists in the database
     let zipcodeRecord = await knex("zipcodes").where({ zipcode }).first();
+
     if (!zipcodeRecord) {
-      await knex("zipcodes").insert({ zipcode, city, state });
+      // Use the helper function to fetch city and state
+      const { city, state } = await getCityStateFromApi(zipcode);
+
+      // Insert the new ZIP code into the zipcodes table
+      await knex("zipcodes").insert({
+        zipcode,
+        city: city.toUpperCase(), // Convert to uppercase for consistency
+        state: state.toUpperCase(), // Convert to uppercase for consistency
+      });
     }
 
+    // Insert the volunteer into the volunteers table
     await knex("volunteers").insert({
       volfirstname: first_name.toUpperCase(),
       vollastname: last_name.toUpperCase(),
       phone,
       email: email.toLowerCase(),
-      zipcode,
+      zipcode, // Use the existing or newly inserted ZIP code
       sewinglevel: sewing_level,
       monthlyhours: parseInt(monthly_hours, 10),
       heardaboutopportunity: heard_about,
     });
 
-    res.redirect("/");
+    if (req.query.admin === "true") {
+      res.redirect("/dashboard"); // Redirect admin users to dashboard
+    } else {
+      res.redirect("/"); // Redirect non-admin users to the home page
+    }
   } catch (error) {
     console.error("Error adding volunteer:", error);
-    res.status(500).send("Failed to add volunteer.");
+    res.status(500).send("Internal Server Error");
   }
 });
+
+
+
 
 // Add Admin Route
 app.get("/addAdmin", isAuthenticated, (req, res) => {
