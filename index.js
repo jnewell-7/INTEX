@@ -235,6 +235,8 @@ app.get("/api/zip/:zipcode", async (req, res) => {
   }
 });
 
+
+
 // Redirect to Real Donation Page
 app.get("/realDonate", (req, res) => {
   res.redirect(
@@ -243,15 +245,21 @@ app.get("/realDonate", (req, res) => {
 });
 
 
+
+
 // Donate Page Route
 app.get("/donate", (req, res) => {
   res.render("donate", { title: "Donate Today" });
 });
 
+
+
 // Login Page Route
 app.get("/login", (req, res) => {
   res.render("login", { title: "Admin Login", errorMessage: null });
 });
+
+
 
 // Login Submit Route
 app.post("/login", async (req, res) => {
@@ -277,6 +285,8 @@ app.post("/login", async (req, res) => {
   }
 });
 
+
+
 // Dashboard Route
 app.get("/dashboard", isAuthenticated, (req, res) => {
   res.render("dashboard", { title: "Admin Dashboard" });
@@ -284,52 +294,11 @@ app.get("/dashboard", isAuthenticated, (req, res) => {
 
 
 
+
+// Add Volunteer Get Route
 app.get('/addVolunteer', (req, res) => {
-  console.log('Navigated to /addVolunteer');
   res.render('addVolunteer');
 });
-
-
-
-/*
-app.post('/submitVolunteerData', async (req, res) => {
-  const {
-    first_name,
-    last_name,
-    phone,
-    email,
-    city,
-    state,
-    zipcode,
-    sewing_level,
-    monthly_hours,
-    heard_about,
-    other_input,
-  } = req.body;
-
-  try {
-    // Insert data into the 'volunteers' table
-    await knex('volunteers').insert({
-      volfirstname: first_name.toUpperCase(),
-      vollastname: last_name.toUpperCase(),
-      phone,
-      email: email.toLowerCase(),
-      city: city.toUpperCase(),
-      state: state.toUpperCase(),
-      zipcode,
-      sewinglevel: sewing_level,
-      monthlyhours: parseInt(monthly_hours, 10),
-      heardaboutopportunity: heard_about === 'Other' ? other_input : heard_about,
-    });
-
-    res.redirect('/dashboard'); // Redirect to the admin dashboard
-  } catch (error) {
-    console.error('Error inserting data:', error);
-    res.status(500).send('Internal Server Error');
-  }
-});
-
-*/
 
 
 
@@ -369,8 +338,11 @@ app.get("/manageVolunteers", isAuthenticated, async (req, res) => {
   }
 });
 
+
+
+
 // Manage Event Requests Route
-app.get("/manage-event-requests", isAuthenticated, async (req, res) => {
+app.get("/manageEventRequests", isAuthenticated, async (req, res) => {
   try {
     const eventRequests = await knex("eventrequests")
       .join("zipcodes", "eventrequests.zipcode", "=", "zipcodes.zipcode")
@@ -395,17 +367,18 @@ app.get("/manage-event-requests", isAuthenticated, async (req, res) => {
       )
       .orderBy("eventrequests.requestid", "asc");
 
-    res.render("manageEventRequests", {
-      title: "Manage Event Requests",
-      eventRequests,
-    });
+      console.log(eventRequests); // Verify the data
+      res.render("manageEventRequests", {
+        title: "Manage Event Requests",
+        eventRequests,
+      });
+      
   } catch (error) {
     console.error("Error loading event requests page:", error);
     res.status(500).send("Failed to load event requests.");
   }
 });
 
-// NEW: Edit Event Request Routes
 
 // Edit Event Request (GET)
 app.get("/editReq/:requestid", isAuthenticated, async (req, res) => {
@@ -427,7 +400,10 @@ app.get("/editReq/:requestid", isAuthenticated, async (req, res) => {
       .first();
 
     if (request) {
-      res.render("editReq", { request });
+      res.render("editReq", {
+        title: `Edit Event Request - ${request.requestid}`,
+        request, // Ensure request is passed to the EJS template
+      });
     } else {
       res.status(404).send("Event request not found.");
     }
@@ -436,6 +412,9 @@ app.get("/editReq/:requestid", isAuthenticated, async (req, res) => {
     res.status(500).send("Server error while retrieving event request.");
   }
 });
+
+
+
 
 // Edit Event Request (POST)
 app.post("/editReq/:requestid", isAuthenticated, async (req, res) => {
@@ -448,17 +427,22 @@ app.post("/editReq/:requestid", isAuthenticated, async (req, res) => {
       eventdate,
       eventtime,
       proposedeventaddress: proposedeventaddress.toUpperCase(),
-      city: city.toUpperCase(),
-      state: state.toUpperCase(),
       zipcode,
     });
+    
 
-    res.redirect("/admin");
+    res.redirect("/manageEventRequests"); // Redirect to the updated page
   } catch (error) {
     console.error("Error updating event request:", error);
     res.status(500).send("Failed to update event request.");
   }
 });
+
+
+
+
+
+
 
 // Manage Events Route
 app.get("/manageEvents", isAuthenticated, async (req, res) => {
@@ -724,12 +708,44 @@ app.post("/addEvent", isAuthenticated, async (req, res) => {
       }
     }
 
-    res.redirect("/admin"); // Redirect back to Admin Dashboard
+    res.redirect("/manageEvents"); // Redirect back to manageEvents
   } catch (error) {
     console.error("Error adding event:", error);
     res.status(500).send("Failed to add event.");
   }
 });
+
+
+
+// Manage Admins Route
+app.get("/manageAdmins", isAuthenticated, async (req, res) => {
+  try {
+    // Fetch Admins Data
+    const admins = await knex("admins")
+      .select(
+        "admins.adminid",
+        knex.raw("CONCAT(admins.firstname, ' ', admins.lastname) AS name"),
+        "admins.username",
+        "admins.password",
+        "admins.email",
+        "admins.phonenumber"
+      )
+      .orderBy("admins.adminid", "asc");
+
+    // Render the manageAdmins view
+    res.render("manageAdmins", {
+      title: "Manage Admins",
+      admins,
+    });
+  } catch (error) {
+    console.error("Error loading admins page:", error);
+    res.status(500).send("Failed to load admins.");
+  }
+});
+
+
+
+
 
 // Route to render the Update Event page
 app.get("/updateEvent/:requestid", isAuthenticated, async (req, res) => {
@@ -840,7 +856,7 @@ app.post("/saveEvent", isAuthenticated, async (req, res) => {
     // Delete the original event request
     await knex("eventrequests").where({ requestid }).del();
 
-    res.redirect("/admin");
+    res.redirect("/manageEvents");
   } catch (error) {
     console.error("Error saving event:", error);
     res.status(500).send("Failed to save event.");
@@ -868,7 +884,7 @@ app.post("/deleteAdmin/:adminid", isAuthenticated, async (req, res) => {
   const { adminid } = req.params;
   try {
     await knex("admins").where("adminid", adminid).del();
-    res.redirect("/admin");
+    res.redirect("/manageAdmins");
   } catch (error) {
     console.error("Error deleting admin:", error);
     res.status(500).send("Failed to delete admin.");
@@ -880,7 +896,7 @@ app.post("/deleteVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
   const { volunteerid } = req.params;
   try {
     await knex("volunteers").where("volunteerid", volunteerid).del();
-    res.redirect("/admin");
+    res.redirect("/manageVolunteers");
   } catch (error) {
     console.error("Error deleting volunteer:", error);
     res.status(500).send("Failed to delete volunteer.");
@@ -893,7 +909,7 @@ app.post("/deleteEventReq/:requestid", isAuthenticated, async (req, res) => {
 
   try {
     await knex("eventrequests").where("requestid", requestid).del();
-    res.redirect("/admin");
+    res.redirect("/manageEventRequests");
   } catch (error) {
     console.error("Error deleting event request:", error);
     res.status(500).send("Failed to delete event request.");
@@ -915,7 +931,7 @@ app.post("/deleteEvent/:eventid", isAuthenticated, async (req, res) => {
       // No need to manually commit; Knex handles it automatically
     });
 
-    res.redirect("/admin");
+    res.redirect("/manageEvents");
   } catch (error) {
     console.error("Error deleting event:", error);
     res.status(500).send("Failed to delete event.");
@@ -964,7 +980,7 @@ app.post("/submitVolunteerData", async (req, res) => {
     });
 
     if (req.query.admin === "true") {
-      res.redirect("/dashboard"); // Redirect admin users to dashboard
+      res.redirect("/manageVolunteers"); // Redirect admin users to dashboard
     } else {
       res.redirect("/"); // Redirect non-admin users to the home page
     }
@@ -996,7 +1012,7 @@ app.post("/addAdmin", isAuthenticated, async (req, res) => {
       phonenumber,
     });
 
-    res.redirect("/admin"); // Redirect to the admin list after adding
+    res.redirect("/manageAdmins"); // Redirect to the admin list after adding
   } catch (error) {
     console.error("Error adding admin:", error);
     res.status(500).send("Failed to create a new admin.");
@@ -1033,7 +1049,7 @@ app.post("/editAdmin/:adminid", isAuthenticated, async (req, res) => {
     await knex("admins")
       .where({ adminid })
       .update({ username, password, firstname, lastname, email, phonenumber });
-    res.redirect("/admin");
+    res.redirect("/manageAdmins");
   } catch (error) {
     console.error("Error editing admin:", error);
     res.status(500).send("Failed to edit admin.");
@@ -1084,7 +1100,7 @@ app.post("/editVolunteer/:volunteerid", isAuthenticated, async (req, res) => {
         zipcode,
       });
 
-    res.redirect("/admin");
+    res.redirect("/manageVolunteers");
   } catch (error) {
     console.error("Error updating volunteer:", error);
     res.status(500).send("Failed to update volunteer.");
@@ -1129,20 +1145,13 @@ app.post("/editEvent/:eventid", isAuthenticated, async (req, res) => {
         eventstatus: event_status,
       });
 
-    res.redirect("/admin");
+    res.redirect("/manageEvents");
   } catch (error) {
     console.error("Error updating event:", error);
     res.status(500).send("Failed to update event.");
   }
 });
 
-// Logout Route
-app.post("/logout", (req, res) => {
-  req.session.destroy((err) => {
-    if (err) return res.status(500).send("Failed to log out.");
-    res.redirect("/login");
-  });
-});
 
 // Error Handling
 app.use((req, res) => {

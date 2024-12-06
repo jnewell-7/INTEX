@@ -4,8 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Manage Events</title>
     <link rel="stylesheet" href="/css/sb-admin-2.css">
+    <link rel="stylesheet" href="/css/admin-styles.css"> <!-- Table-specific styling -->
     <style>
         .turtle-image {
             position: absolute;
@@ -43,9 +44,9 @@
                     <span>Admin Dashboard</span></a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="/admin">
+                <a class="nav-link" href="/manageAdmins">
                   <i class="fas fa-users"></i>
-                  <span>User Management</span>
+                  <span>Admins</span>
                 </a>
               </li>
               
@@ -97,7 +98,69 @@
                 </nav>
                 <!-- End of Topbar -->
 
-                <!-- Dashboard Content -->
+
+
+
+                <div class="events-table-container">
+                    <h2>Manage Event Requests</h2>
+                    <div class="table-container">
+                      <table>
+                        <thead>
+                          <tr>
+                            <th>Request ID</th>
+                            <th>Date/Time</th>
+                            <th>Estimated Attendance</th>
+                            <th>Type</th>
+                            <th>Contact</th>
+                            <th>Address</th>
+                            <th>Hear Jen's Story</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          <% eventRequests.forEach(function (request, index) { %>
+                          <tr>
+                            <td><%= request.requestid %></td>
+                            <td><%= request.eventdatetime %></td>
+                            <td><%= request.estimatedattendance %></td>
+                            <td><%= request.activitytype %></td>
+                            <td>
+                              <strong><%= request.name %></strong><br>
+                              <a href="mailto:<%= request.contactemail %>"><%= request.contactemail %></a><br>
+                              <%= request.contactphone %>
+                            </td>
+                            <td>
+                              <%= request.proposedeventaddress %><br>
+                              <%= request.city %>, <%= request.state %> <%= request.zipcode %>
+                            </td>
+                            <td><%= request.jenstoryrequest ? "Yes" : "No" %></td>
+                            <td>
+                              <select name="status_<%= request.requestid %>" class="status-dropdown" data-request-id="<%= request.requestid %>">
+                                <option value="Pending" <%= request.eventreqstatus === "Pending" ? "selected" : "" %>>Pending</option>
+                                <option value="Approved" <%= request.eventreqstatus === "Approved" ? "selected" : "" %>>Approved</option>
+                              </select>
+                            </td>
+                            <td>
+                              <div class="action-buttons">
+                                <a href="/editReq/<%= request.requestid %>" class="button edit">Edit</a>
+                                <a href="/updateEvent/<%= request.requestid %>" class="button complete"
+                                  onclick="return confirm('Mark this request as completed?')">Complete</a>
+                                <form action="/deleteEventReq/<%= request.requestid %>" method="POST" style="display: inline;">
+                                  <button type="submit" class="button delete"
+                                    onclick="return confirm('Are you sure you want to decline this event request?')">Decline</button>
+                                </form>
+                              </div>
+                            </td>
+                          </tr>
+                          <% }); %>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                  
+                  
+                
 
                 
 
@@ -108,7 +171,7 @@
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="text-center my-auto">
-                        <span>Copyright &copy; Your Organization 2024</span>
+                        <span>Copyright &copy; Turtle Shelter Project 2024</span>
                     </div>
                 </div>
             </footer>

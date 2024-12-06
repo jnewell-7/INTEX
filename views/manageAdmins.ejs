@@ -4,8 +4,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard</title>
+    <title>Manage Events</title>
     <link rel="stylesheet" href="/css/sb-admin-2.css">
+    <link rel="stylesheet" href="/css/admin-styles.css"> <!-- Table-specific styling -->
     <style>
         .turtle-image {
             position: absolute;
@@ -25,63 +26,63 @@
         
         <!-- Sidebar -->
         <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-          <!-- Sidebar - Brand -->
-          <a class="sidebar-brand d-flex align-items-center justify-content-center">
-              <div class="sidebar-brand-icon">
-                  <i class="fas fa-chart-line"></i>
-              </div>
-              <div class="sidebar-brand-text mx-3">Admin Panel</div>
-          </a>
-          
-          <!-- Divider -->
-          <hr class="sidebar-divider">
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center">
+                <div class="sidebar-brand-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Admin Panel</div>
+            </a>
+            
+            <!-- Divider -->
+            <hr class="sidebar-divider">
 
-          <!-- Nav Items -->
-          <li class="nav-item active">
-              <a class="nav-link" href="/dashboard">
-                  <i class="fas fa-tachometer-alt"></i>
-                  <span>Admin Dashboard</span></a>
-          </li>
-          <li class="nav-item">
-              <a class="nav-link" href="/admin">
+            <!-- Nav Items -->
+            <li class="nav-item active">
+                <a class="nav-link" href="/dashboard">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>Admin Dashboard</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/manageAdmins">
                 <i class="fas fa-users"></i>
-                <span>User Management</span>
+                <span>Admins</span>
               </a>
             </li>
-            
+              
+              <li class="nav-item">
+                <a class="nav-link" href="/manageVolunteers">
+                    <i class="fas fa-hands-helping"></i>
+                    <span>Volunteers</span>
+                </a>
+            </li>
+
             <li class="nav-item">
-              <a class="nav-link" href="/manageVolunteers">
-                  <i class="fas fa-hands-helping"></i>
-                  <span>Volunteers</span>
-              </a>
-          </li>
+                <a class="nav-link" href="/manageEventRequests">
+                    <i class="fas fa-hands-helping"></i>
+                    <span>Event Requests</span>
+                </a>
+            </li>
 
-          <li class="nav-item">
-              <a class="nav-link" href="/manageEventRequests">
-                  <i class="fas fa-hands-helping"></i>
-                  <span>Event Requests</span>
-              </a>
-          </li>
+            <li class="nav-item">
+                <a class="nav-link" href="/manageEvents">
+                    <i class="fas fa-calendar-alt"></i>
+                    <span>Events</span>
+                </a>
+            </li>
 
-          <li class="nav-item">
-              <a class="nav-link" href="/manageEvents">
-                  <i class="fas fa-calendar-alt"></i>
-                  <span>Events</span>
-              </a>
-          </li>
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
 
-          <!-- Divider -->
-          <hr class="sidebar-divider d-none d-md-block">
-
-          <!-- Return to Home -->
-          <li class="nav-item">
-              <a class="nav-link" href="/">
-                  <i class="fas fa-home"></i>
-                  <span>Return to Home</span>
-              </a>
-          </li>
-      </ul>
-      <!-- End of Sidebar -->
+            <!-- Return to Home -->
+            <li class="nav-item">
+                <a class="nav-link" href="/">
+                    <i class="fas fa-home"></i>
+                    <span>Return to Home</span>
+                </a>
+            </li>
+        </ul>
+        <!-- End of Sidebar -->
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
@@ -97,7 +98,65 @@
                 </nav>
                 <!-- End of Topbar -->
 
-                <!-- Dashboard Content -->
+
+
+
+                <!-- Admin Management Section -->
+              <div class="events-table-container">
+              <h2>Manage Admins</h2>
+              <div class="table-container">
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Admin ID</th>
+                      <th>Name</th>
+                      <th>Username</th>
+                      <th>Password</th>
+                      <th>Contact Info</th>
+                      <th>Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% admins.forEach(function(admin, index) { %>
+                        <tr>
+                          <td>
+                            <%= admin.adminid %>
+                          </td>
+                          <td>
+                            <%= admin.name %>
+                          </td>
+                          <td>
+                            <%= admin.username %>
+                          </td>
+                          <td>
+                            <%= admin.password %>
+                          </td>
+                          <td>
+                            <a href="mailto:<%= admin.email %>">
+                              <%= admin.email %>
+                            </a><br>
+                            <%= admin.phonenumber %>
+                          </td>
+                          <td>
+                            <div class="action-buttons">
+                              <a href="/editAdmin/<%= admin.adminid %>" class="button edit">Edit</a>
+                              <form action="/deleteAdmin/<%= admin.adminid %>" method="POST" style="display: inline;">
+                                <button type="submit" class="button delete"
+                                  onclick="return confirm('Are you sure you want to delete this admin?')">Delete</button>
+                              </form>
+                            </div>
+                          </td>
+                        </tr>
+                            <% }); %>
+                          </tbody>
+                        </table>
+                    </div>
+                    <!-- Add Event Button -->
+                    <button type="button" onclick="window.location.href='/addAdmin'" class="button add">Add New Admin</button>
+                </div>
+                  
+                  
+                
 
                 
 
@@ -108,7 +167,7 @@
             <footer class="sticky-footer bg-white">
                 <div class="container my-auto">
                     <div class="text-center my-auto">
-                        <span>Copyright &copy; Your Organization 2024</span>
+                        <span>Copyright &copy; Turtle Shelter Project 2024</span>
                     </div>
                 </div>
             </footer>
