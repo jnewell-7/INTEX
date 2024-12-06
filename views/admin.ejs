@@ -3,7 +3,7 @@
 
 <head>
   <title>
-    <%= title %>
+    Administration
   </title>
   <style>
     /* Global Styles */
@@ -173,7 +173,6 @@
         </thead>
         <tbody>
           <% admins.forEach(function(admin, index) { %>
-            <% if (index < 5) { %>
               <tr>
                 <td>
                   <%= admin.adminid %>
@@ -203,12 +202,6 @@
                   </div>
                 </td>
               </tr>
-              <% } else { %>
-                <tr style="display: none;">
-                  <!-- Hidden rows beyond the first 5 -->
-                  <!-- You can keep this empty or include the data -->
-                </tr>
-                <% } %>
                   <% }); %>
         </tbody>
       </table>
@@ -233,7 +226,6 @@
         </thead>
         <tbody>
           <% volunteers.forEach(function(volunteer, index) { %>
-            <% if (index < 5) { %>
               <tr>
                 <td>
                   <%= volunteer.volunteerid %>
@@ -269,11 +261,6 @@
                   </div>
                 </td>
               </tr>
-              <% } else { %>
-                <tr style="display: none;">
-                  <!-- Hidden rows beyond the first 5 -->
-                </tr>
-                <% } %>
                   <% }); %>
         </tbody>
       </table>
@@ -300,7 +287,7 @@
         </thead>
         <tbody>
           <% eventRequests.forEach(function(request, index) { %>
-            <% if (index < 5) { %>
+          
               <tr>
                 <td>
                   <%= request.requestid %>
@@ -353,11 +340,6 @@
                   </div>
                 </td>
               </tr>
-              <% } else { %>
-                <tr style="display: none;">
-                  <!-- Hidden rows beyond the first 5 -->
-                </tr>
-                <% } %>
                   <% }); %>
         </tbody>
       </table>
